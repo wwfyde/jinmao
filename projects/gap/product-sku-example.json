@@ -1,0 +1,252 @@
+{
+    "looks": [
+        {
+            "pinned": false,
+            "look_id": "a215713c-7f80-4f59-88f3-c189261d3257",
+            "items": [
+                {
+                    "category": "Women Apparel.Jeans",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=852814002",
+                    "details": {
+                        "regular_price": 8995
+                    },
+                    "uni": "852814||00",
+                    "item_id": "4c61e7d7-9fd1-437c-8362-5ee021595791",
+                    "price": 8000.0,
+                    "title": "High Rise '90s Loose Jeans",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/4c61e7d7-9fd1-437c-8362-5ee021595791/bd3d44b2-d9a2-4875-8db4-2d4054cb9f95.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Sweater.Cardigan",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=854777002",
+                    "details": {
+                        "regular_price": 7995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/691/306/cn54691306.jpg",
+                            "https://www.gap.com/webcontent/0054/669/670/cn54669670.jpg"
+                        ]
+                    },
+                    "uni": "854777||00",
+                    "item_id": "a8510154-8ec8-4546-8b1f-3d24056090b1",
+                    "price": 6300.0,
+                    "title": "Crochet Cardigan Sweater",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/a8510154-8ec8-4546-8b1f-3d24056090b1/a62909c5-88da-41b9-ac2f-1c8b77f58db4.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Shoes.Sandals",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876295002",
+                    "details": {
+                        "regular_price": 4995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/621/995/cn54621995.jpg",
+                            "https://www.gap.com/webcontent/0054/621/580/cn54621580.jpg"
+                        ]
+                    },
+                    "uni": "876295||00",
+                    "item_id": "05c3cc00-e7ca-4be1-b65f-4c445ace0881",
+                    "price": 3400.0,
+                    "title": "Vegan Leather Cross Strap Sandals",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/05c3cc00-e7ca-4be1-b65f-4c445ace0881/abf188f6-9aa7-4f0b-af6e-3754bc010fae.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Accessory.Hat.Casual",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876280002",
+                    "details": {
+                        "regular_price": 4995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/613/878/cn54613878.jpg",
+                            "https://www.gap.com/webcontent/0054/613/872/cn54613872.jpg"
+                        ]
+                    },
+                    "uni": "876280||00",
+                    "item_id": "97433400-7605-47d1-9f49-e5054f2f9698",
+                    "price": 2900.0,
+                    "title": "Straw Panama Hat",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/97433400-7605-47d1-9f49-e5054f2f9698/bd234e25-30d1-401e-98bb-73e1c4ee9b93.lg.png"
+                }
+            ],
+            "featured": 0,
+            "order": [
+                "b7613f83-e66b-4b0a-9439-c2decf9a9cfd",
+                "4c61e7d7-9fd1-437c-8362-5ee021595791",
+                "a8510154-8ec8-4546-8b1f-3d24056090b1",
+                "05c3cc00-e7ca-4be1-b65f-4c445ace0881",
+                "97433400-7605-47d1-9f49-e5054f2f9698"
+            ]
+        },
+        {
+            "pinned": false,
+            "look_id": "8fba9346-1133-459d-8cfa-ac3690bce17b",
+            "items": [
+                {
+                    "category": "Women Apparel.Shorts.Casual",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=416638022",
+                    "details": {
+                        "regular_price": 4995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/969/883/cn54969883.jpg",
+                            "https://www.gap.com/webcontent/0054/970/298/cn54970298.jpg"
+                        ]
+                    },
+                    "uni": "416638||02",
+                    "item_id": "59b53440-1fac-44c1-bddc-603b466223be",
+                    "price": 2400.0,
+                    "title": "365 High Rise Linen-Blend Shorts",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/59b53440-1fac-44c1-bddc-603b466223be/5574eac9-072d-476f-8b41-b80a85391e63.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Shoes.Sandals",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876295012",
+                    "details": {
+                        "regular_price": 4995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/621/925/cn54621925.jpg",
+                            "https://www.gap.com/webcontent/0054/622/818/cn54622818.jpg"
+                        ]
+                    },
+                    "uni": "876295||01",
+                    "item_id": "71ae8867-ca37-449a-9d00-0950a4092735",
+                    "price": 4995.0,
+                    "title": "Vegan Leather Cross Strap Sandals",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/71ae8867-ca37-449a-9d00-0950a4092735/55eab571-876c-4b6f-a7e8-1c0963f3aa9f.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Accessory.Hat.Beach",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876176012",
+                    "details": {
+                        "regular_price": 4995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/613/815/cn54613815.jpg",
+                            "https://www.gap.com/webcontent/0054/613/806/cn54613806.jpg"
+                        ]
+                    },
+                    "uni": "876176||01",
+                    "item_id": "59890446-901d-4099-b6d7-b1edaceedb52",
+                    "price": 2900.0,
+                    "title": "Straw Western Hat",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/59890446-901d-4099-b6d7-b1edaceedb52/5aaab5b8-c838-46be-a947-b01daa9dd898.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Accessory.Bag.Tote",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876250002",
+                    "details": {
+                        "regular_price": 5495,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/681/605/cn54681605.jpg",
+                            "https://www.gap.com/webcontent/0054/679/696/cn54679696.jpg"
+                        ]
+                    },
+                    "uni": "876250||00",
+                    "item_id": "d11b0353-709d-41b5-95ef-9f4a335fcdca",
+                    "price": 4900.0,
+                    "title": "Linen-Cotton Tote Bag",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/d11b0353-709d-41b5-95ef-9f4a335fcdca/f1cda1ec-69ee-4b54-88cf-2924b85a5cbc.lg.png"
+                }
+            ],
+            "featured": 0,
+            "order": [
+                "b7613f83-e66b-4b0a-9439-c2decf9a9cfd",
+                "59b53440-1fac-44c1-bddc-603b466223be",
+                "71ae8867-ca37-449a-9d00-0950a4092735",
+                "59890446-901d-4099-b6d7-b1edaceedb52",
+                "d11b0353-709d-41b5-95ef-9f4a335fcdca"
+            ]
+        },
+        {
+            "pinned": false,
+            "look_id": "b1b5c98a-1082-462c-9663-9849879d502a",
+            "items": [
+                {
+                    "category": "Women Apparel.Pants.Casual",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=855965042",
+                    "details": {
+                        "regular_price": 7995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/963/605/cn54963605.jpg",
+                            "https://www.gap.com/webcontent/0054/963/708/cn54963708.jpg"
+                        ]
+                    },
+                    "uni": "855965||04",
+                    "item_id": "c8f4c9ef-926b-4d30-9237-07254fbd8352",
+                    "price": 7995.0,
+                    "title": "High Rise Linen-Cotton Pull-On Pants",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/c8f4c9ef-926b-4d30-9237-07254fbd8352/8694a5b0-dd34-4a79-9701-eccf750931fc.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Accessory.Bag.Tote",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=824305022",
+                    "details": {
+                        "regular_price": 7495,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/612/246/cn54612246.jpg",
+                            "https://www.gap.com/webcontent/0054/612/240/cn54612240.jpg"
+                        ]
+                    },
+                    "uni": "824305||02",
+                    "item_id": "4d2a4ee2-fecd-4e74-95f5-ac6be55b766d",
+                    "price": 5900.0,
+                    "title": "Tote Bag",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/4d2a4ee2-fecd-4e74-95f5-ac6be55b766d/36e019b3-a98b-493b-835c-836ca2ba7def.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Shoes.Flip Flops",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876241022",
+                    "details": {
+                        "regular_price": 4495,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/601/798/cn54601798.jpg",
+                            "https://www.gap.com/webcontent/0054/601/464/cn54601464.jpg"
+                        ]
+                    },
+                    "uni": "876241||02",
+                    "item_id": "8f9d488b-6d3b-4627-a690-3b37097be8cc",
+                    "price": 4000.0,
+                    "title": "Vegan Leather Platform Flip Flops",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/8f9d488b-6d3b-4627-a690-3b37097be8cc/f1df6af3-6ad2-49fd-a6fe-9dfa3bde6965.lg.png"
+                },
+                {
+                    "category": "Women Apparel.Accessory.Hat.Beach",
+                    "item_url": "https://www.gap.com/browse/product.do?pid=876176012",
+                    "details": {
+                        "regular_price": 4995,
+                        "original_images": [
+                            "https://www.gap.com/webcontent/0054/613/815/cn54613815.jpg",
+                            "https://www.gap.com/webcontent/0054/613/806/cn54613806.jpg"
+                        ]
+                    },
+                    "uni": "876176||01",
+                    "item_id": "59890446-901d-4099-b6d7-b1edaceedb52",
+                    "price": 2900.0,
+                    "title": "Straw Western Hat",
+                    "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/59890446-901d-4099-b6d7-b1edaceedb52/5aaab5b8-c838-46be-a947-b01daa9dd898.lg.png"
+                }
+            ],
+            "featured": 0,
+            "order": [
+                "b7613f83-e66b-4b0a-9439-c2decf9a9cfd",
+                "c8f4c9ef-926b-4d30-9237-07254fbd8352",
+                "4d2a4ee2-fecd-4e74-95f5-ac6be55b766d",
+                "8f9d488b-6d3b-4627-a690-3b37097be8cc",
+                "59890446-901d-4099-b6d7-b1edaceedb52"
+            ]
+        }
+    ],
+    "result": "success",
+    "response_uuid": "6918be31-11cb-487a-b27a-e03709521320",
+    "pdp_item": {
+        "category": "Women Apparel.Shirt.Short Sleeve",
+        "item_url": "https://www.gap.com/browse/product.do?pid=438190002",
+        "details": {
+            "regular_price": 3995,
+            "original_images": [
+                "https://www.gap.com/webcontent/0055/568/710/cn55568710.jpg",
+                "https://www.gap.com/webcontent/0055/567/576/cn55567576.jpg"
+            ]
+        },
+        "uni": "438190||00",
+        "item_id": "b7613f83-e66b-4b0a-9439-c2decf9a9cfd",
+        "price": 2700.0,
+        "title": "Modern Rib Puff Sleeve Shirt",
+        "image_url": "https://pdimg-prod-fmv3.findmine.com/v3/b7613f83-e66b-4b0a-9439-c2decf9a9cfd/f896d66b-9736-4666-abb6-46585dfce583.lg.png"
+    }
+}

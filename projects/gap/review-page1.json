@@ -1,0 +1,511 @@
+{
+    "name": "review",
+    "paging": {
+        "total_results": 1783,
+        "pages_total": 179,
+        "page_size": 10,
+        "current_page_number": 2,
+        "next_page_url": "/m/1443032450/l/en_US/product/540635/reviews?paging.from=20&paging.size=10&filters=&search=&sort=Newest&image_only=false&page_locale=en_US"
+    },
+    "results": [
+        {
+            "page_id": "540635",
+            "reviews": [
+                {
+                    "ugc_id": 514168751,
+                    "legacy_id": 514168751,
+                    "review_id": 514168751,
+                    "internal_review_id": 514168751,
+                    "details": {
+                        "comments": "Perfect fit to size",
+                        "headline": "True fit",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'3\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715828681620,
+                        "updated_date": 1716101076444,
+                        "product_page_id": "540635",
+                        "product_variant": "540635032"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 1,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 514155198,
+                    "legacy_id": 514155198,
+                    "review_id": 514155198,
+                    "internal_review_id": 514155198,
+                    "details": {
+                        "comments": "Always my fav t shirt",
+                        "headline": "Not see thru",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'4\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715807867347,
+                        "updated_date": 1716155868160,
+                        "product_page_id": "540635",
+                        "product_variant": "540635032"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 2,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513987314,
+                    "legacy_id": 513987314,
+                    "review_id": 513987314,
+                    "internal_review_id": 513987314,
+                    "details": {
+                        "comments": "Finally! Someone has made a white t-shirt again that isn't paper thin. This shirt is reminiscent of the quality of shirts Gap made in the early 90s.",
+                        "headline": "Not see through!",
+                        "nickname": "anonymous",
+                        "properties": [],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715740037422,
+                        "updated_date": 1716155885166,
+                        "product_page_id": "540635",
+                        "product_variant": "540635032"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 6,
+                        "not_helpful_votes": 1,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513965528,
+                    "legacy_id": 513965528,
+                    "review_id": 513965528,
+                    "internal_review_id": 513965528,
+                    "details": {
+                        "comments": "I love Modern Crewneck T-shirt. Very simple and forever modern style.\nI wish you make more different colors. Love, love , \uD83D\uDC95 this T-shirts.",
+                        "headline": "Sturdy, comfortable and good quality.",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'1\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715737679205,
+                        "updated_date": 1716101085236,
+                        "product_page_id": "540635",
+                        "product_variant": "540635052"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 1,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513792055,
+                    "legacy_id": 513792055,
+                    "review_id": 513792055,
+                    "internal_review_id": 513792055,
+                    "details": {
+                        "comments": "Love the fit and length of the sleeve. Feels well-made and elevates a basic look. Definitely recommend!",
+                        "headline": "Great Basic T-Shirt",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'6\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715716129189,
+                        "updated_date": 1716101088241,
+                        "product_page_id": "540635",
+                        "product_variant": "540635052"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 2,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513691847,
+                    "legacy_id": 393416432,
+                    "review_id": 513691847,
+                    "internal_review_id": 393416432,
+                    "details": {
+                        "comments": "I love this tshirt. good weight, washes well, great sleeve length. Have a few white, grey, and navy. Have been wanting the black ribbed. was very disappointed since it is so thin and see through.",
+                        "headline": "Love this shirt except black rib",
+                        "nickname": "Frances",
+                        "properties": [
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "locale": "en_US",
+                        "location": "Undisclosed",
+                        "created_date": 1715657926263,
+                        "updated_date": 1716156322291,
+                        "product_page_id": "540635"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": false,
+                        "is_verified_reviewer": false
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 1,
+                        "not_helpful_votes": 0,
+                        "rating": 4,
+                        "helpful_score": 1606
+                    }
+                },
+                {
+                    "ugc_id": 513665482,
+                    "legacy_id": 393396950,
+                    "review_id": 513665482,
+                    "internal_review_id": 393396950,
+                    "details": {
+                        "comments": "If you buy this online, know that it is not loose and the tall is not tall (if you mesure 9 feet 10, it is short). I oredred a smal because it said loose style but I should have keep my regular M. Both fits me but I prefered not being squeezed.",
+                        "headline": "Not loose and not tall",
+                        "brand_base_url": "https://www.gapcanada.ca/",
+                        "brand_name": "Gap Canada EN",
+                        "nickname": "Dominique L",
+                        "properties": [
+                            {
+                                "key": "chest",
+                                "label": "Chest",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            },
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'10\""
+                                ]
+                            },
+                            {
+                                "key": "length",
+                                "label": "Length",
+                                "type": "tag",
+                                "value": [
+                                    "short"
+                                ]
+                            },
+                            {
+                                "key": "weight",
+                                "label": "Weight",
+                                "type": "tag",
+                                "value": [
+                                    "160–170 lbs"
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "small"
+                                ]
+                            },
+                            {
+                                "key": "lengthpurchased",
+                                "label": "Length purchased",
+                                "type": "tag",
+                                "value": [
+                                    "tall"
+                                ]
+                            }
+                        ],
+                        "locale": "en_CA",
+                        "source": "syndicated",
+                        "location": "Undisclosed",
+                        "created_date": 1715646279791,
+                        "updated_date": 1716084167905,
+                        "product_page_id": "540635"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": false,
+                        "is_verified_reviewer": false
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 1,
+                        "not_helpful_votes": 1,
+                        "rating": 4,
+                        "helpful_score": 1802
+                    }
+                },
+                {
+                    "ugc_id": 513601558,
+                    "legacy_id": 513601558,
+                    "review_id": 513601558,
+                    "internal_review_id": 513601558,
+                    "details": {
+                        "comments": "I really like the style of this t-shirt.  The fabric is a cotton blend, which helps the shirt fit nicely; it is not too tight or too loose, and the sleeve length is a little longer than most other short sleeve t-shirts but is a perfect length that helps make it look more on the expensive side.  It can be dressed up or dressed down depending on your outfit for the day.",
+                        "headline": "Good quality t-shirt",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'10\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715601324073,
+                        "updated_date": 1715652755061,
+                        "product_page_id": "540635",
+                        "product_variant": "540635012"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513601101,
+                    "legacy_id": 513601101,
+                    "review_id": 513601101,
+                    "internal_review_id": 513601101,
+                    "details": {
+                        "comments": "Great basic shirt!",
+                        "headline": "Staple item",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'2\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "small"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715599848885,
+                        "updated_date": 1715650948782,
+                        "product_page_id": "540635",
+                        "product_variant": "540635012"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 4,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513589575,
+                    "legacy_id": 513589575,
+                    "review_id": 513589575,
+                    "internal_review_id": 513589575,
+                    "details": {
+                        "comments": "Better than most t-shirts. Not too thick. Thick enough to not see through. Love them. Sale price is AWESOME",
+                        "headline": "Got one in every color",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'3\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Modern Crewneck T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715566827501,
+                        "updated_date": 1716156367562,
+                        "product_page_id": "540635",
+                        "product_variant": "540635012"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 1,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                }
+            ]
+        }
+    ]
+}

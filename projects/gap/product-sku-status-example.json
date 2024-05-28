@@ -1,0 +1,385 @@
+{
+    "brand": "GAP",
+    "market": "US",
+    "channel": "ONL",
+    "storeStyleInventory": {
+        "styleId": "438190",
+        "status": "OUT_OF_STOCK",
+        "variantList": [
+            {
+                "variantId": "TALL",
+                "status": "OUT_OF_STOCK",
+                "customerChoiceList": [
+                    {
+                        "customerChoiceId": "438190012",
+                        "status": "OUT_OF_STOCK",
+                        "skuList": [
+                            {
+                                "skuId": "4381900120104",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120304",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120204",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120404",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120504",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "customerChoiceId": "438190002",
+                        "status": "OUT_OF_STOCK",
+                        "skuList": [
+                            {
+                                "skuId": "4381900020204",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020104",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020304",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020404",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020504",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "variantId": "PETITE",
+                "status": "OUT_OF_STOCK",
+                "customerChoiceList": [
+                    {
+                        "customerChoiceId": "438190012",
+                        "status": "OUT_OF_STOCK",
+                        "skuList": [
+                            {
+                                "skuId": "4381900124002",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900124005",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900124003",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900124004",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "customerChoiceId": "438190002",
+                        "status": "OUT_OF_STOCK",
+                        "skuList": [
+                            {
+                                "skuId": "4381900024004",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900024005",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900024003",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900024002",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "variantId": "REGULAR",
+                "status": "OUT_OF_STOCK",
+                "customerChoiceList": [
+                    {
+                        "customerChoiceId": "438190002",
+                        "status": "OUT_OF_STOCK",
+                        "skuList": [
+                            {
+                                "skuId": "4381900020003",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020000",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020002",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020005",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020009",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020001",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900020004",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "customerChoiceId": "438190012",
+                        "status": "OUT_OF_STOCK",
+                        "skuList": [
+                            {
+                                "skuId": "4381900120002",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120003",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120000",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120009",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120001",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120004",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            },
+                            {
+                                "skuId": "4381900120005",
+                                "status": "OUT_OF_STOCK",
+                                "storeList": [
+                                    {
+                                        "storeId": "278",
+                                        "status": "OUT_OF_STOCK"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

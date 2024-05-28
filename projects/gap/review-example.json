@@ -1,0 +1,923 @@
+{
+    "name": "review",
+    "paging": {
+        "total_results": 919,
+        "pages_total": 92,
+        "page_size": 10,
+        "current_page_number": 1,
+        "next_page_url": "/m/1443032450/l/en_US/product/878111/reviews?paging.from=10&paging.size=10&filters=&search=&sort=Newest&image_only=false&page_locale=en_US"
+    },
+    "results": [
+        {
+            "page_id": "878111",
+            "rollup": {
+                "properties": [
+                    {
+                        "display_type": "histogram",
+                        "key": "chest",
+                        "name": "Chest",
+                        "type": "tag",
+                        "values": [
+                            {
+                                "label": "loose",
+                                "count": 6
+                            },
+                            {
+                                "label": "tight",
+                                "count": 5
+                            },
+                            {
+                                "label": "true to size",
+                                "count": 125
+                            }
+                        ],
+                        "display_values": [
+                            "tight",
+                            "true to size",
+                            "loose"
+                        ]
+                    },
+                    {
+                        "display_type": "text",
+                        "key": "height",
+                        "name": "Height",
+                        "type": "tag",
+                        "values": [
+                            {
+                                "label": "5'11\"",
+                                "count": 61
+                            },
+                            {
+                                "label": "5'10\"",
+                                "count": 51
+                            },
+                            {
+                                "label": "6'0\"",
+                                "count": 48
+                            },
+                            {
+                                "label": "5'8\"",
+                                "count": 44
+                            },
+                            {
+                                "label": "5'9\"",
+                                "count": 40
+                            },
+                            {
+                                "label": "6'1\"",
+                                "count": 33
+                            },
+                            {
+                                "label": "5'6\"",
+                                "count": 29
+                            },
+                            {
+                                "label": "5'7\"",
+                                "count": 24
+                            },
+                            {
+                                "label": "6'2\"",
+                                "count": 20
+                            },
+                            {
+                                "label": "5'5\"",
+                                "count": 15
+                            },
+                            {
+                                "label": "6'3\"",
+                                "count": 14
+                            },
+                            {
+                                "label": "5'4\"",
+                                "count": 10
+                            },
+                            {
+                                "label": "5'2\"",
+                                "count": 5
+                            },
+                            {
+                                "label": "4'11\"",
+                                "count": 4
+                            },
+                            {
+                                "label": "4'9\"",
+                                "count": 4
+                            },
+                            {
+                                "label": "6'4\"",
+                                "count": 3
+                            },
+                            {
+                                "label": "5'1\"",
+                                "count": 2
+                            },
+                            {
+                                "label": "Over 6'5\"",
+                                "count": 2
+                            },
+                            {
+                                "label": "5'0\"",
+                                "count": 1
+                            },
+                            {
+                                "label": "5'3\"",
+                                "count": 1
+                            },
+                            {
+                                "label": "6'5\"",
+                                "count": 1
+                            }
+                        ],
+                        "display_values": [
+                            "4'10\"",
+                            "4'11\"",
+                            "4'8\"",
+                            "4'9\"",
+                            "5'0\"",
+                            "5'1\"",
+                            "5'10\"",
+                            "5'11\"",
+                            "5'2\"",
+                            "5'3\"",
+                            "5'4\"",
+                            "5'5\"",
+                            "5'6\"",
+                            "5'7\"",
+                            "5'8\"",
+                            "5'9\"",
+                            "6'0\"",
+                            "6'1\"",
+                            "6'2\"",
+                            "6'3\"",
+                            "6'4\"",
+                            "6'5\"",
+                            "Over 6'5\"",
+                            "Under 4'8\""
+                        ]
+                    },
+                    {
+                        "display_type": "histogram",
+                        "key": "length",
+                        "name": "Length",
+                        "type": "tag",
+                        "values": [
+                            {
+                                "label": "long",
+                                "count": 10
+                            },
+                            {
+                                "label": "short",
+                                "count": 1
+                            },
+                            {
+                                "label": "true to size",
+                                "count": 129
+                            }
+                        ],
+                        "display_values": [
+                            "short",
+                            "true to size",
+                            "long"
+                        ]
+                    },
+                    {
+                        "display_type": "histogram",
+                        "key": "overallsize",
+                        "name": "Overall size",
+                        "type": "tag",
+                        "values": [
+                            {
+                                "label": "big",
+                                "count": 21
+                            },
+                            {
+                                "label": "small",
+                                "count": 22
+                            },
+                            {
+                                "label": "true to size",
+                                "count": 406
+                            }
+                        ],
+                        "display_values": [
+                            "small",
+                            "true to size",
+                            "big"
+                        ]
+                    },
+                    {
+                        "display_type": "text",
+                        "key": "weight",
+                        "name": "Weight",
+                        "type": "tag",
+                        "values": [
+                            {
+                                "label": "160–170 lbs",
+                                "count": 15
+                            },
+                            {
+                                "label": "150–160 lbs",
+                                "count": 14
+                            },
+                            {
+                                "label": "190–200 lbs",
+                                "count": 14
+                            },
+                            {
+                                "label": "180–190 lbs",
+                                "count": 12
+                            },
+                            {
+                                "label": "200–210 lbs",
+                                "count": 12
+                            },
+                            {
+                                "label": "170–180 lbs",
+                                "count": 11
+                            },
+                            {
+                                "label": "140–150 lbs",
+                                "count": 8
+                            },
+                            {
+                                "label": "120–130 lbs",
+                                "count": 4
+                            },
+                            {
+                                "label": "130–140 lbs",
+                                "count": 3
+                            },
+                            {
+                                "label": "240–250 lbs",
+                                "count": 3
+                            },
+                            {
+                                "label": "280–290 lbs",
+                                "count": 3
+                            },
+                            {
+                                "label": "220–230 lbs",
+                                "count": 2
+                            },
+                            {
+                                "label": "230–240 lbs",
+                                "count": 2
+                            },
+                            {
+                                "label": "100–110 lbs",
+                                "count": 1
+                            },
+                            {
+                                "label": "110–120 lbs",
+                                "count": 1
+                            },
+                            {
+                                "label": "250–260 lbs",
+                                "count": 1
+                            },
+                            {
+                                "label": "260–270 lbs",
+                                "count": 1
+                            },
+                            {
+                                "label": "270–280 lbs",
+                                "count": 1
+                            },
+                            {
+                                "label": "290–300 lbs",
+                                "count": 1
+                            }
+                        ],
+                        "display_values": [
+                            "100–110 lbs",
+                            "110–120 lbs",
+                            "120–130 lbs",
+                            "130–140 lbs",
+                            "140–150 lbs",
+                            "150–160 lbs",
+                            "160–170 lbs",
+                            "170–180 lbs",
+                            "180–190 lbs",
+                            "190–200 lbs",
+                            "200–210 lbs",
+                            "210–220 lbs",
+                            "220–230 lbs",
+                            "230–240 lbs",
+                            "240–250 lbs",
+                            "250–260 lbs",
+                            "260–270 lbs",
+                            "270–280 lbs",
+                            "280–290 lbs",
+                            "290–300 lbs",
+                            "300–310 lbs",
+                            "310–320 lbs",
+                            "320–330 lbs",
+                            "330–340 lbs",
+                            "340–350 lbs",
+                            "Over 350 lbs",
+                            "Under 100 lbs"
+                        ]
+                    }
+                ],
+                "rating_histogram": [
+                    28,
+                    20,
+                    30,
+                    153,
+                    973
+                ],
+                "review_histogram": [
+                    13,
+                    9,
+                    19,
+                    114,
+                    764
+                ],
+                "rating_count": 1204,
+                "review_count": 919,
+                "average_rating": 4.68,
+                "recommended_ratio": 0.96,
+                "media": [
+                    {
+                        "id": "507400610",
+                        "review_id": 507400564,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/dllc5abqxriogykz0rkx.jpg",
+                        "headline": "Tenty and the neck stretched way out after the first wash",
+                        "rating": 1,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "Neck stretched after first wash, very disappointing",
+                        "nickname": "Spencer S",
+                        "created_date": 1709390956162
+                    },
+                    {
+                        "id": "506985493",
+                        "review_id": 506982888,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/g20fr01jysqnaslca8jn.jpg",
+                        "headline": "So comfortable",
+                        "rating": 5,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "",
+                        "nickname": "anonymous",
+                        "created_date": 1708972024756
+                    },
+                    {
+                        "id": "470381141",
+                        "review_id": 470380821,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/wbar3zbzwpcznsoiqsmv.jpg",
+                        "headline": "cut in fabric before wearing",
+                        "rating": 1,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "nickname": "Joe R",
+                        "created_date": 1693152727681
+                    },
+                    {
+                        "id": "459972493",
+                        "review_id": 459972415,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/pczfujjns6wncuw8paa3.jpg",
+                        "headline": "The cotton is soft",
+                        "rating": 5,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "Organic cotton pocket tee",
+                        "nickname": "anonymous",
+                        "created_date": 1685787784157
+                    },
+                    {
+                        "id": "452994718",
+                        "review_id": 452994932,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/lavavzw9egopuh3xesko.jpg",
+                        "headline": "hello",
+                        "rating": 2,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "caption",
+                        "nickname": "deep",
+                        "created_date": 1681650681827
+                    },
+                    {
+                        "id": "451756148",
+                        "review_id": 451755802,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/maobphzivb7pmc0hhe12.jpg",
+                        "headline": "I love pocket t by Gap!",
+                        "rating": 5,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "",
+                        "nickname": "anonymous",
+                        "created_date": 1681070557331
+                    },
+                    {
+                        "id": "437924493",
+                        "review_id": 437924550,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/ljp6u80hnubfyklxeu2p.jpg",
+                        "headline": "Terrible QC",
+                        "rating": 1,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "Side seams no longer side seams.",
+                        "nickname": "BummedOu, T",
+                        "created_date": 1671396409558
+                    },
+                    {
+                        "id": "410634700",
+                        "review_id": 410634722,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/drjswsoykumtyrd7t6zp.jpg",
+                        "headline": "Amazing fabric",
+                        "rating": 5,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "nickname": "Safiulla A",
+                        "created_date": 1653512164866
+                    },
+                    {
+                        "id": "377204042",
+                        "review_id": 377204100,
+                        "uri": "//res.cloudinary.com/powerreviews/image/upload/f_auto,q_auto,h_768,w_auto/d_portal-no-product-image_ttlfpi.svg/prod/ahdlqqdncvscemj6ptrs.jpg",
+                        "headline": "Pilling",
+                        "rating": 1,
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "type": "image",
+                        "caption": "Orange shirt pilling",
+                        "nickname": "Rahul S",
+                        "created_date": 1629746519349
+                    }
+                ],
+                "faceoff_positive": {
+                    "comments": "I've been buying pocket Ts from the Gap (sometimes J.Crew) for many years.  I appreciate that the Gap continues to offer tall sizes which fit me perfect.  I'm only 6'1\" which is the exact height where most clothing makers switch between regular and tall so it's always a coin flip whether I should order tall sizes or not.  At 190 pounds with a 44-46 inch chest, the size tall medium fit me just right, maybe a little snug, but the fabric they use has just the right amount of stretch in it so that a snug fit looks normal/good after you've had the shirt on for a little while.  It conforms to your body naturally without looking weirdly tight.  I would normally need a size large in any clothing I buy, but the size large tall in this specific shirt is too big, baggy and too long for me.  I like the updated colors each year.  The cornflower blue and the tan colors are great and I like the soft black too which is a modern looking black color.  The green color is on back order, but I hope that will look as good as this year's blue color.",
+                    "headline": "Always offer tall sizes!",
+                    "rating": 5,
+                    "ugc_id": 341883571
+                },
+                "faceoff_negative": {
+                    "comments": "I bought a bunch of T-shirts from the GAP 2 or 3 years ago that were labelled the most comfortable shirt, and they were definitely that. This year I bought a bunch of these T-shirts in different colors, and while they felt comfortable when I first tried them on, after wearing for a while they feel itchy and uncomfortable, even after washing with fabric softener. I don't know what kind of fabric or dye they used on these, but it's been a complete waste of money as I'll have to throw this out and buy new ones elsewhere. Skip and go elsewhere.",
+                    "headline": "The most uncomfortable shirt ever",
+                    "rating": 1,
+                    "ugc_id": 356091545
+                },
+                "name": "Organic Cotton Pocket T-Shirt",
+                "variant_names": [
+                    "Organic Cotton Pocket T-Shirt"
+                ],
+                "native_review_count": 984,
+                "native_sampling_review_count": 0,
+                "native_sweepstakes_review_count": 881,
+                "native_community_content_review_count": 0,
+                "syndicated_review_count": 220,
+                "locale": "en_US"
+            },
+            "reviews": [
+                {
+                    "ugc_id": 514280646,
+                    "legacy_id": 514280646,
+                    "review_id": 514280646,
+                    "internal_review_id": 514280646,
+                    "details": {
+                        "comments": "Great quality! Daily wear! Color is perfect for summer! This is the second time purchase.",
+                        "headline": "Must have!",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'7\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715911559159,
+                        "updated_date": 1715960874054,
+                        "product_page_id": "878111",
+                        "product_variant": "878111602"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 514135026,
+                    "legacy_id": 514135026,
+                    "review_id": 514135026,
+                    "internal_review_id": 514135026,
+                    "details": {
+                        "comments": "Fit is a little strang in the shoulders, but the fabric is really nice!",
+                        "headline": "Quality fabric, great overall cut.",
+                        "nickname": "anonymous",
+                        "properties": [],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715795822351,
+                        "updated_date": 1715836764498,
+                        "product_page_id": "878111",
+                        "product_variant": "878111202"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 4,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513959182,
+                    "legacy_id": 513959182,
+                    "review_id": 513959182,
+                    "internal_review_id": 513959182,
+                    "details": {
+                        "comments": "Guys! I LOVE these shirts! I have a collection and have seriously considered replacing all tees in my home with these. They are cozy, they are extremely comfortable, and they look absolutely AMAZING. GAP…. Never stop making these",
+                        "headline": "GOAT TEES",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "6'3\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715737028911,
+                        "updated_date": 1715780572450,
+                        "product_page_id": "878111",
+                        "product_variant": "878111232"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513586813,
+                    "legacy_id": 513586813,
+                    "review_id": 513586813,
+                    "internal_review_id": 513586813,
+                    "details": {
+                        "comments": "#sweepstakes",
+                        "headline": "The new green is a great color",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "6'2\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715562834846,
+                        "updated_date": 1715604591955,
+                        "product_page_id": "878111",
+                        "product_variant": "878111592"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 513553086,
+                    "legacy_id": 513553086,
+                    "review_id": 513553086,
+                    "internal_review_id": 513553086,
+                    "details": {
+                        "comments": "Great clothes wonderful material best prices",
+                        "headline": "Great price high quality",
+                        "nickname": "anonymous",
+                        "properties": [],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1715485309988,
+                        "updated_date": 1715542224398,
+                        "product_page_id": "878111",
+                        "product_variant": "878111612"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 512990456,
+                    "legacy_id": 512990456,
+                    "review_id": 512990456,
+                    "internal_review_id": 512990456,
+                    "details": {
+                        "comments": "Very comfortable and it's a classic.",
+                        "headline": "You can't go wrong with this shirt.",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'7\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1714836854014,
+                        "updated_date": 1714912976906,
+                        "product_page_id": "878111",
+                        "product_variant": "878111592"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 512913397,
+                    "legacy_id": 512913397,
+                    "review_id": 512913397,
+                    "internal_review_id": 512913397,
+                    "details": {
+                        "comments": "Liked the material, but really shrinks after washing.  I washed one of the four I purchased and exchanged the others for the next size up.",
+                        "headline": "Shrinks",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'11\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "small"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1714763572058,
+                        "updated_date": 1714858964562,
+                        "product_page_id": "878111",
+                        "product_variant": "878111272"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 4,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 512877195,
+                    "legacy_id": 512877195,
+                    "review_id": 512877195,
+                    "internal_review_id": 512877195,
+                    "details": {
+                        "comments": "Pretty much a regular gap tee. Good quality, but I think it runs a bit small.",
+                        "headline": "Can't go wrong with a black gap tee!",
+                        "nickname": "anonymous",
+                        "properties": [],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1714730280998,
+                        "updated_date": 1715632604898,
+                        "product_page_id": "878111",
+                        "product_variant": "878111202"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 1,
+                        "rating": 4,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 512863070,
+                    "legacy_id": 512863070,
+                    "review_id": 512863070,
+                    "internal_review_id": 512863070,
+                    "details": {
+                        "comments": "Decent quality so far. Needs a few washings to make decisions. \nVery roomy. Probably should have gone down a size",
+                        "headline": "Nice pocket T",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "5'11\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "big"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1714705123059,
+                        "updated_date": 1714842115473,
+                        "product_page_id": "878111",
+                        "product_variant": "878111602"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                },
+                {
+                    "ugc_id": 512693781,
+                    "legacy_id": 512693781,
+                    "review_id": 512693781,
+                    "internal_review_id": 512693781,
+                    "details": {
+                        "comments": "Great material & fit! #sweepstakes",
+                        "headline": "Perfect for a resort trip!",
+                        "nickname": "anonymous",
+                        "properties": [
+                            {
+                                "key": "height",
+                                "label": "Height",
+                                "type": "tag",
+                                "value": [
+                                    "6'2\""
+                                ]
+                            },
+                            {
+                                "key": "overallsize",
+                                "label": "Overall size",
+                                "type": "tag",
+                                "value": [
+                                    "true to size"
+                                ]
+                            }
+                        ],
+                        "product_name": "Organic Cotton Pocket T-Shirt",
+                        "locale": "en_US",
+                        "disclosure_code": "sweepstakes",
+                        "location": "Undisclosed",
+                        "created_date": 1714527169417,
+                        "updated_date": 1714753018263,
+                        "product_page_id": "878111",
+                        "product_variant": "878111652"
+                    },
+                    "badges": {
+                        "is_staff_reviewer": false,
+                        "is_verified_buyer": true,
+                        "is_verified_reviewer": true
+                    },
+                    "media": [],
+                    "metrics": {
+                        "helpful_votes": 0,
+                        "not_helpful_votes": 0,
+                        "rating": 5,
+                        "helpful_score": 0
+                    }
+                }
+            ]
+        }
+    ]
+}

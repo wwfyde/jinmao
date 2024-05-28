@@ -72,3 +72,14 @@ target/
 *.tar.xz
 *.tgz
 *.txz
+
+
+# env file and config
+
+*.local
+*.local.toml
+*.local.yml
+
+# playwright
+browser_data/
+.browser_data/
