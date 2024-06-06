@@ -45,7 +45,7 @@ async def run(playwright: Playwright) -> None:
         content = await page.content()
         tree = etree.HTML(content)
         pdp_urls = tree.xpath("//*[@id='faceted-grid']/section/div/div/div/div[1]/a/@href")
-        print(f"商品数: {len(pdp_urls)} 商品链接: {pdp_urls}")
+        log.info(f"商品数: {len(pdp_urls)} 商品链接: {pdp_urls}")
 
         # model_image_urls = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div[9]/div/a/href()")
 
@@ -118,7 +118,7 @@ def parse_reviews_from_api(r: dict) -> tuple[list[dict], int | None]:
 
 def parse_reviews_from_api_old(r: dict) -> tuple[list[dict], int | None]:
     # 获取分页信息
-    print("开始解析评论数据")
+    log.info("开始解析评论数据")
     review_domain = "https://display.powerreviews.com"
     paging_raw = r.get("paging", {})
     total_count = paging_raw.get("total_results", None) if paging_raw else None

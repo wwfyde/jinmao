@@ -10,20 +10,20 @@ def run(playwright: Playwright) -> None:
     page.goto("https://login2.scrape.center/login?next=/")
     page.locator('input[name="username"]').fill("admin")
     page.locator('input[name="password"]').fill("admin")
-    print(page.url)
+    log.info(page.url)
     # 点击登录
     page.locator(
         "#app > div:nth-child(2) > div > div > div > div > div > form > div:nth-child(4) > div > input"
     ).click()
-    print(page.url)
+    log.info(page.url)
     # 获取所有url链接
     page.wait_for_load_state("networkidle")
     elements = page.locator("a.name").element_handles()
-    print(elements)
+    log.info(elements)
     url = []
     for eletemnt in elements:
         url.append(eletemnt.get_attribute("href"))
-    print(url)
+    log.info(url)
     main_url = "https://login2.scrape.center"
     for i in url:
         page = context.new_page()

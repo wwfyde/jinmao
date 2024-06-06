@@ -6,5 +6,5 @@ with sync_playwright() as p:
         page = browser.new_page()
         page.goto("https://www.baidu.com")
         page.screenshot(path=f"screenshot-{browser_type.name}.png")
-        print(page.title())
+        log.info(page.title())
         browser.close()

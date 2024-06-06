@@ -24,7 +24,10 @@ sqlalchemy = "^2.0.30"
 mysql-connector-python = "^8.4.0"
 psycopg = {extras = ["binary", "pool"], version = "^3.1.19"}
 redis = "^5.0.4"
-httpx = {extras = ["socks"], version = "^0.27.0"}
+httpx = {extras = ["http2", "socks"], version = "^0.27.0"}
+structlog = "^24.2.0"
+python-benedict = "^0.33.2"
+oss2 = "^2.18.5"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from sqlalchemy import String, Integer, DateTime, JSON, func, Boolean, BigInteger, Numeric
+from sqlalchemy import String, Integer, DateTime, JSON, func, Boolean, BigInteger, Numeric, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -15,23 +15,30 @@ class Product(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")  # 内部ID
     product_id: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="源产品ID"
-    )  # required: gap, jcpenney
+    )  # required: gap, jcpenney, target
     source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
         String(64), default="other", nullable=True, comment="数据来源"
-    )  # required: ,gap jcpenney
-    name: Mapped[str | None] = mapped_column(String(128), nullable=False, comment="商品名称")  # required: gap, jcpenney
-    brand: Mapped[str | None] = mapped_column(String(64), comment="品牌")  # required: gap, jcpenney
-    product_url: Mapped[str | None] = mapped_column(String(1024), comment="商品链接")  # required: gap, jcpenney
-    image_url: Mapped[str | None] = mapped_column(String(1024), comment="商品主图链接")  # required: gap, jcpenney
+    )  # required: gap jcpenney, target
+    product_name: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, comment="商品名称"
+    )  # required: gap, jcpenney, target
+    brand: Mapped[str | None] = mapped_column(String(64), comment="品牌")  # required: gap, jcpenney, target
+    product_url: Mapped[str | None] = mapped_column(String(1024), comment="商品链接")  # required: gap, jcpenney, target
+    image_url: Mapped[str | None] = mapped_column(
+        String(1024), comment="商品主图链接"
+    )  # required: gap, jcpenney, target
     image_url_stored: Mapped[str | None] = mapped_column(
         String(1024), comment="本地存储图片连接"
-    )  # required: gap, jcpenney
+    )  # required: gap, jcpenney, target
     rating: Mapped[float | None] = mapped_column(
         Numeric(2, 1), nullable=True, comment="评分"
-    )  # required: gap, jcpenney
+    )  # required: gap, jcpenney, target
     review_count: Mapped[int | None] = mapped_column(
         Integer, nullable=True, default=0, comment="评论数"
-    )  # required: gap, jcpenney
+    )  # required: gap, jcpenney, target
+    rating_count: Mapped[int | None] = mapped_column(
+        Integer, nullable=True, default=0, comment="评分数"
+    )  # optional: target
     sku_id: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="主款号 ID"
     )  # required: gap, jcpenney
@@ -40,7 +47,7 @@ class Product(Base):
     )  # optional: jcpenney
     category: Mapped[Literal["women", "men", "girls", "boys", "other"] | None] = mapped_column(
         String(256), comment="商品类别"
-    )  # optional: jcpenney
+    )  # optional: jcpenney, target
     gender: Mapped[Literal["F", "M", "O"]] = mapped_column(
         String(16), nullable=True, comment="性别, 根据类别推断"
     )  # required gap, jcpeney
@@ -97,25 +104,32 @@ class ProductSKU(Base):
     __tablename__ = "product_sku"
     __table_args__ = {"comment": "商品SKU"}
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")
-    sku_id: Mapped[str | None] = mapped_column(String(128), comment="源SKU ID")  # required: gap, jcpenney
+    sku_id: Mapped[str | None] = mapped_column(String(128), comment="源SKU ID")  # required: gap, jcpenney, next, target
     source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
         String(64), default="other", nullable=True, comment="数据来源"
-    )  # required: gap, jcpenney
-    product_id: Mapped[str | None] = mapped_column(String(128), comment="商品ID")  # required: gap, jcpenney
-    product_name: Mapped[str] = mapped_column(String(128), comment="商品名称")  # required: gap, jcpenney
-    size: Mapped[str | None] = mapped_column(String(64), comment="尺码")  # required: gap, jcpenney
-    color: Mapped[str | None] = mapped_column(String(64), comment="颜色")  # required: gap, jcpenney
+    )  # required: gap, jcpenney, next, target
+    product_id: Mapped[str | None] = mapped_column(
+        String(128), comment="商品ID"
+    )  # required: gap, jcpenney, next, target
+    product_name: Mapped[str | None] = mapped_column(
+        String(128), comment="商品名称"
+    )  # required: gap, jcpenney, next, target
+    size: Mapped[str | None] = mapped_column(String(64), comment="尺码")  # required: gap, jcpenney, next, target
+    color: Mapped[str | None] = mapped_column(String(64), comment="颜色")  # required: gap, jcpenney, next, target
     material: Mapped[str | None] = mapped_column(String(128), comment="材质")
     source_id: Mapped[int | None] = mapped_column(BigInteger, comment="源商品ID")
-    name: Mapped[str | None] = mapped_column(String(128), nullable=True, comment="商品名称")
+    sku_name: Mapped[str | None] = mapped_column(String(128), nullable=True, comment="SKU名称")
     description: Mapped[str | None] = mapped_column(String(1024), comment="商品描述")
-    category_id: Mapped[int] = mapped_column(BigInteger, comment="类别ID")
-    image_url: Mapped[str | None] = mapped_column(String(512), nullable=True, comment="商品图片")
+    category_id: Mapped[int | None] = mapped_column(BigInteger, comment="类别ID")
+    image_url: Mapped[str | None] = mapped_column(
+        String(512), nullable=True, comment="商品图片"
+    )  # optional: next, target
     style: Mapped[str | None] = mapped_column(String(128), comment="服装风格")
     inventory: Mapped[int | None] = mapped_column(Integer, comment="库存")
     inventory_status: Mapped[str | None] = mapped_column(String(32), comment="库存状态")
     vendor: Mapped[str | None] = mapped_column(String(64), comment="供应商")
     fit: Mapped[str | None] = mapped_column(String(128), comment="适合人群")
+    origin: Mapped[str | None] = mapped_column(String(128), comment="产地")  # optional: next
 
     # 其他数据
     length: Mapped[str | None] = mapped_column(String(128), comment="服装长度")
@@ -124,7 +138,6 @@ class ProductSKU(Base):
     clothing_details: Mapped[str | None] = mapped_column(String(1024), comment="服装细节")
     package_quantity: Mapped[int | None] = mapped_column(Integer, comment="包装数量")
     care_instructions: Mapped[str | None] = mapped_column(String(1024), comment="护理和清洁")
-    origin: Mapped[str | None] = mapped_column(String(128), comment="产地")
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, comment="软删除")
     created_at: Mapped[datetime | None] = mapped_column(
         DateTime,
@@ -148,25 +161,27 @@ class ProductReview(Base):
     __tablename__ = "product_review"
     __table_args__ = {"comment": "商品评论"}
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    review_id: Mapped[str | None] = mapped_column(String(64), comment="源评论ID")  # required: gap, jcpenney
+    review_id: Mapped[str | None] = mapped_column(String(64), comment="源评论ID")  # required: gap, jcpenney, next
     source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
         String(64), default="other", nullable=True, comment="数据来源"
-    )  # required: gap, jcpenney
+    )  # required: gap, jcpenney, next
     product_id: Mapped[str | None] = mapped_column(
         String(64), nullable=True, comment="商品ID"
-    )  # required: gap, jcpenney
-    product_name: Mapped[str | None] = mapped_column(String(128), nullable=True, comment="商品标题")  # optional: gap
-    sku_id: Mapped[str | None] = mapped_column(String(64), comment="SKU ID")  # optional: gap
+    )  # required: gap, jcpenney, next
+    product_name: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, comment="商品标题"
+    )  # optional: gap, next
+    sku_id: Mapped[str | None] = mapped_column(String(64), comment="SKU ID")  # optional: gap, next
     rating: Mapped[float | None] = mapped_column(
-        Numeric(2, 1), comment="评分等级"
-    )  # CheckConstraint('rating >= 1 AND rating <= 5'  # required: gap, jcpenney
-    title: Mapped[str | None] = mapped_column(String(128), comment="评论标题")  # required: gap, jcpenney
-    comment: Mapped[str | None] = mapped_column(String(1024), comment="评论内容")  # required: gap, jcpenney
-    nickname: Mapped[str | None] = mapped_column(String(64), comment="昵称")  # required: gap, jcpenney
+        Numeric(2, 1), comment="评分"
+    )  # CheckConstraint('rating >= 1 AND rating <= 5'  # required: gap, jcpenney, next
+    title: Mapped[str | None] = mapped_column(String(1024), comment="评论标题")  # required: gap, jcpenney, next
+    comment: Mapped[str | None] = mapped_column(Text, comment="评论内容")  # required: gap, jcpenney, next
+    nickname: Mapped[str | None] = mapped_column(String(64), comment="昵称")  # required: gap, jcpenney, next
     helpful_votes: Mapped[int | None] = mapped_column(Integer, default=0, comment="按顶票数")  # required: gap, jcpenney
     not_helpful_votes: Mapped[int | None] = mapped_column(Integer, comment="按踩票数")  # required: gap, jcpenney
 
-    helpful_score: Mapped[float | None] = mapped_column(Numeric(2, 1), comment="有用评分")  # optional: gap
+    helpful_score: Mapped[float | None] = mapped_column(Numeric(6, 1), comment="有用评分")  # optional: gap
     is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")
     created_at: Mapped[datetime | None] = mapped_column(
         DateTime,
@@ -223,3 +238,35 @@ class Category(Base):
         String(64), default="other", comment="数据来源"
     )
     parent_id: Mapped[int | None] = mapped_column(Integer, comment="父类别ID")
+
+
+class ProductProcessedStatus(Base):
+    __tablename__ = "task_status"
+    __table_args__ = {"comment": "任务状态"}
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    product_id: Mapped[str | None] = mapped_column(String(128), nullable=True, comment="商品ID")
+    source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
+        String(64), default="other", comment="数据来源"
+    )
+    task_id: Mapped[str] = mapped_column(String(128), nullable=False, comment="任务ID")
+    status: Mapped[Literal["pending", "running", "finished", "failed"]] = mapped_column(
+        String(64), nullable=False, comment="任务状态"
+    )
+    message: Mapped[str | None] = mapped_column(String(1024), comment="消息")
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        server_default=func.now(),
+        nullable=True,
+        comment="创建时间",
+    )
+    updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        server_default=func.now(),
+        server_onupdate=func.now(),
+        nullable=True,
+        comment="更新时间",
+    )
+    is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")

@@ -46,11 +46,9 @@ def run(playwright: Playwright) -> None:
                     page1.mouse.wheel(0, (random.randrange(500, 700, 10)))
                     page1.wait_for_timeout(500)
                 html = page1.content()
-                print(html)
+                log.info(html)
                 tree = etree.HTML(html)
-                img_name = tree.xpath(
-                    '//*[@id="root"]/div/div[2]/div[2]/div[1]/div/div[2]/div[1]/h1/text()'
-                )[0]
+                img_name = tree.xpath('//*[@id="root"]/div/div[2]/div[2]/div[1]/div/div[2]/div[1]/h1/text()')[0]
 
                 img_name1 = img_name.replace(":", "")
                 img_name3 = img_name1.replace(".", "")
@@ -58,12 +56,12 @@ def run(playwright: Playwright) -> None:
                 img_name3 = img_name3.replace('"', "")
 
                 # amount = tree.xpath('//*[@id="root"]/div/div[2]/div[2]/div[1]/div/div[2]/div[1]/div/span/text()')[0]
-                # print(amount)
+                # log.info(amount)
                 # img_name = page.locator("#J_ShopSearchResult > div > div.shop-hesper-bd.grid > div:nth-child({}) > dl:nth-child({}) > dd > a".format(i, j)).inner_text()
 
                 # if int(amount.split(' ')[-1].replace('+', '')) >= 100:
                 #     img_name = img_name + ' ' + amount
-                # print(img_name)
+                # log.info(img_name)
                 new_folder_name = img_name3
                 # Full path of the new folder
                 new_folder_path = os.path.join(file_path, new_folder_name)
@@ -73,30 +71,26 @@ def run(playwright: Playwright) -> None:
                 for x in range(1, 7):
                     try:
                         img_url = tree.xpath(
-                            "/html/body/div[3]/div/div[2]/div[2]/div[1]/div/div[1]/div/ul/li[{}]/img/@src".format(
-                                x
-                            )
+                            "/html/body/div[3]/div/div[2]/div[2]/div[1]/div/div[1]/div/ul/li[{}]/img/@src".format(x)
                         )[0]
                         # img_url = tree.xpath(
                         #         '//*[@id="root"]/div/div[2]/div[2]/div/div[1]/div[1]/div/div/img/@src')[0]
-                        print(img_url)
+                        log.info(img_url)
                         img_url = "https:" + img_url[:-23]
-                        print(img_url)
-                        img_name2 = (
-                            new_folder_path + "/" + img_name3 + "{}.jpg".format(x)
-                        )
+                        log.info(img_url)
+                        img_name2 = new_folder_path + "/" + img_name3 + "{}.jpg".format(x)
                         # img_name1 = new_folder_path + '/' + img_name + '.jpg'
-                        # print(img_name1)
+                        # log.info(img_name1)
                         r = requests.get(url=img_url, headers=headers)
                         with open(img_name2, "wb") as f:
                             f.write(r.content)
-                            print("{}下载完成".format(img_name2))
+                            log.info("{}下载完成".format(img_name2))
 
                     except IndexError:
-                        # print("The list of elements is empty, and no index could be accessed.")
+                        # log.info("The list of elements is empty, and no index could be accessed.")
                         continue
                     except Exception:
-                        # print(f"An error occurred: {e}")
+                        # log.info(f"An error occurred: {e}")
                         continue
                 page1.wait_for_timeout(random.randrange(1500, 2500, 1))
                 page1.close()

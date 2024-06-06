@@ -1,21 +1,21 @@
 # copy config.yml.example to config.yml
-b: 13
 playwright:
     timeout: 300000
+    concurrency: 10
 mysql:
-    host: 192.168.0.181
+    host: 10.31.0.181
     port: 3306
     db: "crawler"
     user: root
     password: <password>
 postgres:
-    host: 192.168.0.181
+    host: 10.31.0.181
     port: 5432
     db: crawler
     user: root
     password:
 molook_db:
-    host: "192.168.0.133"
+    host: "10.31.0.133"
     port: 3306
     db: "moway_look"
     db2: "python"

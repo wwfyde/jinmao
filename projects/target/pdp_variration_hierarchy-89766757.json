@@ -1,0 +1,1810 @@
+{
+    "data": {
+        "product": {
+            "__typename": "Product",
+            "tcin": "89766757",
+            "variation_hierarchy": [
+                {
+                    "name": "Size",
+                    "value": "XS",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723736",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-xs/-/A-89723736",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_4e36751a-045e-40d7-8b14-35d3fd5c94a9",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723827",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-xs/-/A-89723827",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723792",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-xs/-/A-89723792",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_7ada55d7-a4c9-467b-ad0f-74235bf21c98",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723755",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-xs/-/A-89723755",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723809",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-xs/-/A-89723809",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_5650b458-7e56-4923-91c1-438eb3a20bda",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723775",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-xs/-/A-89723775",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a797ef2c-bf3c-4a79-9369-8e2fb414787a",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "S",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723828",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-s/-/A-89723828",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723737",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-s/-/A-89723737",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_4e36751a-045e-40d7-8b14-35d3fd5c94a9",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723793",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-s/-/A-89723793",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_7ada55d7-a4c9-467b-ad0f-74235bf21c98",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723756",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-s/-/A-89723756",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723810",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-s/-/A-89723810",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_5650b458-7e56-4923-91c1-438eb3a20bda",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723776",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-s/-/A-89723776",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a797ef2c-bf3c-4a79-9369-8e2fb414787a",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "M",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723829",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-m/-/A-89723829",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723738",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-m/-/A-89723738",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_4e36751a-045e-40d7-8b14-35d3fd5c94a9",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723794",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-m/-/A-89723794",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_7ada55d7-a4c9-467b-ad0f-74235bf21c98",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723757",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-m/-/A-89723757",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723811",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-m/-/A-89723811",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_5650b458-7e56-4923-91c1-438eb3a20bda",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723777",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-m/-/A-89723777",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a797ef2c-bf3c-4a79-9369-8e2fb414787a",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "L",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723830",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-l/-/A-89723830",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723739",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-l/-/A-89723739",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_4e36751a-045e-40d7-8b14-35d3fd5c94a9",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723795",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-l/-/A-89723795",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_7ada55d7-a4c9-467b-ad0f-74235bf21c98",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723758",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-l/-/A-89723758",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723812",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-l/-/A-89723812",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_5650b458-7e56-4923-91c1-438eb3a20bda",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723778",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-l/-/A-89723778",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a797ef2c-bf3c-4a79-9369-8e2fb414787a",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "XL",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": true,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723831",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-xl/-/A-89723831",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723740",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-xl/-/A-89723740",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_4e36751a-045e-40d7-8b14-35d3fd5c94a9",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": true,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723796",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-xl/-/A-89723796",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_7ada55d7-a4c9-467b-ad0f-74235bf21c98",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723759",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-xl/-/A-89723759",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723813",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-xl/-/A-89723813",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_5650b458-7e56-4923-91c1-438eb3a20bda",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723779",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-xl/-/A-89723779",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a797ef2c-bf3c-4a79-9369-8e2fb414787a",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "XXL",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": true,
+                        "is_primary_store_available": true,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723832",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-xxl/-/A-89723832",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_405102d4-e7f5-4c41-ac8a-c773eff22fa0",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723741",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-xxl/-/A-89723741",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a6571c0b-70ca-4aef-937e-4965cbdf4f49",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723797",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-xxl/-/A-89723797",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723760",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-xxl/-/A-89723760",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_18e273da-4c0e-49e8-942d-1517584d16c7",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723814",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-xxl/-/A-89723814",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_ed040dc5-a090-4c27-94e3-10c12a1b2485",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723780",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-xxl/-/A-89723780",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_57b5d4ca-6b39-4dbf-a6d2-3178b5b7eaa2",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": true,
+                                "is_primary_store_available": true,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "1X",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723833",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-1x/-/A-89723833",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_405102d4-e7f5-4c41-ac8a-c773eff22fa0",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723742",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-1x/-/A-89723742",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a6571c0b-70ca-4aef-937e-4965cbdf4f49",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723798",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-1x/-/A-89723798",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723761",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-1x/-/A-89723761",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_18e273da-4c0e-49e8-942d-1517584d16c7",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723815",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-1x/-/A-89723815",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_ed040dc5-a090-4c27-94e3-10c12a1b2485",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723781",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-1x/-/A-89723781",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_57b5d4ca-6b39-4dbf-a6d2-3178b5b7eaa2",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "2X",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723834",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-2x/-/A-89723834",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_405102d4-e7f5-4c41-ac8a-c773eff22fa0",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723743",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-2x/-/A-89723743",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a6571c0b-70ca-4aef-937e-4965cbdf4f49",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723799",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-2x/-/A-89723799",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723762",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-2x/-/A-89723762",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_18e273da-4c0e-49e8-942d-1517584d16c7",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723816",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-2x/-/A-89723816",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_ed040dc5-a090-4c27-94e3-10c12a1b2485",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723782",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-2x/-/A-89723782",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_57b5d4ca-6b39-4dbf-a6d2-3178b5b7eaa2",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "3X",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723835",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-3x/-/A-89723835",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_405102d4-e7f5-4c41-ac8a-c773eff22fa0",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723744",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-3x/-/A-89723744",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a6571c0b-70ca-4aef-937e-4965cbdf4f49",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723800",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-3x/-/A-89723800",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723763",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-3x/-/A-89723763",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_18e273da-4c0e-49e8-942d-1517584d16c7",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723817",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-3x/-/A-89723817",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_ed040dc5-a090-4c27-94e3-10c12a1b2485",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723783",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-3x/-/A-89723783",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_57b5d4ca-6b39-4dbf-a6d2-3178b5b7eaa2",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Size",
+                    "value": "4X",
+                    "availability": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "fulfillment": {
+                        "is_shipping_available": true,
+                        "is_shipping_loyalty_available": true,
+                        "is_scheduled_delivery_available": false,
+                        "is_primary_store_available": false,
+                        "is_backup_store_available": false,
+                        "is_digital_options_available": false,
+                        "is_sold_out": false
+                    },
+                    "variation_hierarchy": [
+                        {
+                            "name": "Color",
+                            "value": "Black",
+                            "tcin": "89723836",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-4x/-/A-89723836",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_92d9b1f0-398a-4899-8353-28bb7df4f3e3?cropN=0.33,0.51,0.0625,0.0625&sizeN=150,150",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_405102d4-e7f5-4c41-ac8a-c773eff22fa0",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": true
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": true
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Black Floral",
+                            "tcin": "89723745",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-black-floral-4x/-/A-89723745",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_a1b08593-3aa3-4430-b8c0-f0731e499277?cropN=0.44444457,0.07222231,0.11666656,0.11666656",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_a6571c0b-70ca-4aef-937e-4965cbdf4f49",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Green",
+                            "tcin": "89723801",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-green-4x/-/A-89723801",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b?cropN=0.39629632,0.59259254,0.033333357,0.033333357",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_e21a923d-6cb5-4ba5-8f54-4cd7f9d99b3b",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Pink",
+                            "tcin": "89723764",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-pink-4x/-/A-89723764",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_d125c4b8-e9cb-4ee1-80dc-9d0a87dfb3d5?cropN=0.29444435,0.61111116,0.03703697,0.03703697",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_18e273da-4c0e-49e8-942d-1517584d16c7",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Tan",
+                            "tcin": "89723818",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-tan-4x/-/A-89723818",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_13f99c5a-050c-4222-8a30-eb3ee5230503?cropN=0.6055556,0.52777785,0.038888857,0.038888857",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_ed040dc5-a090-4c27-94e3-10c12a1b2485",
+                            "availability": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": true
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": false,
+                                "is_shipping_loyalty_available": false,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": true
+                            }
+                        },
+                        {
+                            "name": "Color",
+                            "value": "Yellow Floral",
+                            "tcin": "89723784",
+                            "buy_url": "https://www.target.com/p/women-39-s-tie-waist-button-front-midi-skirt-universal-thread-8482-yellow-floral-4x/-/A-89723784",
+                            "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_7bbff3c6-da9f-4616-84bc-8244f9d37b42?cropN=0.5568287,0.63831025,0.07092591,0.07092591",
+                            "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_57b5d4ca-6b39-4dbf-a6d2-3178b5b7eaa2",
+                            "availability": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            },
+                            "fulfillment": {
+                                "is_shipping_available": true,
+                                "is_shipping_loyalty_available": true,
+                                "is_scheduled_delivery_available": false,
+                                "is_primary_store_available": false,
+                                "is_backup_store_available": false,
+                                "is_digital_options_available": false,
+                                "is_sold_out": false
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -17,11 +17,7 @@ async def fetch_images(url):
 
         # 获取所有图片的 src 属性
         img_elements = await page.query_selector_all("img")
-        img_urls = [
-            await img.get_attribute("src")
-            for img in img_elements
-            if await img.get_attribute("src")
-        ]
+        img_urls = [await img.get_attribute("src") for img in img_elements if await img.get_attribute("src")]
 
         await browser.close()
         return img_urls
@@ -35,7 +31,7 @@ async def download_image(session, url, path):
                 await f.write(await response.read())
                 await f.close()
     except Exception as e:
-        print(f"Failed to download {url}: {e}")
+        log.info(f"Failed to download {url}: {e}")
 
 
 async def download_images(img_urls, download_folder):
@@ -61,7 +57,7 @@ async def main(url, download_folder, zip_path):
         os.makedirs(download_folder)
     await download_images(img_urls, download_folder)
     create_zip(download_folder, zip_path)
-    print(f"Images downloaded and zipped at {zip_path}")
+    log.info(f"Images downloaded and zipped at {zip_path}")
 
 
 if __name__ == "__main__":

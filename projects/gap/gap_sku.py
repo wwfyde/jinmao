@@ -3,8 +3,11 @@ import json
 import uuid
 
 import httpx
+import structlog
 from lxml import etree
 from playwright.async_api import Playwright, async_playwright, Route
+
+log = structlog.get_logger()
 
 
 async def run(playwright: Playwright) -> None:
@@ -35,18 +38,18 @@ async def run(playwright: Playwright) -> None:
         base_url: str = "https://www.gap.com/browse/product.do?pid=223627262&cid=1127944&pcid=1127944&vid=1&grid=pds_68_948_2&cpos=372&cexp=2859&kcid=CategoryIDs%3D1127944&ctype=Listing&cpid=res24052700881663268842577#pdp-page-content"
 
         async def handle_route(route: Route):
-            print("拦截请求", route.request.url)
+            log.info("拦截请求", route.request.url)
             request = route.request
             if "/reviews" in request.url:
                 response = await route.fetch()
                 json_dict = await response.json()
                 # TODO  获取评论信息
                 reviews, total_count = parse_reviews_from_api(json_dict)
-                print(f"预期评论数{total_count}")
-                print(f"预期评论数{total_count}, reviews: , {len(reviews)}")
+                log.info(f"预期评论数{total_count}")
+                log.info(f"预期评论数{total_count}, reviews: , {len(reviews)}")
                 page_size = 25
                 total_pages = (total_count + page_size - 1) // page_size
-                print(f"总页数{total_pages}")
+                log.info(f"总页数{total_pages}")
 
                 semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
                 tasks = []
@@ -54,7 +57,7 @@ async def run(playwright: Playwright) -> None:
                     review_url = (
                         request.url
                         + "&sort=Newest"
-                        + f"&paging.from={10 + (i-1) * page_size}"
+                        + f"&paging.from={10 + (i - 1) * page_size}"
                         + f"&paging.size={page_size}"
                         + "&filters=&search=&sort=Newest&image_only=false"
                     )
@@ -64,18 +67,18 @@ async def run(playwright: Playwright) -> None:
                 for review in new_reviews:
                     reviews.extend(review)
 
-                print(f"实际评论数{len(reviews)}")
+                log.info(f"实际评论数{len(reviews)}")
 
                 with open("review.json", "w") as f:
                     f.write(json.dumps(reviews))
 
-                # print("获取评论信息")
+                # log.info("获取评论信息")
                 # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
                 #     f.write(json.dumps(json_dict))
                 # pass
             # if "api" in request.pdp_url or "service" in request.pdp_url:
             #
-            #     print(f"API Request URL: {request.pdp_url}")
+            #     log.info(f"API Request URL: {request.pdp_url}")
             await route.continue_()
 
         await page.route("**/display.powerreviews.com/**", handle_route)
@@ -90,31 +93,35 @@ async def run(playwright: Playwright) -> None:
         # await page.wait_for_timeout(1000)
         # await page.pause()
         sku_id = httpx.URL(base_url).params.get("pid", "0")
-        print(sku_id)
+        log.info(sku_id)
 
         content = await page.content()
         tree = etree.HTML(content)
+        # product_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
+        t = tree.xpath('//*[@id="buy-box"]/div/h1/h1/text()')
+        log.info(t, type(t))
+
         product_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
         product_name = product_name.replace("|", "")
         product_name = product_name.replace('"', "")
-        print(product_name)
+        log.info(product_name)
         price = tree.xpath('//*[@id="buy-box"]/div/div/div[1]/div[1]/span/text()')[0]
         original_price = tree.xpath("//*[@id='buy-box']/div/div/div[1]/div[1]/div/span/text()")[0]
         product_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
 
-        print(price)
+        log.info(price)
         color = tree.xpath('//*[@id="swatch-label--Color"]/span[2]/text()')[0]
-        print(color)
+        log.info(color)
         # fit_size 适合人群
         fit_and_size = tree.xpath(
             "//*[@id='buy-box-wrapper-id']/div/div[2]/div/div/div/div[2]/div[1]/div/div[1]/div/div/ul/li/text()"
         )
-        print(fit_and_size)
+        log.info(fit_and_size)
         # 产品详情
         product_details: list = tree.xpath(
             '//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/ul/li/span/text()'
         )
-        print(product_details)
+        log.info(product_details)
         detail_locator = page.get_by_role("button", name="product details")
         # '//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/ul'
         # 面料
@@ -123,9 +130,9 @@ async def run(playwright: Playwright) -> None:
         )
         product_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
         product_id = product_details[-1]
-        print(fabric_and_care)
+        log.info(fabric_and_care)
         model_image_urls = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div/a/@href")
-        print(model_image_urls)
+        log.info(model_image_urls)
         base_url = "https://www.gap.com"
         image_tasks = []
         semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
@@ -139,7 +146,7 @@ async def run(playwright: Playwright) -> None:
         #  下载图片
 
         await page.pause()
-        print(
+        log.info(
             dict(
                 price=price,
                 original_price=original_price,
@@ -217,7 +224,7 @@ def parse_reviews_from_api(r: dict) -> tuple[list[dict], int | None]:
 
 def parse_reviews_from_api_old(r: dict) -> tuple[list[dict], int | None]:
     # 获取分页信息
-    print("开始解析评论数据")
+    log.info("开始解析评论数据")
     review_domain = "https://display.powerreviews.com"
     paging_raw = r.get("paging", {})
     total_count = paging_raw.get("total_results", None) if paging_raw else None

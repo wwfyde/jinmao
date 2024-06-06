@@ -18,21 +18,21 @@ def test_insert_or_update():
         # result = session.execute(text("select version()")).scalars().one_or_none()
         review = session.execute(select(ProductReview).filter(ProductReview.product_id == id)).scalars().one_or_none()
         if review:
-            print("已存在")
-            print(review)
+            log.info("已存在")
+            log.info(review)
             for key, value in item.items():
                 setattr(review, key, value)
 
-                print(key, value)
-            print(review.id, review.product_id)
+                log.info(key, value)
+            log.info(review.id, review.product_id)
             session.add(review)
             session.commit()
             session.refresh(review)
-            print(review)
+            log.info(review)
         else:
-            print("不存在")
+            log.info("不存在")
 
             stmt = insert(ProductReview).values(item)
             result = session.execute(stmt)
             session.commit()
-            print(result)
+            log.info(result)

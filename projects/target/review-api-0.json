@@ -1,0 +1,1388 @@
+{
+    "statistics": {
+        "review_count": 190,
+        "question_count": 2,
+        "recommended_count": 134,
+        "not_recommended_count": 33,
+        "recommended_percentage": 80,
+        "reviews_with_images_count": 16,
+        "rating": {
+            "distribution": {
+                "1": 80,
+                "2": 59,
+                "3": 140,
+                "4": 229,
+                "5": 1299
+            },
+            "average": 4.45,
+            "positive_percentage": 92,
+            "count": 1807,
+            "secondary_averages": [
+                {
+                    "id": "Sizing",
+                    "value": 1.89,
+                    "label": "sizing",
+                    "type": "SELECTOR",
+                    "range": 3,
+                    "selector_text": "true to size"
+                },
+                {
+                    "id": "Quality",
+                    "value": 4.2,
+                    "label": "quality",
+                    "type": "RATING",
+                    "range": 5
+                },
+                {
+                    "id": "Comfort",
+                    "value": 4.69,
+                    "label": "comfort",
+                    "type": "RATING",
+                    "range": 5
+                },
+                {
+                    "id": "Style",
+                    "value": 4.57,
+                    "label": "style",
+                    "type": "RATING",
+                    "range": 5
+                }
+            ]
+        },
+        "calculated_at": "2024-05-30T02:53:58.802Z"
+    },
+    "reviews": {
+        "page": 0,
+        "size": 8,
+        "total_results": 190,
+        "total_pages": 24,
+        "first_page": true,
+        "last_page": false,
+        "results": [
+            {
+                "id": "b3fe785f-7e1b-44a2-9078-c320dc581215",
+                "external_id": "r119988_17165173N6XBwlgJ3q",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Sizing",
+                    "Quality",
+                    "Style",
+                    "Comfort"
+                ],
+                "SecondaryRatings": {
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Perfect tee!",
+                "text": "Great color, soft, and comfortable!",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_f38f8c84-c08d-46bc-8856-bb6c42208448"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8002049902",
+                    "nickname": "MT"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 1,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-24T02:22:41.000+00:00",
+                "modified_at": "2024-05-27T22:47:51.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "6bfa16b1-77fe-40d5-a98f-3bea08c1bf7b",
+                "external_id": "r119988_17164673GLa12pEImy",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 1,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Style",
+                    "Sizing",
+                    "Comfort",
+                    "Quality"
+                ],
+                "SecondaryRatings": {
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 2,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 1,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "too small",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 4,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 3,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Crop it like it's hot!",
+                "text": "Very short! When is it considered a crop? I don’t wear high waisted pants, so to me it’s cropped. I usually wear a small, or medium but sized up to a large for the length. Even the large is still short. The material itself is very thin and lightweight.",
+                "is_recommended": false,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "618999306",
+                    "nickname": "FactChecker"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 1,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-23T12:28:30.000+00:00",
+                "modified_at": "2024-05-25T12:02:57.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "88379ac9-b25d-4d97-9081-bf6104e5c112",
+                "external_id": "r119988_17162069gCXnd9WiWe",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 4,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Quality",
+                    "Sizing",
+                    "Comfort",
+                    "Style"
+                ],
+                "SecondaryRatings": {
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 4,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Short tee but not cropped",
+                "text": "Great tee for summer. I sized up for comfort and it fits really well.",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "1698794569",
+                    "nickname": "RBA"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 1,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-20T12:09:26.000+00:00",
+                "modified_at": "2024-05-27T21:28:05.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "5eb47b51-1144-4207-acc7-aeb1bc382daa",
+                "external_id": "r119988_17161317wIOXXrGZ3m",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Sizing",
+                    "Quality",
+                    "Comfort",
+                    "Style"
+                ],
+                "SecondaryRatings": {
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Buy it! Consider sizing up!",
+                "text": "These are the BEST shirts!! They are a re-buy for me. I sized up to a L. You can dress them up or down. They wash up great!",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "10008798486",
+                    "nickname": "Elizabeth"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 4,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-19T15:15:19.000+00:00",
+                "modified_at": "2024-05-28T00:22:23.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "d83107eb-a14e-4512-9958-3f6ae11a36af",
+                "external_id": "r119988_17157998xSW7xJjH00",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 1,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Comfort",
+                    "Style",
+                    "Quality",
+                    "Sizing"
+                ],
+                "SecondaryRatings": {
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 2,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 1,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 2,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 1,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "too small",
+                        "DisplayType": "SLIDER"
+                    }
+                },
+                "title": "Target stop making everythung short!",
+                "text": "I really wanted to love this shirt cause the color is one of my favorites.. seems like the “shrunken” style is taking over everything… I was very hesitant to buy due to it being shorter and I am top heavy.. I’m was hoping it would just cover enough.. but nope… shows my stomach.. target being back the normal length shirts!! Not everyone wants to show off their stomachs!!!!",
+                "is_recommended": false,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8034691266",
+                    "nickname": "Tired"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 12,
+                    "unhelpful": 7,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-15T19:03:35.000+00:00",
+                "modified_at": "2024-05-27T20:33:33.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "1183ace7-fe51-4380-b037-9aa4e6707b62",
+                "external_id": "r119988_17155777gMhVlFOiej",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 4,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Style",
+                    "Sizing",
+                    "Quality",
+                    "Comfort"
+                ],
+                "SecondaryRatings": {
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 4,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Good casual option",
+                "text": "The cut of the shirt is good but the white is a bit see through",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "10019081160",
+                    "nickname": "Jaiden Roush"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 3,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-13T05:21:45.000+00:00",
+                "modified_at": "2024-05-28T00:22:41.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "253f6f5c-4d7d-45e0-8fa1-8dcc59bf5688",
+                "external_id": "r119988_171546092fHAbmWGAl",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Quality",
+                    "Style",
+                    "Comfort",
+                    "Sizing"
+                ],
+                "SecondaryRatings": {
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    }
+                },
+                "title": "Great shirt!",
+                "text": "This is a great quality shirt. I love the shorter length of it, but that it’s not cropped. It washes up well but I do hang dry.",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_47b8a5f1-917e-44f2-bbe0-fd12e6f7ff04"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8081632997",
+                    "nickname": "Emily"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 6,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-11T20:55:22.000+00:00",
+                "modified_at": "2024-05-28T00:20:34.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "6813519d-9ca7-45d6-8d63-568d42f8a959",
+                "external_id": "r119988_171546069ero6muEmO",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Quality",
+                    "Comfort",
+                    "Sizing",
+                    "Style"
+                ],
+                "SecondaryRatings": {
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Great shirt!",
+                "text": "This is a great quality shirt. I love the shorter length of it, but that it’s not cropped. It washes up well but I do hang dry.",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_e0f8be0b-273c-4e02-b48e-8cc5accbfdad"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8081632997",
+                    "nickname": "Emily"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 3,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-11T20:51:37.000+00:00",
+                "modified_at": "2024-05-29T19:17:35.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            }
+        ]
+    },
+    "reviews_with_photos": {
+        "page": 0,
+        "size": 8,
+        "total_results": 16,
+        "total_pages": 2,
+        "first_page": true,
+        "last_page": false,
+        "results": [
+            {
+                "id": "b3fe785f-7e1b-44a2-9078-c320dc581215",
+                "external_id": "r119988_17165173N6XBwlgJ3q",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Sizing",
+                    "Quality",
+                    "Style",
+                    "Comfort"
+                ],
+                "SecondaryRatings": {
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Perfect tee!",
+                "text": "Great color, soft, and comfortable!",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_f38f8c84-c08d-46bc-8856-bb6c42208448"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8002049902",
+                    "nickname": "MT"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 1,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-24T02:22:41.000+00:00",
+                "modified_at": "2024-05-27T22:47:51.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "253f6f5c-4d7d-45e0-8fa1-8dcc59bf5688",
+                "external_id": "r119988_171546092fHAbmWGAl",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Quality",
+                    "Style",
+                    "Comfort",
+                    "Sizing"
+                ],
+                "SecondaryRatings": {
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    }
+                },
+                "title": "Great shirt!",
+                "text": "This is a great quality shirt. I love the shorter length of it, but that it’s not cropped. It washes up well but I do hang dry.",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_47b8a5f1-917e-44f2-bbe0-fd12e6f7ff04"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8081632997",
+                    "nickname": "Emily"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 6,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-11T20:55:22.000+00:00",
+                "modified_at": "2024-05-28T00:20:34.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "6813519d-9ca7-45d6-8d63-568d42f8a959",
+                "external_id": "r119988_171546069ero6muEmO",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Quality",
+                    "Comfort",
+                    "Sizing",
+                    "Style"
+                ],
+                "SecondaryRatings": {
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Great shirt!",
+                "text": "This is a great quality shirt. I love the shorter length of it, but that it’s not cropped. It washes up well but I do hang dry.",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_e0f8be0b-273c-4e02-b48e-8cc5accbfdad"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "8081632997",
+                    "nickname": "Emily"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 3,
+                    "unhelpful": 0,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-05-11T20:51:37.000+00:00",
+                "modified_at": "2024-05-29T19:17:35.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "12fd3e50-70ab-4d1d-b599-398d44915f9c",
+                "external_id": "r119988_171501692tz8IMv4jR",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Comfort",
+                    "Quality",
+                    "Sizing",
+                    "Style"
+                ],
+                "SecondaryRatings": {
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 5,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Perfectly \"long\" cropped",
+                "text": "Perfect “long cropped” for us who want to look cute but not like a teenie bopper… wish I bought them all in every color. Perfect fit!",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_ef0694b7-1dac-4627-9f62-af0f1a9f5a1a"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "2271247669",
+                    "nickname": "Bree"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 16,
+                    "unhelpful": 0,
+                    "inappropriate": 1
+                },
+                "submitted_at": "2024-05-06T17:36:23.000+00:00",
+                "modified_at": "2024-05-29T19:17:58.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "39a2350f-0126-46c2-8d30-fdb873966a57",
+                "external_id": "r119988_17132756MeRxQYHCdq",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [],
+                "SecondaryRatings": {},
+                "title": "Love the fit!",
+                "text": "These shirts are thin but breathable and so soft! It's the perfect crop tee that looks so much better with high rise jeans than regular tees. I love that it hugs my chest but stays loose at the midsection. Makes it comfortable but stylish!",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_81de6005-1a5c-4d8c-84d1-e99c7975f28f"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "20389619",
+                    "nickname": "AWS2024"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 8,
+                    "unhelpful": 2,
+                    "inappropriate": 1
+                },
+                "submitted_at": "2024-04-16T13:54:02.000+00:00",
+                "modified_at": "2024-05-24T20:54:23.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "df8a0241-5869-40db-95e2-641201d9bd30",
+                "external_id": "r119988_17117250ywqcO4mckI",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 5,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Comfort",
+                    "Quality",
+                    "Sizing",
+                    "Style"
+                ],
+                "SecondaryRatings": {
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 3,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "Cute!",
+                "text": "These shirts are so cute and comfy! Comfortable for everyday wear and workout wear!",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_8442780c-4e51-4fc2-b9bd-e42cc1146179"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [],
+                "tags": [],
+                "author": {
+                    "external_id": "20021293263",
+                    "nickname": "Jen"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 7,
+                    "unhelpful": 1,
+                    "inappropriate": 1
+                },
+                "submitted_at": "2024-03-29T15:10:44.000+00:00",
+                "modified_at": "2024-05-08T01:14:44.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "38ff117b-071e-4fb4-bba9-7500a6c2232a",
+                "external_id": "r119988_17113137nQghdY8Wz8",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 1,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Quality",
+                    "Sizing"
+                ],
+                "SecondaryRatings": {
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 2,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    }
+                },
+                "title": "Didn't like",
+                "text": "After the first wash my shirt already has little holes on it.",
+                "is_recommended": false,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_381b8a8d-5841-447e-a192-ad821e2b56de"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [
+                    {
+                        "entity_id": "wash",
+                        "attribute_name": "textile wash recommendation",
+                        "attribute_value": "wash"
+                    },
+                    {
+                        "entity_id": "wash",
+                        "attribute_name": "textile wash recommendation",
+                        "attribute_value": "wash"
+                    }
+                ],
+                "tags": [],
+                "author": {
+                    "external_id": "7991770994",
+                    "nickname": "Cailey"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 10,
+                    "unhelpful": 1,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-03-24T20:55:39.000+00:00",
+                "modified_at": "2024-05-30T03:30:44.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            },
+            {
+                "id": "2f8392d2-2c46-4c29-a6aa-70eb1cea20dd",
+                "external_id": "r119988_17109813dFStmszmsN",
+                "channel": "TARGET",
+                "Tcin": "90021837",
+                "Rating": 4,
+                "RatingRange": 5,
+                "SecondaryRatingsOrder": [
+                    "Sizing",
+                    "Style",
+                    "Quality",
+                    "Comfort"
+                ],
+                "SecondaryRatings": {
+                    "Sizing": {
+                        "Id": "Sizing",
+                        "Value": 2,
+                        "Label": "sizing",
+                        "ValueRange": 3,
+                        "ValueLabel": "true to size",
+                        "DisplayType": "SLIDER"
+                    },
+                    "Style": {
+                        "Id": "Style",
+                        "Value": 5,
+                        "Label": "style",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Quality": {
+                        "Id": "Quality",
+                        "Value": 3,
+                        "Label": "quality",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    },
+                    "Comfort": {
+                        "Id": "Comfort",
+                        "Value": 5,
+                        "Label": "comfort",
+                        "ValueRange": 5,
+                        "DisplayType": "NORMAL"
+                    }
+                },
+                "title": "deodorant bleached the shirt",
+                "text": "I really like the fit and color of this shirt. Although, i had put on deodorant prior to putting on and found that it had bleached the shirt?? i’ve never had this happen before!! i do use a clinical strength deodorant, so am not sure if it was due to the strength in this vs standard deodorant. i was disappointed at first but due to wearing it for the day, i had gotten a wet towel and soaked the areas that had been altered in color, in which it had gotten it out. just a weird reaction and i have purchased clothes from this brand before. so don’t be alarmed, but give yourself time to treat the weird reaction.",
+                "is_recommended": true,
+                "is_verified": true,
+                "status": "APPROVED",
+                "photos": [
+                    "https://target.scene7.com/is/image/Target/GUEST_b71a0f13-b359-49c5-9a79-2aec14833de6"
+                ],
+                "BadgesOrder": [
+                    "verifiedPurchaser"
+                ],
+                "Badges": {
+                    "verifiedPurchaser": {
+                        "Id": "verifiedPurchaser",
+                        "ContentType": "REVIEW",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "SourceClient": "targetcom",
+                "IsRatingsOnly": false,
+                "ClientResponseCount": 0,
+                "ClientResponses": [],
+                "Entities": [
+                    {
+                        "entity_id": "color",
+                        "attribute_name": "color name",
+                        "attribute_value": "color"
+                    },
+                    {
+                        "entity_id": "use",
+                        "attribute_name": "garment used for",
+                        "attribute_value": "use"
+                    },
+                    {
+                        "entity_id": "fit",
+                        "attribute_name": "pant leg type",
+                        "attribute_value": "fit"
+                    },
+                    {
+                        "entity_id": "color",
+                        "attribute_name": "color name",
+                        "attribute_value": "color"
+                    },
+                    {
+                        "entity_id": "use",
+                        "attribute_name": "garment used for",
+                        "attribute_value": "use"
+                    },
+                    {
+                        "entity_id": "fit",
+                        "attribute_name": "pant leg type",
+                        "attribute_value": "fit"
+                    }
+                ],
+                "tags": [],
+                "author": {
+                    "external_id": "10006821307",
+                    "nickname": "bdog"
+                },
+                "is_syndicated": false,
+                "feedback": {
+                    "helpful": 8,
+                    "unhelpful": 2,
+                    "inappropriate": 0
+                },
+                "submitted_at": "2024-03-21T00:36:08.000+00:00",
+                "modified_at": "2024-05-30T03:13:10.000+00:00",
+                "reviewer_attributes": [],
+                "is_incentivized": false
+            }
+        ]
+    },
+    "metadata": {
+        "has_verified": true,
+        "has_photos": true,
+        "has_entities": false
+    }
+}

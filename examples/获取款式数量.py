@@ -7,6 +7,6 @@ with open("projects/金茂/category_max_than_300.json", "r") as f:
     for i in result["products"]:
         o += 1
         skus = len(i["styleColors"])
-        print(skus)
+        log.info(skus)
         j += skus
-    print(o, j)
+    log.info(o, j)

@@ -1,0 +1,2045 @@
+{
+    "Limit": 8,
+    "Offset": 0,
+    "TotalResults": 161,
+    "Locale": "en_US",
+    "Results": [
+        {
+            "Id": "233907210",
+            "CID": "420cdfbb-8e51-53b9-914c-24b7f911e193",
+            "SourceClient": "jcpenney",
+            "LastModeratedTime": "2024-05-27T18:03:34.000+00:00",
+            "LastModificationTime": "2024-05-27T18:03:34.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "Sacramento,  a",
+            "AuthorId": "zlmbgx6z1qivx8npci4zwtiemx",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 4,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": false,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__17168270e21MXVQJJc",
+            "SubmissionTime": "2024-05-27T16:24:03.000+00:00",
+            "ReviewText": "Good shirt. Wish collar was longer.  Color good. Not too thin.",
+            "Title": "Good",
+            "UserNickname": null,
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "over60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "male",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "No",
+                    "Id": "contestSweepstakes"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 3,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 4,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "Badges": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "BadgesOrder": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233866218",
+            "CID": "ae2c55a1-938c-5f2e-a013-9dc92482fd0a",
+            "SourceClient": "jcpenney",
+            "Badges": {
+                "contestSweepstakesYes": {
+                    "ContentType": "REVIEW",
+                    "Id": "contestSweepstakesYes",
+                    "BadgeType": "Custom"
+                }
+            },
+            "BadgesOrder": [
+                "contestSweepstakesYes"
+            ],
+            "LastModeratedTime": "2024-05-24T21:18:07.000+00:00",
+            "LastModificationTime": "2024-05-24T21:18:07.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "ShopFrequency",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "Chardon, Ohio",
+            "AuthorId": "zhx2to1cun00rko2mg2o17l6nf",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality",
+                "Apparel"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": true,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__171658423lN8P0O66V",
+            "SubmissionTime": "2024-05-24T20:56:57.000+00:00",
+            "ReviewText": "We purchased Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt. The fabric is strong and well-made. It's a sharp shirt. The color is perfect. The size is a bit big but we hope washing it first will correct that issue. Great shirt and we would highly recommend it.",
+            "Title": "Well made! Love the material it's made of.",
+            "UserNickname": null,
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "over60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "male",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "Yes",
+                    "Id": "contestSweepstakes"
+                },
+                "ShopFrequency": {
+                    "Value": "occasionally",
+                    "Id": "ShopFrequency"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 5,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Apparel": {
+                    "Value": 3,
+                    "Id": "Apparel",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "SLIDER",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233863991",
+            "CID": "d664ca5a-a5ad-5ca8-a19e-333cfb397122",
+            "SourceClient": "jcpenney",
+            "Badges": {
+                "contestSweepstakesYes": {
+                    "ContentType": "REVIEW",
+                    "Id": "contestSweepstakesYes",
+                    "BadgeType": "Custom"
+                }
+            },
+            "BadgesOrder": [
+                "contestSweepstakesYes"
+            ],
+            "LastModeratedTime": "2024-05-24T19:18:18.000+00:00",
+            "LastModificationTime": "2024-05-24T19:18:18.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "New York, NY",
+            "AuthorId": "zpgvpw4mjlxpasdhkqti84idqe",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": true,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__17165763YIX77dzTkK",
+            "SubmissionTime": "2024-05-24T18:46:16.000+00:00",
+            "ReviewText": "Total fan of Stafford Oxford shirts for 30 years or more!!",
+            "Title": "Quality,  style, and last!",
+            "UserNickname": null,
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "over60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "male",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "Yes",
+                    "Id": "contestSweepstakes"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 5,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233805346",
+            "CID": "a6ac6809-93e5-549b-b4d6-0b20702a2e3e",
+            "SourceClient": "jcpenney",
+            "Badges": {
+                "contestSweepstakesYes": {
+                    "ContentType": "REVIEW",
+                    "Id": "contestSweepstakesYes",
+                    "BadgeType": "Custom"
+                }
+            },
+            "BadgesOrder": [
+                "contestSweepstakesYes"
+            ],
+            "LastModeratedTime": "2024-05-21T20:48:03.000+00:00",
+            "LastModificationTime": "2024-05-21T20:48:03.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "BV_MOBILE_REVIEW_DISPLAY",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "ShopFrequency",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "Madison Wisconsin - west",
+            "AuthorId": "zdvw7f618boh2p34rhe26xujek",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality",
+                "Apparel"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": true,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__171632333ZYRtSAdLd",
+            "SubmissionTime": "2024-05-21T20:29:12.000+00:00",
+            "ReviewText": "I bought this today and if it wasn\u2019t for Donna helping me out I would\u2019ve become very stressed out! Thanks so much for your time and effort today!!",
+            "Title": "Great fit especially neck size and comfortable",
+            "UserNickname": null,
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "50to60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "male",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "Yes",
+                    "Id": "contestSweepstakes"
+                },
+                "ShopFrequency": {
+                    "Value": "occasionally",
+                    "Id": "ShopFrequency"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 5,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Apparel": {
+                    "Value": 3,
+                    "Id": "Apparel",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "SLIDER",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233758865",
+            "CID": "71a0dd1d-a562-5324-9473-d47b300d1de3",
+            "SourceClient": "jcpenney",
+            "Badges": {
+                "contestSweepstakesYes": {
+                    "ContentType": "REVIEW",
+                    "Id": "contestSweepstakesYes",
+                    "BadgeType": "Custom"
+                }
+            },
+            "BadgesOrder": [
+                "contestSweepstakesYes"
+            ],
+            "LastModeratedTime": "2024-05-18T17:17:33.000+00:00",
+            "LastModificationTime": "2024-05-18T17:17:33.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "ShopFrequency",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "Clark Fork,  Idaho",
+            "AuthorId": "zadq39smezi2zm283zpjsj4r6d",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality",
+                "Apparel"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": true,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__17160453u8dXxkl7s3",
+            "SubmissionTime": "2024-05-18T15:16:11.000+00:00",
+            "ReviewText": "I have purchased this shirt for my husband before and was amazed by three things:\n1. Comfort : one of my husband's favorite shirts\n2. Washable: The shirt is easy to wash and virtually wrinkle free.\n3. Durability: The original shirts I purchased and washed several times, after three years of constant wear, are just about ready to be replaced. So, I reordered .",
+            "Title": "Comfortable,  Washable, Durable",
+            "UserNickname": null,
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "over60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "female",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "Yes",
+                    "Id": "contestSweepstakes"
+                },
+                "ShopFrequency": {
+                    "Value": "occasionally",
+                    "Id": "ShopFrequency"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 5,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Apparel": {
+                    "Value": 3,
+                    "Id": "Apparel",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "SLIDER",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233660397",
+            "CID": "673bc254-95de-5284-b41f-4e930dd68962",
+            "SourceClient": "jcpenney",
+            "LastModeratedTime": "2024-05-12T12:46:48.000+00:00",
+            "LastModificationTime": "2024-05-12T12:46:48.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "ShopFrequency",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "West Virginia",
+            "AuthorId": "z66csuwr1h16jzss8tgxtxegpi",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality",
+                "Apparel"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": true,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__17155164iFu7t1F2n6",
+            "SubmissionTime": "2024-05-12T12:20:48.000+00:00",
+            "ReviewText": "Beautiful quality at fair price. I can always depend on size and fit from JCP",
+            "Title": "Great quality and price",
+            "UserNickname": null,
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "over60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "male",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "No",
+                    "Id": "contestSweepstakes"
+                },
+                "ShopFrequency": {
+                    "Value": "frequently",
+                    "Id": "ShopFrequency"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 5,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Apparel": {
+                    "Value": 3,
+                    "Id": "Apparel",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "SLIDER",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "Badges": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "BadgesOrder": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233636194",
+            "CID": "ce550590-8d88-5927-8214-22aa7d3fcc3e",
+            "SourceClient": "jcpenney",
+            "Badges": {
+                "contestSweepstakesYes": {
+                    "ContentType": "REVIEW",
+                    "Id": "contestSweepstakesYes",
+                    "BadgeType": "Custom"
+                }
+            },
+            "BadgesOrder": [
+                "contestSweepstakesYes"
+            ],
+            "LastModeratedTime": "2024-05-10T22:31:12.000+00:00",
+            "LastModificationTime": "2024-05-10T22:31:12.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "ShopFrequency",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "West Palm Beach, Florida",
+            "AuthorId": "h5ke4dmfauncty3eks11yausg",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality",
+                "Apparel"
+            ],
+            "IsRatingsOnly": false,
+            "IsRecommended": true,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__17153790MQmKUKQtcU",
+            "SubmissionTime": "2024-05-10T22:11:04.000+00:00",
+            "ReviewText": "There was a young man in the men\u2019s department that went over and above helping me select my purchases.beat",
+            "Title": "Great selection",
+            "UserNickname": "Gene 39",
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "over60",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "male",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "Yes",
+                    "Id": "contestSweepstakes"
+                },
+                "ShopFrequency": {
+                    "Value": "frequently",
+                    "Id": "ShopFrequency"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 5,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Apparel": {
+                    "Value": 4,
+                    "Id": "Apparel",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "SLIDER",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": []
+        },
+        {
+            "Id": "233594043",
+            "CID": "e0ec1e98-30c1-5a36-9725-6b179243430d",
+            "SourceClient": "jcpenney",
+            "Badges": {
+                "contestSweepstakesYes": {
+                    "ContentType": "REVIEW",
+                    "Id": "contestSweepstakesYes",
+                    "BadgeType": "Custom"
+                }
+            },
+            "BadgesOrder": [
+                "contestSweepstakesYes"
+            ],
+            "LastModeratedTime": "2024-05-08T16:15:54.000+00:00",
+            "LastModificationTime": "2024-05-08T16:15:54.000+00:00",
+            "ProductId": "ppr5008282306",
+            "OriginalProductName": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+            "CampaignId": "JCP_PPE",
+            "ContextDataValuesOrder": [
+                "Age",
+                "Gender",
+                "contestSweepstakes"
+            ],
+            "UserLocation": "Chandler, Az",
+            "AuthorId": "FDAD3F22D07C3CE8298584ECE1E2B339",
+            "ContentLocale": "en_US",
+            "IsFeatured": false,
+            "TotalInappropriateFeedbackCount": 0,
+            "TotalClientResponseCount": 0,
+            "TotalCommentCount": 0,
+            "Rating": 5,
+            "SecondaryRatingsOrder": [
+                "Value",
+                "Quality"
+            ],
+            "IsRatingsOnly": false,
+            "TotalFeedbackCount": 0,
+            "TotalNegativeFeedbackCount": 0,
+            "TotalPositiveFeedbackCount": 0,
+            "ModerationStatus": "APPROVED",
+            "SubmissionId": "r11573-en__17151836qTieFmvCh7",
+            "SubmissionTime": "2024-05-08T15:54:14.000+00:00",
+            "ReviewText": "We had been searching for this color shirt for quite some time and we were so glad we found it! Nice quality and this can be easily worn with or without a tie.",
+            "Title": "Nice shirt!",
+            "UserNickname": "Mermaid03",
+            "ContextDataValues": {
+                "Age": {
+                    "Value": "40to49",
+                    "Id": "Age"
+                },
+                "Gender": {
+                    "Value": "female",
+                    "Id": "Gender"
+                },
+                "contestSweepstakes": {
+                    "Value": "Yes",
+                    "Id": "contestSweepstakes"
+                }
+            },
+            "SecondaryRatings": {
+                "Value": {
+                    "Value": 4,
+                    "Id": "Value",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                },
+                "Quality": {
+                    "Value": 5,
+                    "Id": "Quality",
+                    "Label": null,
+                    "ValueLabel": null,
+                    "DisplayType": "NORMAL",
+                    "ValueRange": 5,
+                    "MaxLabel": null,
+                    "MinLabel": null
+                }
+            },
+            "TagDimensions": {},
+            "Cons": null,
+            "AdditionalFieldsOrder": [],
+            "IsSyndicated": false,
+            "RatingRange": 5,
+            "Helpfulness": null,
+            "AdditionalFields": {},
+            "ProductRecommendationIds": [],
+            "ClientResponses": [],
+            "Photos": [],
+            "Pros": null,
+            "InappropriateFeedbackList": [],
+            "Videos": [],
+            "CommentIds": [],
+            "TagDimensionsOrder": [],
+            "IsRecommended": null
+        }
+    ],
+    "Includes": {
+        "Products": {
+            "ppr5008282306": {
+                "AttributesOrder": [
+                    "VENDORID",
+                    "ENTITY",
+                    "AVAILABILITY",
+                    "BRAND_TYPE",
+                    "SUBDIVISION",
+                    "DIVISION"
+                ],
+                "Attributes": {
+                    "VENDORID": {
+                        "Id": "VENDORID",
+                        "Values": [
+                            {
+                                "Value": "764852",
+                                "Locale": null
+                            }
+                        ]
+                    },
+                    "ENTITY": {
+                        "Id": "ENTITY",
+                        "Values": [
+                            {
+                                "Value": "23",
+                                "Locale": null
+                            }
+                        ]
+                    },
+                    "AVAILABILITY": {
+                        "Id": "AVAILABILITY",
+                        "Values": [
+                            {
+                                "Value": "True",
+                                "Locale": null
+                            }
+                        ]
+                    },
+                    "BRAND_TYPE": {
+                        "Id": "BRAND_TYPE",
+                        "Values": [
+                            {
+                                "Value": "PRIVATE",
+                                "Locale": null
+                            }
+                        ]
+                    },
+                    "SUBDIVISION": {
+                        "Id": "SUBDIVISION",
+                        "Values": [
+                            {
+                                "Value": "531",
+                                "Locale": null
+                            }
+                        ]
+                    },
+                    "DIVISION": {
+                        "Id": "DIVISION",
+                        "Values": [
+                            {
+                                "Value": "002",
+                                "Locale": null
+                            }
+                        ]
+                    }
+                },
+                "Description": "Deemed a Gotta-Have-It item for value you can count on every day! Style and performance meet in this Stafford Coolmax men's dress shirt. This long-sleeve button-down is cut for a regular-fit from wrinkle-free stretch-cotton and features moisture-wicking properties to keep you cool and confident all day. Team it with a pair of suit pants.  \nFeatures: Moisture Wicking, Wrinkle Resistant, Stretch Fabric, Stretch Collar, Break Resistant Buttons, Wrinkle Free\n\nClosure Type: Button\n\nFit: Slim Fit\n\nNeckline: Collar Neck\n\nPockets: 1 Chest Slip Pocket, 1 Inside Coin Pocket\n\nSleeve Length: Long Sleeve\n\nSleeve Style: Cuffed Sleeve\n\nApparel Length: 32 Inches - Back\n\nFiber Content: 60% Cotton, 40% Recycled Polyester\n\nFabric Description: Chambray\n\nCollar: Button Down Collar\n\nCare: Tumble Dry, Machine Wash\n\nCountry of Origin: Imported",
+                "UPCs": [
+                    "198272099737",
+                    "198273861234",
+                    "198272099713",
+                    "198272101119",
+                    "198272104936",
+                    "198272095043",
+                    "198273681177",
+                    "198272110425",
+                    "198273861302",
+                    "198272104875",
+                    "198272110388",
+                    "198272078701",
+                    "198273681184",
+                    "198272104929",
+                    "198272099768",
+                    "198272082906",
+                    "198273861227",
+                    "198272110500",
+                    "198272095067",
+                    "198273861258",
+                    "198272095050",
+                    "198272104868",
+                    "198272101126",
+                    "198272110395",
+                    "198272095098",
+                    "198272104882",
+                    "198272101133",
+                    "198273861272",
+                    "198272078749",
+                    "198272082944",
+                    "198272082951",
+                    "198272101188",
+                    "198272095074",
+                    "198272110401",
+                    "198272110456",
+                    "198273861296",
+                    "198272102604",
+                    "198273681139",
+                    "198272099799",
+                    "198272102581",
+                    "198272110463",
+                    "198273681207",
+                    "198272082937",
+                    "198272095036",
+                    "198272101140",
+                    "198272095104",
+                    "198272101195",
+                    "198272110531",
+                    "198273681191",
+                    "198272102659",
+                    "198272110449",
+                    "198272078671",
+                    "198272078718",
+                    "198272104851",
+                    "198273681153",
+                    "198272110470",
+                    "198272078664",
+                    "198272099782",
+                    "198273861289",
+                    "198272099805",
+                    "198273681146",
+                    "198273681160",
+                    "198273861241",
+                    "198272082968",
+                    "198272099867",
+                    "198272082920",
+                    "198272099706",
+                    "198272102666",
+                    "198272082975",
+                    "198272110371",
+                    "198272102598",
+                    "198272110494",
+                    "198272082982",
+                    "198272110524",
+                    "198272099874",
+                    "198272099812",
+                    "198272102611",
+                    "198272101171",
+                    "198272099751",
+                    "198272101164",
+                    "198272099744",
+                    "198272104912",
+                    "198272104899",
+                    "198272110487",
+                    "198272110418",
+                    "198272099836",
+                    "198272082913",
+                    "198272101157",
+                    "198272099775",
+                    "198272078732",
+                    "198273681122",
+                    "198272099829",
+                    "198272102628",
+                    "198273861265",
+                    "198272095111",
+                    "198272104905",
+                    "198272102642",
+                    "198272099843",
+                    "198272095081",
+                    "198272110432",
+                    "198272078725",
+                    "198272110517",
+                    "198272078688",
+                    "198272110548",
+                    "198272099850",
+                    "198272099720",
+                    "198272102635",
+                    "198272078695"
+                ],
+                "Name": "Stafford Coolmax Mens Regular Fit Stretch Fabric Wrinkle Free Long Sleeve Dress Shirt",
+                "ImageUrl": "https://jcpenney.scene7.com/is/image/JCPenney/DP1108202107010233M",
+                "Id": "ppr5008282306",
+                "CategoryId": "531",
+                "BrandExternalId": "100013",
+                "Brand": {
+                    "Id": "100013",
+                    "Name": "STAFFORD"
+                },
+                "Active": true,
+                "ProductPageUrl": "https://www.jcpenney.com/p/stafford-coolmax-mens-regular-fit-stretch-fabric-wrinkle-free-long-sleeve-dress-shirt/ppr5008282306?pTmplType=regular",
+                "Disabled": false,
+                "QuestionIds": [],
+                "ModelNumbers": [],
+                "EANs": [],
+                "StoryIds": [],
+                "ManufacturerPartNumbers": [],
+                "ReviewIds": [],
+                "FamilyIds": [],
+                "ISBNs": [],
+                "ReviewStatistics": {
+                    "FirstSubmissionTime": "2022-08-26T18:17:17.000+00:00",
+                    "LastSubmissionTime": "2024-05-27T16:24:03.000+00:00",
+                    "HelpfulVoteCount": 92,
+                    "NotRecommendedCount": 14,
+                    "FeaturedReviewCount": 0,
+                    "ContextDataDistributionOrder": [
+                        "Age",
+                        "Gender",
+                        "ShopFrequency",
+                        "contestSweepstakes"
+                    ],
+                    "ContextDataDistribution": {
+                        "Age": {
+                            "Id": "Age",
+                            "Values": [
+                                {
+                                    "Count": 1,
+                                    "Value": "18to24"
+                                },
+                                {
+                                    "Count": 5,
+                                    "Value": "25to29"
+                                },
+                                {
+                                    "Count": 4,
+                                    "Value": "30to39"
+                                },
+                                {
+                                    "Count": 15,
+                                    "Value": "40to49"
+                                },
+                                {
+                                    "Count": 44,
+                                    "Value": "50to60"
+                                },
+                                {
+                                    "Count": 92,
+                                    "Value": "over60"
+                                }
+                            ]
+                        },
+                        "Gender": {
+                            "Id": "Gender",
+                            "Values": [
+                                {
+                                    "Count": 107,
+                                    "Value": "male"
+                                },
+                                {
+                                    "Count": 54,
+                                    "Value": "female"
+                                }
+                            ]
+                        },
+                        "ShopFrequency": {
+                            "Id": "ShopFrequency",
+                            "Values": [
+                                {
+                                    "Count": 3,
+                                    "Value": "first"
+                                },
+                                {
+                                    "Count": 91,
+                                    "Value": "occasionally"
+                                },
+                                {
+                                    "Count": 57,
+                                    "Value": "frequently"
+                                }
+                            ]
+                        },
+                        "contestSweepstakes": {
+                            "Id": "contestSweepstakes",
+                            "Values": [
+                                {
+                                    "Count": 138,
+                                    "Value": "Yes"
+                                },
+                                {
+                                    "Count": 16,
+                                    "Value": "No"
+                                }
+                            ]
+                        }
+                    },
+                    "TotalReviewCount": 161,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 134
+                        },
+                        {
+                            "RatingValue": 4,
+                            "Count": 11
+                        },
+                        {
+                            "RatingValue": 3,
+                            "Count": 10
+                        },
+                        {
+                            "RatingValue": 1,
+                            "Count": 5
+                        },
+                        {
+                            "RatingValue": 2,
+                            "Count": 1
+                        }
+                    ],
+                    "RatingsOnlyReviewCount": 0,
+                    "SecondaryRatingsAveragesOrder": [
+                        "Value",
+                        "Quality",
+                        "Apparel"
+                    ],
+                    "SecondaryRatingsAverages": {
+                        "Quality": {
+                            "Id": "Quality",
+                            "AverageRating": 4.767741935483871,
+                            "DisplayType": "NORMAL",
+                            "MaxLabel": null,
+                            "MinLabel": null,
+                            "ValueRange": 5
+                        },
+                        "Apparel": {
+                            "Id": "Apparel",
+                            "AverageRating": 3.138888888888889,
+                            "DisplayType": "SLIDER",
+                            "ValueRange": 5,
+                            "MaxLabel": null,
+                            "MinLabel": null
+                        },
+                        "Value": {
+                            "Id": "Value",
+                            "AverageRating": 4.709677419354839,
+                            "DisplayType": "NORMAL",
+                            "MaxLabel": null,
+                            "MinLabel": null,
+                            "ValueRange": 5
+                        }
+                    },
+                    "RecommendedCount": 137,
+                    "NotHelpfulVoteCount": 45,
+                    "AverageOverallRating": 4.6645962732919255,
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {}
+                },
+                "TotalReviewCount": 161,
+                "FilteredReviewStatistics": {
+                    "FirstSubmissionTime": "2022-08-26T18:17:17.000+00:00",
+                    "LastSubmissionTime": "2024-05-27T16:24:03.000+00:00",
+                    "HelpfulVoteCount": 92,
+                    "NotRecommendedCount": 14,
+                    "FeaturedReviewCount": 0,
+                    "ContextDataDistributionOrder": [
+                        "Age",
+                        "Gender",
+                        "ShopFrequency",
+                        "contestSweepstakes"
+                    ],
+                    "ContextDataDistribution": {
+                        "Age": {
+                            "Id": "Age",
+                            "Values": [
+                                {
+                                    "Count": 1,
+                                    "Value": "18to24"
+                                },
+                                {
+                                    "Count": 5,
+                                    "Value": "25to29"
+                                },
+                                {
+                                    "Count": 4,
+                                    "Value": "30to39"
+                                },
+                                {
+                                    "Count": 15,
+                                    "Value": "40to49"
+                                },
+                                {
+                                    "Count": 44,
+                                    "Value": "50to60"
+                                },
+                                {
+                                    "Count": 92,
+                                    "Value": "over60"
+                                }
+                            ]
+                        },
+                        "Gender": {
+                            "Id": "Gender",
+                            "Values": [
+                                {
+                                    "Count": 107,
+                                    "Value": "male"
+                                },
+                                {
+                                    "Count": 54,
+                                    "Value": "female"
+                                }
+                            ]
+                        },
+                        "ShopFrequency": {
+                            "Id": "ShopFrequency",
+                            "Values": [
+                                {
+                                    "Count": 3,
+                                    "Value": "first"
+                                },
+                                {
+                                    "Count": 91,
+                                    "Value": "occasionally"
+                                },
+                                {
+                                    "Count": 57,
+                                    "Value": "frequently"
+                                }
+                            ]
+                        },
+                        "contestSweepstakes": {
+                            "Id": "contestSweepstakes",
+                            "Values": [
+                                {
+                                    "Count": 138,
+                                    "Value": "Yes"
+                                },
+                                {
+                                    "Count": 16,
+                                    "Value": "No"
+                                }
+                            ]
+                        }
+                    },
+                    "TotalReviewCount": 161,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 134
+                        },
+                        {
+                            "RatingValue": 4,
+                            "Count": 11
+                        },
+                        {
+                            "RatingValue": 3,
+                            "Count": 10
+                        },
+                        {
+                            "RatingValue": 1,
+                            "Count": 5
+                        },
+                        {
+                            "RatingValue": 2,
+                            "Count": 1
+                        }
+                    ],
+                    "RatingsOnlyReviewCount": 0,
+                    "SecondaryRatingsAveragesOrder": [
+                        "Value",
+                        "Quality",
+                        "Apparel"
+                    ],
+                    "SecondaryRatingsAverages": {
+                        "Quality": {
+                            "Id": "Quality",
+                            "AverageRating": 4.767741935483871,
+                            "DisplayType": "NORMAL",
+                            "MaxLabel": null,
+                            "MinLabel": null,
+                            "ValueRange": 5
+                        },
+                        "Apparel": {
+                            "Id": "Apparel",
+                            "AverageRating": 3.138888888888889,
+                            "DisplayType": "SLIDER",
+                            "ValueRange": 5,
+                            "MaxLabel": null,
+                            "MinLabel": null
+                        },
+                        "Value": {
+                            "Id": "Value",
+                            "AverageRating": 4.709677419354839,
+                            "DisplayType": "NORMAL",
+                            "MaxLabel": null,
+                            "MinLabel": null,
+                            "ValueRange": 5
+                        }
+                    },
+                    "RecommendedCount": 137,
+                    "NotHelpfulVoteCount": 45,
+                    "AverageOverallRating": 4.6645962732919255,
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {}
+                }
+            }
+        },
+        "Authors": {
+            "zlmbgx6z1qivx8npci4zwtiemx": {
+                "Id": "zlmbgx6z1qivx8npci4zwtiemx",
+                "ModerationStatus": "SUBMITTED",
+                "SubmissionTime": "2024-05-27T16:23:45.000+00:00",
+                "ThirdPartyIds": [],
+                "LastModeratedTime": null,
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "ContributorRank": null,
+                "Avatar": {},
+                "SubmissionId": null,
+                "UserNickname": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "FeaturedReviewCount": 0,
+                    "AverageOverallRating": 4.0,
+                    "NotHelpfulVoteCount": 0,
+                    "RatingsOnlyReviewCount": 0,
+                    "TotalReviewCount": 1,
+                    "FirstSubmissionTime": "2024-05-27T16:24:03.000+00:00",
+                    "LastSubmissionTime": "2024-05-27T16:24:03.000+00:00",
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 4,
+                            "Count": 1
+                        }
+                    ],
+                    "NotRecommendedCount": 1,
+                    "HelpfulVoteCount": 0,
+                    "RecommendedCount": 0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 1,
+                "FilteredReviewStatistics": {
+                    "FeaturedReviewCount": 0,
+                    "AverageOverallRating": 4.0,
+                    "NotHelpfulVoteCount": 0,
+                    "RatingsOnlyReviewCount": 0,
+                    "TotalReviewCount": 1,
+                    "FirstSubmissionTime": "2024-05-27T16:24:03.000+00:00",
+                    "LastSubmissionTime": "2024-05-27T16:24:03.000+00:00",
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 4,
+                            "Count": 1
+                        }
+                    ],
+                    "NotRecommendedCount": 1,
+                    "HelpfulVoteCount": 0,
+                    "RecommendedCount": 0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "zhx2to1cun00rko2mg2o17l6nf": {
+                "Id": "zhx2to1cun00rko2mg2o17l6nf",
+                "ModerationStatus": "SUBMITTED",
+                "SubmissionTime": "2024-05-24T20:54:41.000+00:00",
+                "ThirdPartyIds": [],
+                "LastModeratedTime": null,
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "ContributorRank": null,
+                "Avatar": {},
+                "SubmissionId": null,
+                "UserNickname": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "NotHelpfulVoteCount": 0,
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "FeaturedReviewCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "TotalReviewCount": 1,
+                    "RatingsOnlyReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "FirstSubmissionTime": "2024-05-24T20:56:57.000+00:00",
+                    "LastSubmissionTime": "2024-05-24T20:56:57.000+00:00",
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 1,
+                "FilteredReviewStatistics": {
+                    "NotHelpfulVoteCount": 0,
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "FeaturedReviewCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "TotalReviewCount": 1,
+                    "RatingsOnlyReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "FirstSubmissionTime": "2024-05-24T20:56:57.000+00:00",
+                    "LastSubmissionTime": "2024-05-24T20:56:57.000+00:00",
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "zpgvpw4mjlxpasdhkqti84idqe": {
+                "Id": "zpgvpw4mjlxpasdhkqti84idqe",
+                "ModerationStatus": "SUBMITTED",
+                "SubmissionTime": "2024-05-24T18:45:30.000+00:00",
+                "ThirdPartyIds": [],
+                "LastModeratedTime": null,
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "ContributorRank": null,
+                "Avatar": {},
+                "SubmissionId": null,
+                "UserNickname": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "RatingsOnlyReviewCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "FeaturedReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "FirstSubmissionTime": "2024-05-24T18:46:16.000+00:00",
+                    "LastSubmissionTime": "2024-05-24T18:46:16.000+00:00",
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "NotHelpfulVoteCount": 0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 1,
+                "FilteredReviewStatistics": {
+                    "RatingsOnlyReviewCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "FeaturedReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "FirstSubmissionTime": "2024-05-24T18:46:16.000+00:00",
+                    "LastSubmissionTime": "2024-05-24T18:46:16.000+00:00",
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "NotHelpfulVoteCount": 0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "zdvw7f618boh2p34rhe26xujek": {
+                "Id": "zdvw7f618boh2p34rhe26xujek",
+                "ModerationStatus": "SUBMITTED",
+                "SubmissionTime": "2024-05-21T20:27:40.000+00:00",
+                "ThirdPartyIds": [],
+                "LastModeratedTime": null,
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "ContributorRank": null,
+                "Avatar": {},
+                "SubmissionId": null,
+                "UserNickname": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "TotalReviewCount": 1,
+                    "AverageOverallRating": 5.0,
+                    "HelpfulVoteCount": 0,
+                    "NotRecommendedCount": 0,
+                    "RatingsOnlyReviewCount": 0,
+                    "NotHelpfulVoteCount": 0,
+                    "FeaturedReviewCount": 0,
+                    "FirstSubmissionTime": "2024-05-21T20:29:12.000+00:00",
+                    "LastSubmissionTime": "2024-05-21T20:29:12.000+00:00",
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "RecommendedCount": 1,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 1,
+                "FilteredReviewStatistics": {
+                    "TotalReviewCount": 1,
+                    "AverageOverallRating": 5.0,
+                    "HelpfulVoteCount": 0,
+                    "NotRecommendedCount": 0,
+                    "RatingsOnlyReviewCount": 0,
+                    "NotHelpfulVoteCount": 0,
+                    "FeaturedReviewCount": 0,
+                    "FirstSubmissionTime": "2024-05-21T20:29:12.000+00:00",
+                    "LastSubmissionTime": "2024-05-21T20:29:12.000+00:00",
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "RecommendedCount": 1,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "zadq39smezi2zm283zpjsj4r6d": {
+                "Id": "zadq39smezi2zm283zpjsj4r6d",
+                "ModerationStatus": "SUBMITTED",
+                "SubmissionTime": "2024-05-18T15:15:24.000+00:00",
+                "ThirdPartyIds": [],
+                "LastModeratedTime": null,
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "ContributorRank": null,
+                "Avatar": {},
+                "SubmissionId": null,
+                "UserNickname": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "HelpfulVoteCount": 0,
+                    "FirstSubmissionTime": "2024-05-18T15:16:11.000+00:00",
+                    "LastSubmissionTime": "2024-05-18T15:16:11.000+00:00",
+                    "RatingsOnlyReviewCount": 0,
+                    "FeaturedReviewCount": 0,
+                    "NotHelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "AverageOverallRating": 5.0,
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 1,
+                "FilteredReviewStatistics": {
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "HelpfulVoteCount": 0,
+                    "FirstSubmissionTime": "2024-05-18T15:16:11.000+00:00",
+                    "LastSubmissionTime": "2024-05-18T15:16:11.000+00:00",
+                    "RatingsOnlyReviewCount": 0,
+                    "FeaturedReviewCount": 0,
+                    "NotHelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "AverageOverallRating": 5.0,
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "z66csuwr1h16jzss8tgxtxegpi": {
+                "Id": "z66csuwr1h16jzss8tgxtxegpi",
+                "ModerationStatus": "SUBMITTED",
+                "SubmissionTime": "2024-05-12T12:19:28.000+00:00",
+                "ThirdPartyIds": [],
+                "LastModeratedTime": null,
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "ContributorRank": null,
+                "Avatar": {},
+                "SubmissionId": null,
+                "UserNickname": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "HelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "FeaturedReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "FirstSubmissionTime": "2024-05-12T12:20:48.000+00:00",
+                    "LastSubmissionTime": "2024-05-12T12:20:48.000+00:00",
+                    "NotHelpfulVoteCount": 0,
+                    "RatingsOnlyReviewCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 1,
+                "FilteredReviewStatistics": {
+                    "HelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "FeaturedReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "RecommendedCount": 1,
+                    "NotRecommendedCount": 0,
+                    "FirstSubmissionTime": "2024-05-12T12:20:48.000+00:00",
+                    "LastSubmissionTime": "2024-05-12T12:20:48.000+00:00",
+                    "NotHelpfulVoteCount": 0,
+                    "RatingsOnlyReviewCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "h5ke4dmfauncty3eks11yausg": {
+                "Id": "h5ke4dmfauncty3eks11yausg",
+                "Badges": {
+                    "contestSweepstakesYes": {
+                        "ContentType": "REVIEWER",
+                        "Id": "contestSweepstakesYes",
+                        "BadgeType": "Custom"
+                    }
+                },
+                "BadgesOrder": [
+                    "contestSweepstakesYes"
+                ],
+                "ContextDataValuesOrder": [
+                    "Age",
+                    "Gender",
+                    "ShopFrequency",
+                    "contestSweepstakes"
+                ],
+                "Location": "West palm beach Florida",
+                "ContributorRank": "NONE",
+                "UserNickname": "Gene 39",
+                "LastModeratedTime": "2022-12-03T00:00:05.000+00:00",
+                "ModerationStatus": "APPROVED",
+                "SubmissionTime": "2022-12-02T22:01:39.000+00:00",
+                "ThirdPartyIds": [],
+                "ContextDataValues": {
+                    "Age": {
+                        "Value": "over60",
+                        "Id": "Age"
+                    },
+                    "ShopFrequency": {
+                        "Value": "frequently",
+                        "Id": "ShopFrequency"
+                    },
+                    "Gender": {
+                        "Value": "male",
+                        "Id": "Gender"
+                    },
+                    "contestSweepstakes": {
+                        "Value": "Yes",
+                        "Id": "contestSweepstakes"
+                    }
+                },
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Avatar": {},
+                "SubmissionId": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "NotRecommendedCount": 1,
+                    "AverageOverallRating": 4.6,
+                    "RatingsOnlyReviewCount": 0,
+                    "NotHelpfulVoteCount": 0,
+                    "TotalReviewCount": 5,
+                    "FeaturedReviewCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 3
+                        },
+                        {
+                            "RatingValue": 4,
+                            "Count": 2
+                        }
+                    ],
+                    "RecommendedCount": 3,
+                    "FirstSubmissionTime": "2021-02-17T19:31:48.000+00:00",
+                    "LastSubmissionTime": "2024-05-10T22:11:04.000+00:00",
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 5,
+                "FilteredReviewStatistics": {
+                    "NotRecommendedCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "RatingsOnlyReviewCount": 0,
+                    "NotHelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "FeaturedReviewCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "RecommendedCount": 1,
+                    "FirstSubmissionTime": "2024-05-10T22:11:04.000+00:00",
+                    "LastSubmissionTime": "2024-05-10T22:11:04.000+00:00",
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            },
+            "FDAD3F22D07C3CE8298584ECE1E2B339": {
+                "Id": "FDAD3F22D07C3CE8298584ECE1E2B339",
+                "ContributorRank": "NONE",
+                "UserNickname": "Mermaid03",
+                "LastModeratedTime": "2018-01-06T01:30:04.000+00:00",
+                "ModerationStatus": "APPROVED",
+                "SubmissionTime": "2018-01-06T01:02:13.000+00:00",
+                "ThirdPartyIds": [],
+                "QuestionIds": [],
+                "AdditionalFieldsOrder": [],
+                "CommentIds": [],
+                "ContextDataValuesOrder": [],
+                "Location": null,
+                "ContextDataValues": {},
+                "AnswerIds": [],
+                "SecondaryRatingsOrder": [],
+                "StoryIds": [],
+                "AdditionalFields": {},
+                "Badges": {},
+                "Avatar": {},
+                "SubmissionId": null,
+                "Photos": [],
+                "ReviewIds": [],
+                "Videos": [],
+                "ProductRecommendationIds": [],
+                "BadgesOrder": [],
+                "SecondaryRatings": {},
+                "ReviewStatistics": {
+                    "FeaturedReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 4
+                        }
+                    ],
+                    "NotRecommendedCount": 0,
+                    "RecommendedCount": 2,
+                    "AverageOverallRating": 5.0,
+                    "NotHelpfulVoteCount": 0,
+                    "HelpfulVoteCount": 3,
+                    "TotalReviewCount": 4,
+                    "RatingsOnlyReviewCount": 0,
+                    "FirstSubmissionTime": "2018-01-06T01:02:13.000+00:00",
+                    "LastSubmissionTime": "2024-05-08T15:54:14.000+00:00",
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                },
+                "TotalReviewCount": 4,
+                "FilteredReviewStatistics": {
+                    "FeaturedReviewCount": 0,
+                    "RatingDistribution": [
+                        {
+                            "RatingValue": 5,
+                            "Count": 1
+                        }
+                    ],
+                    "NotRecommendedCount": 0,
+                    "RecommendedCount": 0,
+                    "AverageOverallRating": 5.0,
+                    "NotHelpfulVoteCount": 0,
+                    "HelpfulVoteCount": 0,
+                    "TotalReviewCount": 1,
+                    "RatingsOnlyReviewCount": 0,
+                    "FirstSubmissionTime": "2024-05-08T15:54:14.000+00:00",
+                    "LastSubmissionTime": "2024-05-08T15:54:14.000+00:00",
+                    "ContextDataDistribution": {},
+                    "ContextDataDistributionOrder": [],
+                    "SecondaryRatingsAveragesOrder": [],
+                    "OverallRatingRange": 5,
+                    "TagDistributionOrder": [],
+                    "TagDistribution": {},
+                    "SecondaryRatingsAverages": {}
+                }
+            }
+        },
+        "ProductsOrder": [
+            "ppr5008282306"
+        ],
+        "AuthorsOrder": [
+            "zlmbgx6z1qivx8npci4zwtiemx",
+            "zhx2to1cun00rko2mg2o17l6nf",
+            "zpgvpw4mjlxpasdhkqti84idqe",
+            "zdvw7f618boh2p34rhe26xujek",
+            "zadq39smezi2zm283zpjsj4r6d",
+            "z66csuwr1h16jzss8tgxtxegpi",
+            "h5ke4dmfauncty3eks11yausg",
+            "FDAD3F22D07C3CE8298584ECE1E2B339"
+        ]
+    },
+    "HasErrors": false,
+    "Errors": []
+}

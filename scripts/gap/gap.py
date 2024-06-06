@@ -34,16 +34,16 @@ def run(playwright: Playwright) -> None:
         #     popup.wait_for_timeout(500)
         # page1.locator('//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/button').click()
         html = page.content()
-        # print(html)
+        # log.info(html)
         tree = etree.HTML(html)
-        # print(tree)
+        # log.info(tree)
         img_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
         img_name = img_name.replace("|", "")
         img_name = img_name.replace('"', "")
-        # print(img_name)
+        # log.info(img_name)
         price = tree.xpath('//*[@id="buy-box"]/div/div/div[1]/div[1]/span/text()')[0]
-        # print(price)
-        # print(img_name)
+        # log.info(price)
+        # log.info(img_name)
         color = tree.xpath('//*[@id="swatch-label--Color"]/span[2]/text()')[0]
         new_folder_name = img_name
         # Full path of the new folder
@@ -59,13 +59,13 @@ def run(playwright: Playwright) -> None:
                         j
                     )
                 )[0]
-                # print(detail)
+                # log.info(detail)
                 img_detail2.append(detail)
             except IndexError:
-                # print("The list of elements is empty, and no index could be accessed.")
+                # log.info("The list of elements is empty, and no index could be accessed.")
                 continue
             except Exception:
-                # print(f"An error occurred: {e}")
+                # log.info(f"An error occurred: {e}")
                 continue
         img_detail2.append(price)
         img_detail2.append(color)
@@ -80,18 +80,18 @@ def run(playwright: Playwright) -> None:
                     "https://www.gap.com"
                     + tree.xpath('//*[@id="product"]/div[1]/div[1]/div[3]/div[2]/div/div[{}]/div/a/@href'.format(j))[0]
                 )
-                # print(li_list)
+                # log.info(li_list)
                 img_name1 = new_folder_path + "/" + img_name + "{}.jpg".format(j)
                 r = requests.get(li_list)
                 with open(img_name1, "wb") as f:
                     f.write(r.content)
-                    print("{}下载完成".format(img_name1))
+                    log.info("{}下载完成".format(img_name1))
 
             except IndexError:
-                # print("The list of elements is empty, and no index could be accessed.")
+                # log.info("The list of elements is empty, and no index could be accessed.")
                 continue
             except Exception:
-                # print(f"An error occurred: {e}")
+                # log.info(f"An error occurred: {e}")
                 continue
         page.goto("https://www.gap.com/browse/search.do?searchText=coat#department=Men")
         for x in range(10):

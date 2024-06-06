@@ -1,6 +1,7 @@
 import json
 from typing import Mapping, Generator
 
+import structlog
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
@@ -16,7 +17,7 @@ def dumps(obj: Mapping) -> str:
 engine = create_engine(
     str(settings.mysql_dsn),
     connect_args={},
-    echo=True,
+    # echo=True,
     # json_serializer=dumps,
 )
 
@@ -30,5 +31,6 @@ if __name__ == "__main__":
     with Session(engine) as session:
         stmt = text("select version()")
         result = session.execute(stmt).scalars().one_or_none()
-        print(result)
+        log = structlog.get_logger()
+        log.info(result)
         Base.metadata.create_all(engine)
