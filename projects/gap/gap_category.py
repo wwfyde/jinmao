@@ -5,6 +5,8 @@ import httpx
 from lxml import etree
 from playwright.async_api import Playwright, async_playwright
 
+from crawler import log
+
 
 async def run(playwright: Playwright) -> None:
     # 从playwright对象中获取chromium浏览器

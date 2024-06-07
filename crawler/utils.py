@@ -2,10 +2,12 @@ import json
 import uuid
 from pathlib import Path
 
+import httpx
 import oss2
 from fastapi import HTTPException
 from playwright.async_api import Page
 
+from crawler import log
 from crawler.config import settings
 
 
@@ -80,3 +82,45 @@ def upload_image(
         return image_link
     else:
         raise HTTPException(status_code=result.status, detail=result.resp.read().decode())
+
+
+async def scroll_page(
+    page: Page,
+    scroll_pause_time: int = 1000,
+    max_attempt: int | None = None,
+    source: str | None = None,
+    page_size: int = 50,
+):
+    viewport_height = await page.evaluate("window.innerHeight")
+    i = 0
+    current_scroll_position = 0
+    while True:
+        # 滚动视口高度
+        i += 1
+        # log.info(f"第{i}次滚动, 滚动高度: {viewport_height}")
+        current_scroll_position += viewport_height
+        # log.info(f"当前滚动位置: {current_scroll_position}")
+        # 滚动到新的位置
+        await page.evaluate(f"window.scrollTo(0, {current_scroll_position})")
+        # 滚动到页面底部
+        # await page.evaluate(f"window.scrollTo(0, document.body.scrollHeight)")
+        # await asyncio.sleep(scroll_pause_time / 1000)
+        await page.wait_for_timeout(scroll_pause_time)
+        await page.wait_for_load_state()
+        # 重新获取页面高度
+        scroll_height = await page.evaluate("document.body.scrollHeight")
+        # 获取当前视口位置
+        current_viewport_position = await page.evaluate("window.scrollY + window.innerHeight")
+        # log.info(f"页面高度: {scroll_height}")
+        # log.info(f"当前视口位置: {current_viewport_position}")
+        log.debug(f"当前url:{page.url}")
+        if current_viewport_position >= scroll_height or current_scroll_position >= scroll_height:
+            # log.info("滚动到底部")
+            break
+        if max_attempt and i >= max_attempt:
+            log.info(f"最大尝试次数: {i}, 停止")
+            break
+        if source == "next" and int(httpx.URL(page.url).params.get("p")) % page_size == 0:
+            print("下一页")
+            break
+        # previous_height = new_height

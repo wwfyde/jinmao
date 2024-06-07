@@ -180,7 +180,10 @@ class ProductReview(Base):
     nickname: Mapped[str | None] = mapped_column(String(64), comment="昵称")  # required: gap, jcpenney, next
     helpful_votes: Mapped[int | None] = mapped_column(Integer, default=0, comment="按顶票数")  # required: gap, jcpenney
     not_helpful_votes: Mapped[int | None] = mapped_column(Integer, comment="按踩票数")  # required: gap, jcpenney
-
+    # 评论分析字段
+    quality: Mapped[float | None] = mapped_column(
+        Numeric(3, 1), comment="质量"
+    )  # required: gap, jcpenney, next, target
     helpful_score: Mapped[float | None] = mapped_column(Numeric(6, 1), comment="有用评分")  # optional: gap
     is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")
     created_at: Mapped[datetime | None] = mapped_column(

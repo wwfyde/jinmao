@@ -44,10 +44,9 @@ async def run(playwright: Playwright) -> None:
     async with page:
         base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing-0"
         gender = "women"
-        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-blouses?p=201"
-        a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
-        b = ["1-50", "51-100", "101-200", "200, .."]
-        category = "Blouses"
+        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-tshirts?p=1#0"
+        base_url = "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcg"
+        category = "T-Shirts"
         # 拦截所有图片
         await page.route(
             "**/*",
@@ -57,10 +56,9 @@ async def run(playwright: Playwright) -> None:
         b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
         seletor = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
         await page.wait_for_load_state(timeout=60000)
-        await page.wait_for_timeout(5000)
-        scroll_pause_time = random.randrange(1000, 1800, 200)
+        scroll_pause_time = random.randrange(1500, 2500, 200)
         # await page.wait_for_timeout(1000)
-        await scroll_page(page, scroll_pause_time=scroll_pause_time, source="next", page_size=200)
+        await scroll_page(page, scroll_pause_time=scroll_pause_time)
         # await page.pause()
         product_locators = page.locator(seletor)
         product_count = await product_locators.count()
@@ -81,11 +79,9 @@ async def run(playwright: Playwright) -> None:
             print(result)
         # print(products_urls)
         # 将数据持久化到本地
-        with open(settings.project_dir.joinpath("data", f"{gender}-{category}-next_urls.txt"), "w") as f:
+        with open("next_urls.txt", "w") as f:
             for url in product_urls:
                 f.write(url + "\n")
-        print(page.url)
-        await page.pause()
 
 
 async def main():
@@ -102,5 +98,4 @@ if __name__ == "__main__":
     # os.environ["http_proxy"] = "http://127.0.0.1:23457"
     # os.environ["https_proxy"] = "http://127.0.0.1:23457"
     # os.environ["all_proxy"] = "socks5://127.0.0.1:23457"
-
     asyncio.run(main())

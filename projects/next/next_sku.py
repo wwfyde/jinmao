@@ -47,6 +47,10 @@ async def run(playwright: Playwright) -> None:
     page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
     async with page:
         # route_event = asyncio.Event()
+        await page.route(
+            "**/*",
+            lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+        )
 
         async def handle_response(response: Response):
             if "https://api.bazaarvoice.com/data/reviews.json" in response.url and response.status == 200:
@@ -61,6 +65,7 @@ async def run(playwright: Playwright) -> None:
         # url = "https://www.next.co.uk/style/su051590/884625"
         # url = "https://www.next.co.uk/style/su179185/k73610"
         # url = "https://www.next.co.uk/style/SU054491/176332"
+        url = "https://www.next.co.uk/style/su272671/q64927#q64927"
         await page.goto(
             url=url,
             timeout=PLAYWRIGHT_TIMEOUT,
