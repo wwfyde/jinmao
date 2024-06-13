@@ -12,6 +12,7 @@ client = AnthropicBedrock(
     aws_region="us-west-2",  # 指定AWS区域
 )
 
+
 def load_comments(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -20,6 +21,7 @@ def load_comments(file_path):
     except Exception as e:
         print(f"Failed to load comments from {file_path}: {e}")
         return []
+
 
 def prepare_prompt():
     return (
@@ -30,6 +32,7 @@ def prepare_prompt():
         "quality: X, warmth: Y, comfort: Z, softness: W, likability: A, repurchase intent: B, positive sentiment: C. "
         "Ensure no attribute is scored zero by inferring missing details from general feedback."
     )
+
 
 def analyze_single_comment(comment, prompt):
     content = prompt + " " + comment['comment']
@@ -62,6 +65,7 @@ def analyze_single_comment(comment, prompt):
         print(f"Exception occurred while processing comment: {comment['comment']}. Error: {e}")
         return None
 
+
 def analyze_comments(comments, prompt, max_workers=10):
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:  # 使用指定数量的线程并行处理
@@ -71,6 +75,7 @@ def analyze_comments(comments, prompt, max_workers=10):
             if result:
                 results.append(result)
     return results
+
 
 def extract_scores(response):
     scores = {
@@ -108,12 +113,14 @@ def extract_scores(response):
 
     return scores
 
+
 def save_results_to_json(results, output_file):
     try:
         with open(output_file, 'w', encoding='utf-8') as file:
             json.dump(results, file, ensure_ascii=False, indent=4)
     except Exception as e:
         print(f"Failed to save results to {output_file}: {e}")
+
 
 def main():
     file_path = "reviews500.json"
@@ -138,6 +145,7 @@ def main():
     print(f"Total processing time: {total_processing_time:.2f} seconds")
     print(f"Total input tokens: {total_input_tokens}")
     print(f"Total output tokens: {total_output_tokens}")
+
 
 if __name__ == "__main__":
     main()

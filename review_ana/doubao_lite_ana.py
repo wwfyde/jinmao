@@ -5,7 +5,8 @@ from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # 设置API密钥
-os.environ["ARK_API_KEY"] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmstY29uc29sZSIsImV4cCI6MTcxOTA3NjM4MiwiaWF0IjoxNzE4MDc2MzgyLCJ0IjoidXNlciIsImt2IjoxLCJhaWQiOiIyMTAwMjUwMDk0IiwidWlkIjoiMCIsImlzX291dGVyX3VzZXIiOnRydWUsInJlc291cmNlX3R5cGUiOiJlbmRwb2ludCIsInJlc291cmNlX2lkcyI6WyJlcC0yMDI0MDYxMTAyMDMxNi1naDVwaCJdfQ.hoVIRqoo1b3TKZzs9s8x0Jy7nJ-mDvvDdTKi8scs4IopIhX10YjVVhBhE8WSE19VLfDRrhvOv2pSeQQgkIH1J8R0zU1pZENLoUQ8txcE67In134v2TdTvNm8vgJ8vLRBT_nf7VeFizJaXZU4IlgMcapxDbveCyKpUKqkJKivyG6mZd1ybQaOm5fB0RbQtLd1nDyUNZyE9OhhXG69yEumEMr-_0q8EtXtnLm0yz6tf43RRkKhbn72JCfuN_J7nNow07PujF2hvfubiMCDo-Ko9YwU1nvjAkH9ZqHxDhl0oK3jlh1ONXbYCZEbgRm3FBCf7A-2UqldUN2NyCRjyHds6A"
+os.environ[
+    "ARK_API_KEY"] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmstY29uc29sZSIsImV4cCI6MTcxOTA3NjM4MiwiaWF0IjoxNzE4MDc2MzgyLCJ0IjoidXNlciIsImt2IjoxLCJhaWQiOiIyMTAwMjUwMDk0IiwidWlkIjoiMCIsImlzX291dGVyX3VzZXIiOnRydWUsInJlc291cmNlX3R5cGUiOiJlbmRwb2ludCIsInJlc291cmNlX2lkcyI6WyJlcC0yMDI0MDYxMTAyMDMxNi1naDVwaCJdfQ.hoVIRqoo1b3TKZzs9s8x0Jy7nJ-mDvvDdTKi8scs4IopIhX10YjVVhBhE8WSE19VLfDRrhvOv2pSeQQgkIH1J8R0zU1pZENLoUQ8txcE67In134v2TdTvNm8vgJ8vLRBT_nf7VeFizJaXZU4IlgMcapxDbveCyKpUKqkJKivyG6mZd1ybQaOm5fB0RbQtLd1nDyUNZyE9OhhXG69yEumEMr-_0q8EtXtnLm0yz6tf43RRkKhbn72JCfuN_J7nNow07PujF2hvfubiMCDo-Ko9YwU1nvjAkH9ZqHxDhl0oK3jlh1ONXbYCZEbgRm3FBCf7A-2UqldUN2NyCRjyHds6A"
 
 # 从环境变量中获取API密钥
 api_key = os.environ.get("ARK_API_KEY")
@@ -31,6 +32,7 @@ prompt = (
     "quality: X, warmth: Y, comfort: Z, softness: W, likability: A, repurchase intent: B, positive sentiment: C. "
     "Ensure no attribute is scored zero by inferring missing details from general feedback."
 )
+
 
 def analyze_comment(review):
     comment = review.get("comment")
@@ -65,6 +67,7 @@ def analyze_comment(review):
         "output_tokens": len(analysis_result.split()),  # 计算输出token数量
         "processing_time": processing_time
     }
+
 
 # 并行处理评论分析
 analysis_results = []

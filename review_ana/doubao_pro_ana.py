@@ -5,7 +5,8 @@ from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # 设置API密钥
-os.environ["ARK_API_KEY"] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmstY29uc29sZSIsImV4cCI6MTcxOTA5MjU1MiwiaWF0IjoxNzE4MDkyNTUyLCJ0IjoidXNlciIsImt2IjoxLCJhaWQiOiIyMTAwMjUwMDk0IiwidWlkIjoiMCIsImlzX291dGVyX3VzZXIiOnRydWUsInJlc291cmNlX3R5cGUiOiJlbmRwb2ludCIsInJlc291cmNlX2lkcyI6WyJlcC0yMDI0MDYxMTA2MzczMy1nZGYycyJdfQ.GKv1TJp5A-cnfpRcPSTGplyygHcwT3zF8T8RlfOtchjKjQThdkqz1FTcUNqx9Oicx88Btile1TXFjtlU99tNxuBivneeOzOyxj4WYoxklT7H1V8YLGt2eAvRtTqAI-zbRXEi_eVhhNZ9NfflYwrNwc1l6Nuvql6Su-lx6AdUyhfqYsjc4kM8iwkg3WIreDTvyNnCkc6klj3L8TzAr8rvsRG-69TXlU9qb6aNDZyLv7blLZgntuJy8SacT0AzaqvKAvFdKJF7z2rq_7K5YE_dsjKYWIBc9B3fPFV5C3FJBaGdg4oTA8zLTogtFR_3iBy1n_GEWGqTf-UNBk4fnO9-FA"
+os.environ[
+    "ARK_API_KEY"] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmstY29uc29sZSIsImV4cCI6MTcxOTA5MjU1MiwiaWF0IjoxNzE4MDkyNTUyLCJ0IjoidXNlciIsImt2IjoxLCJhaWQiOiIyMTAwMjUwMDk0IiwidWlkIjoiMCIsImlzX291dGVyX3VzZXIiOnRydWUsInJlc291cmNlX3R5cGUiOiJlbmRwb2ludCIsInJlc291cmNlX2lkcyI6WyJlcC0yMDI0MDYxMTA2MzczMy1nZGYycyJdfQ.GKv1TJp5A-cnfpRcPSTGplyygHcwT3zF8T8RlfOtchjKjQThdkqz1FTcUNqx9Oicx88Btile1TXFjtlU99tNxuBivneeOzOyxj4WYoxklT7H1V8YLGt2eAvRtTqAI-zbRXEi_eVhhNZ9NfflYwrNwc1l6Nuvql6Su-lx6AdUyhfqYsjc4kM8iwkg3WIreDTvyNnCkc6klj3L8TzAr8rvsRG-69TXlU9qb6aNDZyLv7blLZgntuJy8SacT0AzaqvKAvFdKJF7z2rq_7K5YE_dsjKYWIBc9B3fPFV5C3FJBaGdg4oTA8zLTogtFR_3iBy1n_GEWGqTf-UNBk4fnO9-FA"
 
 # 从环境变量中获取API密钥
 api_key = os.environ.get("ARK_API_KEY")
@@ -31,6 +32,7 @@ prompt = (
     "quality: X, warmth: Y, comfort: Z, softness: W, likability: A, repurchase intent: B, positive sentiment: C. "
     "Ensure no attribute is scored zero by inferring missing details from general feedback."
 )
+
 
 def analyze_comment(review):
     comment = review.get("comment")
@@ -65,6 +67,7 @@ def analyze_comment(review):
         "output_tokens": len(analysis_result.split()),  # 计算输出token数量
         "processing_time": processing_time
     }
+
 
 # 并行处理评论分析
 analysis_results = []
