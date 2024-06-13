@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from anthropic import AnthropicBedrock
 
@@ -32,6 +33,7 @@ def prepare_prompt():
 
 def analyze_single_comment(comment, prompt):
     content = prompt + " " + comment['comment']
+    start_time = time.time()  # 记录开始时间
     try:
         message = client.messages.create(
             model="anthropic.claude-3-haiku-20240307-v1:0",
@@ -39,14 +41,18 @@ def analyze_single_comment(comment, prompt):
             messages=[{"role": "user", "content": content}]
         )
 
+        end_time = time.time()  # 记录结束时间
+
         if hasattr(message, 'content'):
             response = str(message.content).strip()
             # 提取评分
             scores = extract_scores(response)
             result = {
                 'review_id': comment['review_id'],
-                'comment': comment['comment'],
-                'scores': scores
+                'scores': scores,
+                'input_tokens': len(content.split()),  # 计算输入token数量
+                'output_tokens': len(response.split()),  # 计算输出token数量
+                'processing_time': end_time - start_time  # 计算处理时间
             }
             return result
         else:
@@ -110,12 +116,28 @@ def save_results_to_json(results, output_file):
         print(f"Failed to save results to {output_file}: {e}")
 
 def main():
-    file_path = "comments.json"
+    file_path = "reviews500.json"
     output_file = "predicted_scores.json"
     comments = load_comments(file_path)
     prompt = prepare_prompt()
-    results = analyze_comments(comments, prompt, max_workers=20)  # 调整 max_workers 以增加并行处理数量
-    save_results_to_json(results, output_file)
+
+    start_time = time.time()  # 记录总开始时间
+    results = analyze_comments(comments, prompt, max_workers=50)  # 调整 max_workers 以增加并行处理数量
+    end_time = time.time()  # 记录总结束时间
+
+    total_input_tokens = sum(result['input_tokens'] for result in results)
+    total_output_tokens = sum(result['output_tokens'] for result in results)
+    total_processing_time = end_time - start_time
+
+    # 仅保存评分结果
+    scores_only = [{'review_id': result['review_id'], 'scores': result['scores']} for result in results]
+
+    save_results_to_json(scores_only, output_file)
+
+    print(f"Analysis results have been saved to {output_file}")
+    print(f"Total processing time: {total_processing_time:.2f} seconds")
+    print(f"Total input tokens: {total_input_tokens}")
+    print(f"Total output tokens: {total_output_tokens}")
 
 if __name__ == "__main__":
     main()
