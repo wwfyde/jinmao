@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from sqlalchemy import String, Integer, DateTime, JSON, func, Boolean, BigInteger, Numeric, Text
+from sqlalchemy import String, Integer, DateTime, JSON, func, Boolean, BigInteger, Numeric, Text, Index
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -11,7 +11,7 @@ class Base(DeclarativeBase):
 
 class Product(Base):
     __tablename__ = "product"
-    __table_args__ = {"comment": "商品"}
+    __table_args__ = (Index("ix_source_product_id", "source", "product_id", mysql_using="hash"), {"comment": "商品"})
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")  # 内部ID
     product_id: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="源产品ID"
@@ -30,6 +30,8 @@ class Product(Base):
     image_url_stored: Mapped[str | None] = mapped_column(
         String(1024), comment="本地存储图片连接"
     )  # required: gap, jcpenney, target
+    model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="模特图片链接")
+    model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="模特图片链接列表")
     rating: Mapped[float | None] = mapped_column(
         Numeric(2, 1), nullable=True, comment="评分"
     )  # required: gap, jcpenney, target
@@ -102,7 +104,11 @@ class Product(Base):
 
 class ProductSKU(Base):
     __tablename__ = "product_sku"
-    __table_args__ = {"comment": "商品SKU"}
+    __table_args__ = (
+        Index("ix_source_sku_id", "source", "sku_id", mysql_using="hash"),
+        Index("ix_source_product_id", "source", "product_id", mysql_using="hash"),
+        {"comment": "商品SKU"},
+    )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")
     sku_id: Mapped[str | None] = mapped_column(String(128), comment="源SKU ID")  # required: gap, jcpenney, next, target
     source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
@@ -120,10 +126,16 @@ class ProductSKU(Base):
     source_id: Mapped[int | None] = mapped_column(BigInteger, comment="源商品ID")
     sku_name: Mapped[str | None] = mapped_column(String(128), nullable=True, comment="SKU名称")
     description: Mapped[str | None] = mapped_column(String(1024), comment="商品描述")
+    attributes: Mapped[dict | None] = mapped_column(
+        JSON, comment="额外商品属性, 特点, 和描述bulletedCopyAttrs"
+    )  # optional: jcpenney, next
+    product_url: Mapped[str | None] = mapped_column(String(1024), comment="商品链接")  # optional: jcpenney, next
     category_id: Mapped[int | None] = mapped_column(BigInteger, comment="类别ID")
     image_url: Mapped[str | None] = mapped_column(
         String(512), nullable=True, comment="商品图片"
     )  # optional: next, target
+    model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="模特图片链接")
+    model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="模特图片链接列表")
     style: Mapped[str | None] = mapped_column(String(128), comment="服装风格")
     inventory: Mapped[int | None] = mapped_column(Integer, comment="库存")
     inventory_status: Mapped[str | None] = mapped_column(String(32), comment="库存状态")
@@ -159,7 +171,10 @@ class ProductSKU(Base):
 
 class ProductReview(Base):
     __tablename__ = "product_review"
-    __table_args__ = {"comment": "商品评论"}
+    __table_args__ = (
+        Index("ix_source_product_id", "source", "product_id", mysql_using="hash"),
+        {"comment": "商品评论"},
+    )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     review_id: Mapped[str | None] = mapped_column(String(64), comment="源评论ID")  # required: gap, jcpenney, next
     source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
@@ -181,9 +196,9 @@ class ProductReview(Base):
     helpful_votes: Mapped[int | None] = mapped_column(Integer, default=0, comment="按顶票数")  # required: gap, jcpenney
     not_helpful_votes: Mapped[int | None] = mapped_column(Integer, comment="按踩票数")  # required: gap, jcpenney
     # 评论分析字段
-    quality: Mapped[float | None] = mapped_column(
-        Numeric(3, 1), comment="质量"
-    )  # required: gap, jcpenney, next, target
+    # quality: Mapped[float | None] = mapped_column(
+    #     Numeric(3, 1), comment="质量"
+    # )  # required: gap, jcpenney, next, target
     helpful_score: Mapped[float | None] = mapped_column(Numeric(6, 1), comment="有用评分")  # optional: gap
     is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")
     created_at: Mapped[datetime | None] = mapped_column(

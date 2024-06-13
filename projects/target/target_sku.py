@@ -1,6 +1,7 @@
 import asyncio
 import json
 import random
+import re
 import uuid
 
 import httpx
@@ -59,6 +60,13 @@ async def run(playwright: Playwright) -> None:
         base_url: str = (
             "https://www.target.com/p/women-s-tie-waist-button-front-midi-skirt-universal-thread/-/A-89766757"
         )
+        base_url: str = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245"
+
+        product_event = asyncio.Event()
+        review_event = asyncio.Event()
+        skus_event = asyncio.Event()
+
+        product: dict | None = None
 
         async def handle_review_route(route: Route):
             request = route.request
@@ -88,7 +96,7 @@ async def run(playwright: Playwright) -> None:
                     reviews.extend(review)
 
                 log.info(f"实际评论数{len(reviews)}")
-
+                review_event.set()
                 with open("review.json", "w") as f:
                     f.write(json.dumps(reviews))
 
@@ -110,7 +118,9 @@ async def run(playwright: Playwright) -> None:
                 # TODO 获取产品信息
                 response = await route.fetch()
                 json_dict = await response.json()
+                nonlocal product
                 product = parse_target_product(json_dict)
+                product_event.set()
                 log.info(f"商品详情: {product}")
 
             if "pdp_variation_hierarchy" in request.url:
@@ -118,6 +128,7 @@ async def run(playwright: Playwright) -> None:
                 response = await route.fetch()
                 json_dict = await response.json()
                 skus = parse_target_product_variation(json_dict)
+                skus_event.set()
                 log.info(f"商品变体: {len(skus) if skus else 0}")
             await route.continue_()
 
@@ -176,6 +187,156 @@ async def run(playwright: Playwright) -> None:
             color = await color_locator.inner_text()
         else:
             color = None
+
+        # TODO 通过页面获取产品属性
+        try:
+            await page.locator("//main/div/div[2]/div/div/div/div[3]/button").click()
+            """#product-detail-tabs > div > div:nth-child(3) > button"""
+            log.info("点击按钮成功")
+        except Exception as exc:
+            log.error(f"点击按钮失败: {exc}")
+        size_locator = page.get_by_text(re.compile("Sizing: ", re.IGNORECASE))
+        size = (await size_locator.first.inner_text()).split(": ")[-1] if await size_locator.count() > 0 else None
+        print(f"{size=}")
+
+        material_locator = page.get_by_text(re.compile("Material: ", re.IGNORECASE))
+        material = (
+            (await material_locator.first.inner_text()).split(": ")[-1] if await material_locator.count() > 0 else None
+        )
+        print(f"{material=}")
+
+        garment_style_locator = page.get_by_text(re.compile("Garment Style: ", re.IGNORECASE))
+        garment_style = (
+            (await garment_style_locator.first.inner_text()).split(": ")[-1]
+            if await garment_style_locator.count() > 0
+            else ""
+        )
+        print(f"garment_style: {garment_style}")
+
+        garment_length_locator = page.get_by_text(re.compile("Garment Length: ", re.IGNORECASE))
+        garment_length = (
+            (await garment_length_locator.first.inner_text()).split(": ")[-1]
+            if await garment_length_locator.count() > 0
+            else None
+        )
+        print(f"{garment_length=}")
+        neckline_locator = page.get_by_text(re.compile("Neckline: ", re.IGNORECASE))
+        neckline = (
+            (await neckline_locator.first.inner_text()).split(": ")[-1] if await neckline_locator.count() > 0 else None
+        )
+        print(f"{neckline=}")
+        fabric_name_locator = page.get_by_text(re.compile("Fabric Name: ", re.IGNORECASE))
+        fabric_name = (
+            (await fabric_name_locator.first.inner_text()).split(": ")[-1]
+            if await fabric_name_locator.count() > 0
+            else None
+        )
+        print(f"{fabric_name=}")
+
+        total_garment_length_locator = page.get_by_text(re.compile("Total Garment Length: ", re.IGNORECASE))
+        total_garment_length = (
+            (await total_garment_length_locator.first.inner_text()).split(": ")[-1]
+            if await total_garment_length_locator.count() > 0
+            else None
+        )
+        print(f"{total_garment_length=}")
+
+        garment_details_locator = page.get_by_text(re.compile("Garment Details: ", re.IGNORECASE))
+        garment_details = (
+            (await garment_details_locator.first.inner_text()).split(": ")[-1]
+            if await garment_details_locator.count() > 0
+            else None
+        )
+        print(f"{garment_details=}")
+
+        pacage_quantity_locator = page.get_by_text(re.compile("Package Quantity: ", re.IGNORECASE))
+        package_quantity = (
+            (await pacage_quantity_locator.first.inner_text()).split(": ")[-1]
+            if await pacage_quantity_locator.count() > 0
+            else None
+        )
+        print(f"{package_quantity=}")
+
+        garment_back_type_locator = page.get_by_text(re.compile("Garment Back Type: ", re.IGNORECASE))
+        garment_back_type = (
+            (await garment_back_type_locator.first.inner_text()).split(": ")[-1]
+            if await garment_back_type_locator.count() > 0
+            else None
+        )
+        print(f"{garment_back_type=}")
+
+        fabric_weight_type_locator = page.get_by_text(re.compile("Fabric Weight Type: ", re.IGNORECASE))
+        fabric_weight_type = (
+            (await fabric_weight_type_locator.first.inner_text()).split(": ")[-1]
+            if await fabric_weight_type_locator.count() > 0
+            else None
+        )
+        print(f"{fabric_weight_type=}")
+
+        garment_sleeve_style_locator = page.get_by_text(re.compile("Garment Sleeve Style: ", re.IGNORECASE))
+        garment_sleeve_style = (
+            (await garment_sleeve_style_locator.first.inner_text()).split(": ")[-1]
+            if await garment_sleeve_style_locator.count() > 0
+            else None
+        )
+        print(f"{garment_sleeve_style=}")
+
+        care_and_cleaning_locator = page.get_by_text(re.compile("Care and Cleaning: ", re.IGNORECASE))
+        care_and_cleaning = (
+            (await care_and_cleaning_locator.first.inner_text()).split(": ")[-1]
+            if await care_and_cleaning_locator.count() > 0
+            else None
+        )
+        print(f"{care_and_cleaning=}")
+
+        tcin_locator = page.get_by_text(re.compile("TCIN: ", re.IGNORECASE))
+        tcin = (await tcin_locator.first.inner_text()).split(": ")[-1] if await tcin_locator.count() > 0 else None
+        print(f"{tcin=}")
+
+        upc_locator = page.get_by_text(re.compile("UPC: ", re.IGNORECASE))
+        upc = (await upc_locator.first.inner_text()).split(": ")[-1] if await upc_locator.count() > 0 else None
+        print(f"{upc=}")
+
+        item_number_locator = page.get_by_text(re.compile("Item Number (DPCI): ", re.IGNORECASE))
+        item_number = (
+            (await item_number_locator.first.inner_text()).split(": ")[-1]
+            if await item_number_locator.count() > 0
+            else None
+        )
+        print(f"{item_number=}")
+
+        origin_locator = page.get_by_text(re.compile("Origin: ", re.IGNORECASE))
+        origin = (await origin_locator.first.inner_text()).split(": ")[-1] if await origin_locator.count() > 0 else None
+        print(f"{origin=}")
+
+        attributes = dict(
+            size=size,
+            material=material,
+            garment_style=garment_style,
+            garment_length=garment_length,
+            neckline=neckline,
+            fabric_name=fabric_name,
+            total_garment_length=total_garment_length,
+            garment_details=garment_details,
+            package_quantity=package_quantity,
+            garment_back_type=garment_back_type,
+            fabric_weight_type=fabric_weight_type,
+            garment_sleeve_style=garment_sleeve_style,
+            care_and_cleaning=care_and_cleaning,
+            tcin=tcin,
+            upc=upc,
+            item_number=item_number,
+            origin=origin,
+        )
+
+        await product_event.wait()
+        await skus_event.wait()
+        await review_event.wait()
+        product.update(dict(attributes=attributes))
+        # 保存产品信息到数据库
+        save_product_data(product)
+        await page.pause()
+
         log.info(color)
         # fit_size 适合人群
 
@@ -265,9 +426,8 @@ def parse_target_product(data: dict, sku_id: str | None = None) -> dict | None:
         return None
     product_id = product.get("tcin")
     category = (
-        product.get("category").get("parent_category_id", "") + " " + product.get("category").get("name", "")
-        if product.get("category")
-        else None
+        # product.get("category").get("parent_category_id", "") + " " + product.get("category").get("name", "")
+        product.get("category").get("name", "") if product.get("category") else None
     )
     rating = (
         product.get("ratings_and_reviews").get("statistics").get("rating").get("average")
@@ -308,7 +468,6 @@ def parse_target_product(data: dict, sku_id: str | None = None) -> dict | None:
         review_count=review_count,  # 评论数
     )
     # 保存产品信息到数据库
-    save_product_data(product_obj)
     return product_obj
     pass
 

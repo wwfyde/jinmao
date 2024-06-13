@@ -1,9 +1,12 @@
 import asyncio
+import html
 import re
 import uuid
 
 import httpx
+import redis.asyncio as redis
 import structlog
+from bs4 import BeautifulSoup
 from playwright.async_api import Playwright, async_playwright, BrowserContext, Response, Page
 
 from crawler.config import settings
@@ -38,119 +41,144 @@ async def run(playwright: Playwright) -> None:
     # 设置全局超时
     context.set_default_timeout(PLAYWRIGHT_TIMEOUT)
     # 并发打开新的页面
-    # semaphore = asyncio.Semaphore(settings.playwright.concurrency or 10)
+    semaphore = asyncio.Semaphore(settings.playwright.concurrency or 10)
+    log.debug(f"并发请求数: {settings.playwright.concurrency or 10}")
+
     # tasks = []
     # for i in range(10):
     #     tasks.append(open_pdp_page(context, semaphore))
     # pages = await asyncio.gather(*tasks)
-    page = await context.new_page()
-    page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
-    async with page:
-        # route_event = asyncio.Event()
-        await page.route(
-            "**/*",
-            lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-        )
+    # print(f"{pages=}")
+    # TODO 从redis 中获取商品列表
+    # 获取商品列表
 
-        async def handle_response(response: Response):
-            if "https://api.bazaarvoice.com/data/reviews.json" in response.url and response.status == 200:
-                reviews = await response.json()
-                print(f"{reviews=}")
+    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+    async with r:
+        source = "next"
+        main_category = "women"
+        sub_category = "rashvests"
+        product_urls = await r.smembers(f"{source}:{main_category}:{sub_category}")
+        print(product_urls, len(product_urls))
+        tasks = [
+            open_pdp_page(context, semaphore, url, main_category=main_category, source=source) for url in product_urls
+        ]
+        results = await asyncio.gather(*tasks)
+        print(f"{results=}")
 
-        # await page.route("**/api.bazaarvoice.com/data/**", handle_route)
-        page.on("response", handle_response)
-        url = "https://www.next.co.uk/g29253s3/709159"
-        url = "https://www.next.us/en/style/st423998/981678"
-        url = "https://www.next.co.uk/g29529s4/185342"
-        # url = "https://www.next.co.uk/style/su051590/884625"
-        # url = "https://www.next.co.uk/style/su179185/k73610"
-        # url = "https://www.next.co.uk/style/SU054491/176332"
-        url = "https://www.next.co.uk/style/su272671/q64927#q64927"
-        await page.goto(
-            url=url,
-            timeout=PLAYWRIGHT_TIMEOUT,
-            wait_until="load",
-        )
-        # 单击review按钮以加载评论
-        log.info("等待评论按钮出现")
-        # 可能没有评论
-        # review_node = await page.wait_for_selector('//*[@id="LoadMoreBtn"]', timeout=5000)
-        # if review_node is None:
-        #     print("该商品没有评论")
-        await page.wait_for_load_state(timeout=30000)
-        # 获取product_style 信息
-
-        product_obj = await parse_next_product(page)
-
-        print(f"从Page中解析 商品信息{product_obj=}")
-
-        sku_id_raw = product_obj.get("sku_id_raw")
-        print(f"源sku_id: {sku_id_raw}")
-        # 获取数据信息
-        shot_data: dict = await page.evaluate("""() => {
-                            return window.shotData;
-                        }""")
-        # print(type(shot_data))
-        # print(shot_data.get("Styles"))
-        sku = await parse_next_sku(
-            shot_data,
-            sku_id_raw,
-            product_id=product_obj.get(
-                "product_id",
-            ),
-            product_name=product_obj.get("product_name"),
-            sku_url=page.url,
-            source="next",
-        )
-        print(f"商品SKU信息: {sku=}")
-        # 通过点击按钮加载更多评论
-        while True:
-            try:
-                review_button = page.locator('//*[@id="LoadMoreBtn"]')
-                if await review_button.count() == 0:
-                    log.info("没有额外评论需要展开")
-                    break
-                display = await page.locator('//*[@id="LoadMoreBtn"]').get_attribute("style")
-                class_ = await page.locator('//*[@id="LoadMoreBtn"]').get_attribute("class")
-                log.debug(f"按钮的 class 属性为: {class_}")
-                log.debug(f"按钮的 display 属性为: {display}")
-
-                # TODO 可优化 review_button.is_visible():
-                if display and "display: none;" in display:
-                    log.info("按钮的 display 属性为 none，退出循环")
-                    break
-
-                await page.locator('//*[@id="LoadMoreBtn"]').first.click()
-                print("点击完成")
-                await page.wait_for_timeout(2000)
-                await page.wait_for_load_state("domcontentloaded", timeout=3000)
-                print("等待加载完成")
-            except Exception as exc:
-                log.info(f"没有更多评论可加载: {exc}")
-                break
-            # content = await page.content()
-            # 获取评论列表
-
-        reviews = await parse_review_from_dom(page)
-
-        log.debug(f"共获取到{len(reviews)}, {reviews=}")
-        await page.pause()
-        log.info("点击评论按钮")
-        # await page.locator("#accordion-button-0").click()
-        await page.wait_for_load_state("load", timeout=60000)
-        # await route_event.wait()
-        log.info("等待事件被正确执行")
-
-        print("页面加载完成")
-        pass
-        # await page.pause()
+    # await context.close()
+    # await asyncio.Future()
+    await asyncio.sleep(10)
 
 
-async def open_pdp_page(context: BrowserContext, semaphore: asyncio.Semaphore, product_id: str, sku_id: str):
+async def open_pdp_page(
+    context: BrowserContext, semaphore: asyncio.Semaphore, url: str, main_category: str, source: str
+):
     async with semaphore:
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
-        return sku_id
+        async with page:
+            # route_event = asyncio.Event()
+            await page.route(
+                "**/*",
+                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+            )
+
+            async def handle_response(response: Response):
+                if "https://api.bazaarvoice.com/data/reviews.json" in response.url and response.status == 200:
+                    reviews = await response.json()
+                    print(f"{reviews=}")
+
+            # await page.route("**/api.bazaarvoice.com/data/**", handle_route)
+            page.on("response", handle_response)
+            # url = "https://www.next.co.uk/g29253s3/709159"
+            # url = "https://www.next.us/en/style/st423998/981678"
+            # url = "https://www.next.co.uk/g29529s4/185342"
+            # # url = "https://www.next.co.uk/style/su051590/884625"
+            # # url = "https://www.next.co.uk/style/su179185/k73610"
+            # # url = "https://www.next.co.uk/style/SU054491/176332"
+            # url = "https://www.next.co.uk/style/su272671/q64927#q64927"
+            await page.goto(
+                url=url,
+                timeout=PLAYWRIGHT_TIMEOUT,
+                wait_until="load",
+            )
+            # 单击review按钮以加载评论
+            log.info("等待评论按钮出现")
+            # 可能没有评论
+            # review_node = await page.wait_for_selector('//*[@id="LoadMoreBtn"]', timeout=5000)
+            # if review_node is None:
+            #     print("该商品没有评论")
+            await page.wait_for_load_state(timeout=30000)
+            # 获取product_style 信息
+            product = await parse_next_product(page)
+
+            print(f"从Page中解析 商品信息{product=}")
+
+            sku_id_raw = product.get("sku_id_raw")
+            product.update(dict(gender=main_category, source=source))
+            save_product_data(product)
+
+            print(f"源sku_id: {sku_id_raw}")
+            # 获取数据信息
+            shot_data: dict = await page.evaluate("""() => {
+                                return window.shotData;
+                            }""")
+            # print(type(shot_data))
+            # print(shot_data.get("Styles"))
+            sku = await parse_next_sku(
+                shot_data,
+                sku_id_raw,
+                product_id=product.get(
+                    "product_id",
+                ),
+                product_name=product.get("product_name"),
+                sku_url=page.url,
+                source="next",
+            )
+            print(f"商品SKU信息: {sku=}")
+            # 通过点击按钮加载更多评论
+            while True:
+                try:
+                    review_button = page.locator('//*[@id="LoadMoreBtn"]')
+                    if await review_button.count() == 0:
+                        log.info("没有额外评论需要展开")
+                        break
+                    display = await page.locator('//*[@id="LoadMoreBtn"]').get_attribute("style")
+                    class_ = await page.locator('//*[@id="LoadMoreBtn"]').get_attribute("class")
+                    log.debug(f"按钮的 class 属性为: {class_}")
+                    log.debug(f"按钮的 display 属性为: {display}")
+
+                    # TODO 可优化 review_button.is_visible():
+                    if display and "display: none;" in display:
+                        log.info("按钮的 display 属性为 none，退出循环")
+                        break
+
+                    await page.locator('//*[@id="LoadMoreBtn"]').first.click()
+                    print("点击完成")
+                    await page.wait_for_timeout(2000)
+                    await page.wait_for_load_state("domcontentloaded", timeout=3000)
+                    print("等待加载完成")
+                except Exception as exc:
+                    log.info(f"没有更多评论可加载: {exc}")
+                    break
+                # content = await page.content()
+                # 获取评论列表
+
+            reviews = await parse_review_from_dom(page)
+
+            log.debug(f"共获取到{len(reviews)}, {reviews=}")
+            # await page.pause()
+            log.info("点击评论按钮")
+            # await page.locator("#accordion-button-0").click()
+            await page.wait_for_load_state("load", timeout=60000)
+            # await route_event.wait()
+            log.info("等待事件被正确执行")
+
+            print("页面加载完成")
+            pass
+            # await page.pause()
+        # TODO 当任务完成后, 标记任务状态
+        return url
 
 
 async def parse_review_from_dom(page: Page, product_id: str = None, source: str = None):
@@ -273,6 +301,20 @@ async def parse_next_sku(
     department = item.get("Department", None)  # 护理指导
     origin = item.get("CountryOfOrigin", None)
     source = source or "next"
+    webdata = item.get("WebData", [])[0].get("Value") if item.get("WebData") else ""
+    if webdata:
+        data = html.unescape(webdata)
+        soup = BeautifulSoup(data, "html.parser")
+        p_content = soup.find("p")
+        description = p_content.get_text() if p_content else None
+
+        # 提取 <li> 标签中的内容
+        li_tags = soup.find_all("li")
+        attributes = [li.get_text() for li in li_tags]
+    else:
+        description = None
+        attributes = None
+
     sku = dict(
         sku_id=sku_id,
         product_id=product_id,
@@ -290,10 +332,13 @@ async def parse_next_sku(
         origin=origin,
         department=department,
         care_instructions=care_instructions,
+        description=description,
+        attributes=attributes,
         washing_instructions=washing_instructions,
     )
     # 将sku 入库到数据库
     save_sku_data(sku)
+    save_product_data(dict(product_id=product_id, source=source, attributes=attributes))
     return sku
 
 
@@ -329,7 +374,6 @@ async def parse_next_product(page: Page) -> dict | None:
         brand=brand,
         category=category,
     )
-    save_product_data(product_obj)
     return product_obj
 
 

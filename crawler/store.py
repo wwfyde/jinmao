@@ -176,4 +176,9 @@ if __name__ == "__main__":
     log.warning("warning")
     # print(save_product_data({"product_id": 12, "name": "test", "source": "gap2"}))
     # print(save_review_data({"review_id": 3, "product_name": "test2", "source": "gap", "product_id": 1}))
-    print("已插入数据: ", save_sku_data({"sku_id": 5, "product_name": "test3", "source": "gap"}))
+    print(
+        "已插入数据: ",
+        save_product_data(
+            {"product_id": 999999, "sku_id": 5, "product_name": "test3", "source": "gap", "attributes": {"test": 12}}
+        ),
+    )

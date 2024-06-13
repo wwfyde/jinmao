@@ -38,7 +38,7 @@ async def run(playwright: Playwright) -> None:
         base_url: str = "https://www.gap.com/browse/product.do?pid=223627262&cid=1127944&pcid=1127944&vid=1&grid=pds_68_948_2&cpos=372&cexp=2859&kcid=CategoryIDs%3D1127944&ctype=Listing&cpid=res24052700881663268842577#pdp-page-content"
 
         async def handle_route(route: Route):
-            log.info("拦截请求", route.request.url)
+            log.info(f"拦截请求 {route.request.url}")
             request = route.request
             if "/reviews" in request.url:
                 response = await route.fetch()
@@ -99,7 +99,7 @@ async def run(playwright: Playwright) -> None:
         tree = etree.HTML(content)
         # product_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
         t = tree.xpath('//*[@id="buy-box"]/div/h1/h1/text()')
-        log.info(t, type(t))
+        log.info(f"{t}, {type(t)}")
 
         product_name = tree.xpath('//*[@id="buy-box"]/div/h1/text()')[0]
         product_name = product_name.replace("|", "")
@@ -121,7 +121,7 @@ async def run(playwright: Playwright) -> None:
         product_details: list = tree.xpath(
             '//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/ul/li/span/text()'
         )
-        log.info(product_details)
+        log.info(f"产品详情: {product_details}")
         detail_locator = page.get_by_role("button", name="product details")
         # '//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/ul'
         # 面料
@@ -252,6 +252,62 @@ def parse_reviews_from_api_old(r: dict) -> tuple[list[dict], int | None]:
         )
         my_reviews.append(my_review)
     return my_reviews, total_count
+
+
+async def parse_sku_from_dom_content(content: str):
+    """
+    解析页面内容
+    """
+    tree = etree.HTML(content)
+
+    # 获取商品名称
+    product_name_node = tree.xpath('//*[@id="buy-box"]/div/h1/text()')
+    product_name = product_name_node[0] if product_name_node else None
+    log.info(f"{product_name=}")
+
+    # 获取价格
+    price_node = tree.xpath('//*[@id="buy-box"]/div/div/div[1]/div[1]/span/text()')
+    price = price_node[0] if price_node else None
+
+    log.info(f"{price=}")
+    # 原价抓取存在问题, 可能是价格区间
+    # original_price = tree.xpath("//*[@id='buy-box']/div/div/div[1]/div[1]/div/span/text()")[0]
+    # log.info(original_price)
+
+    # 获取颜色
+    color_node = tree.xpath('//*[@id="swatch-label--Color"]/span[2]/text()')
+    color = color_node[0] if color_node else None
+    log.info(f"{color=}")
+    # fit_size 适合人群
+    fit_and_size = tree.xpath(
+        "//*[@id='buy-box-wrapper-id']/div/div[2]/div/div/div/div[2]/div[1]/div/div[1]/div/div/ul/li/text()"
+    )
+    log.info(fit_and_size)
+    # 产品详情
+    product_details: list = tree.xpath(
+        '//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/ul/li/span/text()'
+    )
+    log.info(product_details)
+    # 面料
+    fabric_and_care: list = tree.xpath(
+        "//*[@id='buy-box-wrapper-id']/div/div[2]/div/div/div/div[2]/div[3]/div/div[1]/div/ul/li/span/text()"
+    )
+    log.info(fabric_and_care)
+    # TODO  下载 模特图片
+
+    model_image_urls = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div/a/@href")
+    product_id = product_details[-1] if product_details else None
+    return dict(
+        price=price,
+        # original_price=original_price,
+        product_name=product_name,
+        color=color,
+        fit_size=fit_and_size,
+        product_details=product_details,
+        fabric_and_care=fabric_and_care,
+        product_id=product_id,
+        model_image_urls=model_image_urls,
+    )
 
 
 # 这是脚本的入口点。

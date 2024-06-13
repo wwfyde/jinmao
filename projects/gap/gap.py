@@ -64,7 +64,7 @@ def get_product_id(url: str) -> str:
     return parsed_url.params.get("pid")[:-3]
 
 
-async def run(playwright: Playwright, base_url: str) -> None:
+async def run(playwright: Playwright, base_url: str, gender: str) -> None:
     # 从playwright对象中获取chromium浏览器
     chromium = playwright.chromium
     # 指定代理
@@ -124,9 +124,17 @@ async def run(playwright: Playwright, base_url: str) -> None:
                 # log.info(f"接口原始数据: {await response.text()}")
                 json_dict = await response.json()
                 # log.info(f"类别接口数据: \n{json_dict}")
+                categories_dir = settings.data_dir.joinpath(PROVIDER, "categories")
+                categories_dir.mkdir(parents=True, exist_ok=True)
+
+                with open(f"{categories_dir}/category.json", "w") as f:
+                    f.write(json.dumps(json_dict))
+
                 # TODO  获取products by categories
 
-                products, _product_count, _pages, _sku_index = await parse_category_from_api(json_dict, page)
+                products, _product_count, _pages, _sku_index = await parse_category_from_api(
+                    json_dict, page, gender, source="gap"
+                )
                 nonlocal product_count
                 product_count = _product_count
                 nonlocal pages
@@ -213,7 +221,9 @@ async def run(playwright: Playwright, base_url: str) -> None:
     await context.close()
 
 
-async def open_pdp_page(context: BrowserContext, semaphore: asyncio.Semaphore, product_id: str, sku_id: str):
+async def open_pdp_page(
+    context: BrowserContext, semaphore: asyncio.Semaphore, product_id: str, sku_id: str, source: str = "gap"
+):
     async with semaphore:
         # product_detail_page 产品详情页
         pdp_url = f"https://www.gap.com/browse/product.do?pid={sku_id}#pdp-page-content"
@@ -346,7 +356,9 @@ async def open_pdp_page(context: BrowserContext, semaphore: asyncio.Semaphore, p
             # await page.wait_for_load_state("load")
             content = await sub_page.content()
             # 获取产品详情页(pdp)信息
-            dom_pdp_info = await parse_sku_from_dom_content(content)
+            dom_pdp_info = await parse_sku_from_dom_content(
+                content, product_id=product_id, sku_id=sku_id, source=source
+            )
             # TODO 更新信息到数据库和json文件 或者等从接口拿取后统一写入
             model_image_urls = dom_pdp_info.get("model_image_urls", [])
             base_url = "https://www.gap.com"
@@ -356,6 +368,7 @@ async def open_pdp_page(context: BrowserContext, semaphore: asyncio.Semaphore, p
             sku_model_dir = sku_dir.joinpath("model")
             sku_model_dir.mkdir(parents=True, exist_ok=True)
             for index, url in enumerate(model_image_urls):
+                url = url.replace("https://www.gap.com", "")
                 image_tasks.append(
                     fetch_images(
                         semaphore,
@@ -490,7 +503,7 @@ async def get_products_old(products: dict) -> list[dict]:
     return results
 
 
-async def parse_sku_from_dom_content(content: str):
+async def parse_sku_from_dom_content(content: str, *, product_id: str, sku_id: str, source: str = "gap") -> dict:
     """
     解析页面内容
     """
@@ -515,25 +528,33 @@ async def parse_sku_from_dom_content(content: str):
     color = color_node[0] if color_node else None
     log.info(f"{color=}")
     # fit_size 适合人群
+    attributes = []
     fit_and_size = tree.xpath(
         "//*[@id='buy-box-wrapper-id']/div/div[2]/div/div/div/div[2]/div[1]/div/div[1]/div/div/ul/li/text()"
     )
     log.info(fit_and_size)
+    attributes.extend(fit_and_size)
     # 产品详情
     product_details: list = tree.xpath(
         '//*[@id="buy-box-wrapper-id"]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/ul/li/span/text()'
     )
+    attributes.extend(product_details)
     log.info(product_details)
     # 面料
     fabric_and_care: list = tree.xpath(
         "//*[@id='buy-box-wrapper-id']/div/div[2]/div/div/div/div[2]/div[3]/div/div[1]/div/ul/li/span/text()"
     )
+    attributes.extend(fabric_and_care)
     log.info(fabric_and_care)
     # TODO  下载 模特图片
 
-    model_image_urls = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div/a/@href")
-    product_id = product_details[-1] if product_details else None
-    return dict(
+    model_image_urls_raw = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div/a/@href")
+    model_image_urls = []
+    for item in model_image_urls_raw:
+        log.info(item)
+        model_image_urls.append("https://www.gap.com" + item)
+    # product_id = product_details[-1] if product_details else None
+    pdp_info = dict(
         price=price,
         # original_price=original_price,
         product_name=product_name,
@@ -542,8 +563,26 @@ async def parse_sku_from_dom_content(content: str):
         product_details=product_details,
         fabric_and_care=fabric_and_care,
         product_id=product_id,
+        sku_id=sku_id,
+        source=source,
         model_image_urls=model_image_urls,
+        attributes=attributes,
     )
+    # 将从页面提取到的信息保存的数据库
+    save_sku_data(pdp_info)
+
+    save_product_data(
+        dict(
+            product_id=product_id,
+            attributes=attributes,
+            source=source,
+            color=color,
+            fit_size=fit_and_size,
+            product_details=product_details,
+            fabric_and_care=fabric_and_care,
+        )
+    )
+    return pdp_info
 
 
 async def get_reviews_from_url_by_id(product_id: str):
@@ -630,10 +669,7 @@ async def scroll_page(page: Page, scroll_pause_time: int = 1000):
         # previous_height = new_height
 
 
-async def parse_category_from_api(
-    data: dict,
-    page: Page,
-):
+async def parse_category_from_api(data: dict, page: Page, gender: str, source: str):
     """
     解析类型页面的API接口
     """
@@ -659,8 +695,9 @@ async def parse_category_from_api(
             type=product.get("webProductType", None),  # 商品类型
             category=product.get("webProductType", None),  # 商品类别
             released_at=product.get("releaseDate", None),  # 发布日期
-            brand="gap",
-            source=PROVIDER,  # 数据来源
+            brand="gap",  # 品牌
+            gender=gender,  # 性别
+            source=PROVIDER or source,  # 数据来源
         )
 
         skus = product.get("styleColors", [])
@@ -670,15 +707,14 @@ async def parse_category_from_api(
             images = skus[0].get("images", [])
             for item in images:
                 # 获取主图
-                if item["type"] == "Z":
+                if item["type"] == "AV6_Z":
                     result["image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
-                    if result["image_url"]:
-                        break
-                    else:
-                        if item["type"] == "AV1_Z":
-                            result["image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
-                            if result["image_url"]:
-                                break
+                    continue
+                if item["type"] == "Z":
+                    result["model_image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
+                if item["type"] == "AV1_Z":
+                    result["model2_image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
+
             # 将图片上传到oss
             # 下载图片
             # FIXME
@@ -781,6 +817,7 @@ async def fetch_reviews(semaphore, url, headers):
 async def fetch_images(semaphore: asyncio.Semaphore, url, headers, file_path: Path | str):
     async with semaphore:
         async with httpx.AsyncClient(timeout=60) as client:
+            log.debug(f"下载图片: {url}")
             response = await client.get(url, headers=headers)
             response.raise_for_status()  # 检查HTTP请求是否成功
             image_bytes = response.content
@@ -805,7 +842,8 @@ async def main():
         # log.info(f"开始抓取: {base_url}")
         # tasks = [run(p, url) for url in urls]
         # await asyncio.gather(*tasks)
-        await run(p, urls[0])
+        gender = "women"
+        await run(p, urls[0], gender)
         ...
 
 

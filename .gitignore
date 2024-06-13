@@ -76,6 +76,7 @@ yarn.lock
 *.local
 *.local.toml
 *.local.yml
+*.dev.yml
 
 # playwright
 browser_data/

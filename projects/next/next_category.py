@@ -4,9 +4,9 @@ import random
 import redis.asyncio as redis
 from playwright.async_api import Playwright, async_playwright
 
+from crawler import log
 from crawler.config import settings
 from crawler.utils import scroll_page
-from projects.gap.gap import PLAYWRIGHT_HEADLESS
 
 
 async def run(playwright: Playwright) -> None:
@@ -20,8 +20,8 @@ async def run(playwright: Playwright) -> None:
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
-            headless=PLAYWRIGHT_HEADLESS,
-            # headless=False,
+            # headless=True,
+            headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             args=["--start-maximized"],  # 启动时最大化窗口
             # ignore_https_errors=True,  # 忽略HTTPS错误
@@ -40,52 +40,281 @@ async def run(playwright: Playwright) -> None:
 
     # 打开新的页面
     # for base_url in urls:
-    page = await context.new_page()
-    async with page:
-        base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing-0"
-        gender = "women"
-        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-blouses?p=201"
-        a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
-        b = ["1-50", "51-100", "101-200", "200, .."]
-        category = "Blouses"
-        # 拦截所有图片
-        await page.route(
-            "**/*",
-            lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-        )
-        await page.goto(base_url)
-        b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
-        seletor = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
-        await page.wait_for_load_state(timeout=60000)
-        await page.wait_for_timeout(5000)
-        scroll_pause_time = random.randrange(1000, 1800, 200)
-        # await page.wait_for_timeout(1000)
-        await scroll_page(page, scroll_pause_time=scroll_pause_time, source="next", page_size=200)
-        # await page.pause()
-        product_locators = page.locator(seletor)
-        product_count = await product_locators.count()
-        product_urls = []
-        for i in range(product_count):
-            url = await product_locators.nth(i).get_attribute("href")
-            print(url)
-            product_urls.append(url)
-            # TODO 将 所有url 存入redis, 以持久化
-        print(f"一共获取商品数: {len(product_urls)}")
 
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-        async with r:
-            print(await r.get("a"))
+    # 获取所有类别
+    categories = [
+        # ("dresses", "14340"),
+        # ("tshirts", "4256"),
+        # ("blouses", "4132"),
+        # ("trousers", "3531"),
+        # ("jackets", "2729"),
+        # ("jumpers", "2310"),
+        # ("skirts", "2131"),  # TODO160 之后没拿对, 原722条
+        # ("shirts", "2081"),
+        # ("jeans", "1901"),
+        # ("shorts", "1841"),
+        # ("bikinis", "1763"),
+        # ("vests", "1380"),
+        # ("jumpsuit", "1226"),
+        # ("cardigans", "1041"),
+        # ("coats", "971"),
+        # ("leggings", "954"),
+        # ("sweattops", "934"),
+        # ("hoodies", "786"),
+        # ("tunics", "660"),
+        # ("joggers", "651"),
+        # ("socks", "611"),
+        # ("coverups", "600"),
+        # ("tanktops", "471"),
+        # ("camisoles", "408"),
+        # ("fleeces", "320"),
+        # ("waistcoats", "307"),
+        # ("gilets", "249"),
+        # ("bodies", "246"),
+        # ("playsuits", "244"),
+        # ("suitjackets", "185"),
+        # ("poloshirts", "178"),
+        # ("suittrousers", "156"),
+        # ("tights", "154"),
+        # ("croptops", "122"),
+        # ("tankinis", "118"),
+        # ("ponchos", "52"),
+        # ("dungarees", "44"),
+        # ("boobtube", "43"),
+        # ("tracksuits", "32"),
+        # ("rashvests", "27"),
+        # ("bodysuits", "22"),
+        # ("allinone", "13"),
+        ("loungewearsets", "12"),
+        ("topshortsets", "12"),
+        ("blazers", "9"),
+        ("topleggingset", "5"),
+        ("suitskirts", "3"),
+        ("rompersuits", "2"),
+        ("snowsuits", "2"),
+        ("dungareeset", "1"),
+    ]
+    # boys
+    categories = [
+        ("tshirts", "2339"),
+        ("shorts", "1079"),
+        ("shirts", "700"),
+        ("hoodies", "629"),
+        ("poloshirts", "556"),
+        ("jackets", "535"),
+        ("pyjamas", "515"),
+        ("socks", "496"),
+        ("trousers", "487"),
+        ("joggers", "459"),
+        ("swimshorts", "339"),
+        ("jeans", "256"),
+        ("sleepsuits", "219"),
+        ("rompersuits", "207"),
+        ("topshortsets", "189"),
+        ("bodysuits", "187"),
+        ("tracksuits", "137"),
+        ("jumpers", "126"),
+        ("rashvests", "109"),
+        ("coats", "108"),
+        ("dungarees", "105"),
+        ("sweattops", "104"),
+        ("trunks", "95"),
+        ("sweattopjoggersets", "86"),
+        ("footballshirts", "85"),
+        ("boxers", "82"),
+        ("cardigans", "75"),
+        ("dungareeset", "63"),
+        ("robes", "63"),
+        ("sweattopshortset", "62"),
+        ("allinone", "59"),
+        ("leggings", "55"),
+        ("gilets", "55"),
+        ("swimsuits", "52"),
+        ("fleeces", "50"),
+        ("suittrousers", "48"),
+        ("briefs", "47"),
+        ("sunsafesuits", "46"),
+        ("suitjackets", "42"),
+        ("vests", "41"),
+        ("topleggingset", "36"),
+        ("puddlesuits", "35"),
+        ("coverups", "31"),
+        ("sleepsuitset", "29"),
+        ("wetsuits", "28"),
+        ("baselayers", "27"),
+        ("waistcoats", "27"),
+        ("shirttrouserset", "23"),
+        ("hoodiejoggerset", "21"),
+        ("pramsuits", "20"),
+    ]
+    # girls
+    categories = [
+        ("dresses", "2350"),
+        ("tshirts", "1347"),
+        ("shorts", "585"),
+        ("leggings", "492"),
+        ("pyjamas", "473"),
+        ("sleepsuits", "439"),
+        ("jackets", "433"),
+        ("socks", "361"),
+        ("hoodies", "349"),
+        ("topshortsets", "347"),
+        ("skirts", "303"),
+        ("jeans", "280"),
+        ("cardigans", "279"),
+        ("sweattops", "275"),
+        ("trousers", "266"),
+        ("swimsuits", "262"),
+        ("rompersuits", "240"),
+        ("joggers", "206"),
+        ("bodysuits", "202"),
+        ("blouses", "175"),
+        ("playsuits", "157"),
+        ("topleggingset", "150"),
+        ("vests", "141"),
+        ("tights", "139"),
+        ("briefs", "129"),
+        ("coats", "120"),
+        ("jumpsuit", "118"),
+        ("jumpers", "99"),
+        ("sunsafesuits", "91"),
+        ("dungarees", "87"),
+        ("rashvests", "68"),
+        ("shirts", "67"),
+        ("allinone", "64"),
+        ("bras", "57"),
+        ("nighties", "45"),
+        ("sweattopleggingset", "44"),
+        ("topskirtset", "44"),
+        ("sweattopjoggersets", "41"),
+        ("slippers", "39"),
+        ("dressset", "38"),
+        ("ponchos", "37"),
+        ("puddlesuits", "37"),
+        ("sweattopshortset", "37"),
+        ("coverups", "36"),
+        ("robes", "36"),
+        ("fleeces", "33"),
+        ("poloshirts", "32"),
+        ("tracksuits", "29"),
+        ("pramsuits", "28"),
+        ("sleepsuitset", "28"),
+    ]
 
-            gender = "women"
-            result = await r.sadd(f"next:{gender}:{category}", *product_urls)
-            print(result)
-        # print(products_urls)
-        # 将数据持久化到本地
-        with open(settings.project_dir.joinpath("data", f"{gender}-{category}-next_urls.txt"), "w") as f:
-            for url in product_urls:
-                f.write(url + "\n")
-        print(page.url)
-        await page.pause()
+    # men
+    categories = [
+        ("tshirts", "4911"),
+        ("shirts", "3559"),
+        ("shorts", "2187"),
+        ("jackets", "2183"),
+        ("poloshirts", "2182"),
+        ("hoodies", "1483"),
+        ("trousers", "1443"),
+        ("sweattops", "983"),
+        ("joggers", "860"),
+        ("socks", "817"),
+        ("jeans", "757"),
+        ("jumpers", "710"),
+        ("swimshorts", "580"),
+        ("suittrousers", "517"),
+        ("suitjackets", "513"),
+        ("footballshirts", "428"),
+        ("waistcoats", "298"),
+        ("fleeces", "296"),
+        ("coats", "267"),
+        ("gilets", "228"),
+        ("vests", "168"),
+        ("tracksuits", "94"),
+        ("cardigans", "50"),
+        ("rashvests", "39"),
+        ("rugbyshirts", "32"),
+        ("topshortsets", "20"),
+        ("leggings", "16"),
+        ("ponchos", "5"),
+        ("allinone", "3"),
+        ("loungewearsets", "3"),
+        ("sweattopjoggersets", "3"),
+        ("tights", "3"),
+        ("hoodiejoggerset", "1"),
+        ("jumpsuit", "1"),
+        ("suits", "1"),
+    ]
+
+    for category, count in categories:
+        print(category, count)
+        total = int(count)
+        page_size = 12
+        page_count = (total + page_size - 1) // page_size
+        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-hoodies"
+        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
+        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-jumpers"
+        base_url = f"https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-{category}"
+        # 分段 当页数太多时可能导致chrome内存爆裂
+        segment = 40
+        times = (page_count + segment - 1) // segment
+        dresses_not = ["549_600", "825_900"]
+        for j in range(0, times):
+            next_base_url = base_url + f"?p={j * segment + 1}"
+
+            page = await context.new_page()
+            async with page:
+                # base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
+                gender = "women"
+                # base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-dresses"
+                a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
+                b = ["1-50", "51-100", "101-200", "200, .."]
+                c = [""]
+                category = base_url.split("/")[-1].split("-")[-1]
+                print(category)
+                # 拦截所有图片
+                await page.route(
+                    "**/*",
+                    lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+                )
+                await page.goto(next_base_url)
+                b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
+                selector = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
+                li_selector = (
+                    "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[2]/div[2]/div/div/div/ul/li/a"
+                )
+                await page.wait_for_load_state(timeout=60000)
+                await page.wait_for_timeout(5000)
+                scroll_pause_time = random.randrange(1000, 1800, 200)
+                # await page.wait_for_timeout(1000)
+                await scroll_page(page, scroll_pause_time=scroll_pause_time, source="next", page_size=segment)
+                # await page.pause()
+                product_locators = page.locator(li_selector)
+                product_count = await product_locators.count()
+                print(f"locators数量: {product_count}")
+                product_urls = []
+                for i in range(product_count):
+                    try:
+                        url = await product_locators.nth(i).get_attribute("href", timeout=5000)
+                        print(url)
+                        product_urls.append(url)
+                    # TODO 将 所有url 存入redis, 以持久化
+                    except Exception as exc:
+                        log.error(f"获取商品url失败: {exc}")
+                        pass
+                print(f"一共获取商品数: {len(product_urls)}")
+
+                r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                async with r:
+                    # print(await r.get("a"))
+
+                    gender = "women"
+                    result = await r.sadd(f"next:{gender}:{category}", *product_urls)
+                    print(result)
+                # print(products_urls)
+                # 将数据持久化到本地
+                with open(settings.project_dir.joinpath("data", f"{gender}-{category}-next_urls.txt"), "w") as f:
+                    for url in product_urls:
+                        f.write(url + "\n")
+                print(page.url)
+                # await page.pause()
+                log.debug(f"第{j + 1}轮: {page.url}")
+                await page.wait_for_timeout(2000)
+    await context.close()
 
 
 async def main():

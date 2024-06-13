@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     save_login_state: bool = True  # 保存登录状态
     base_dir: DirectoryPath | str = Path(__file__).resolve().parent
     project_dir: DirectoryPath | str = base_dir.parent
+    log_file_path: str | DirectoryPath = project_dir.joinpath("logs")
     data_dir: DirectoryPath | str = Path.home().joinpath("crawler")
     user_data_dir: DirectoryPath | str = project_dir.joinpath("browser_data")
     aliyun: Aliyun
@@ -88,7 +89,8 @@ class Settings(BaseSettings):
         yaml_file=[
             "config.yml",
             "config.local.yml",
-            "config.dev.local.yml",
+            # "config.dev.local.yml",
+            "config.dev.yml",
             "config.staging.yml",
             "config.prod.yml",
         ],
@@ -123,6 +125,7 @@ if __name__ == "__main__":
     log.info(settings.mysql_dsn)
     log.info(settings.base_dir)
     log.info(settings.project_dir)
+    # log.info(settings.log_file_path)
     log.info(settings.data_dir)
     log.info(settings.aliyun)
     log.info(settings.redis)
