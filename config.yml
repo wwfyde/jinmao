@@ -1,6 +1,6 @@
 # copy config.yml.example to config.yml
 playwright:
-    timeout: 300000
+    timeout: 180000
     concurrency: 10
 mysql:
     host: 10.31.0.181

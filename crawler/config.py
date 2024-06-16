@@ -89,7 +89,7 @@ class Settings(BaseSettings):
         yaml_file=[
             "config.yml",
             "config.local.yml",
-            # "config.dev.local.yml",
+            "config.dev.local.yml",
             "config.dev.yml",
             "config.staging.yml",
             "config.prod.yml",

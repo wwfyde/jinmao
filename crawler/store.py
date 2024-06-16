@@ -65,9 +65,9 @@ def save_review_data(data: dict | list[dict]):
             else:
                 stmt = insert(ProductReview).values(item)
                 review = session.execute(stmt)
-                log.warning(review)
+                # log.warning(review)
                 insert_id = review.inserted_primary_key[0] if review.inserted_primary_key else None
-                log.warning(insert_id)
+                # log.warning(insert_id)
                 session.commit()
                 if insert_id:
                     inserted_ids.append(insert_id)

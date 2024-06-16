@@ -14,7 +14,7 @@ def initialize_logger(name: str, log_level: int = logging.INFO):
     ch.setLevel(log_level)
 
     # Create formatter and add it to the handler
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s - %(lineno)d - %(message)s")
     ch.setFormatter(formatter)
 
     # Add the handler to the logger
