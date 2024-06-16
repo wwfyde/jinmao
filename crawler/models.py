@@ -22,13 +22,16 @@ class Product(Base):
     product_name: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="商品名称"
     )  # required: gap, jcpenney, target
+    sku_id: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, comment="主款号 ID"
+    )  # required: gap, jcpenney
     brand: Mapped[str | None] = mapped_column(String(64), comment="品牌")  # required: gap, jcpenney, target
     product_url: Mapped[str | None] = mapped_column(String(1024), comment="商品链接")  # required: gap, jcpenney, target
     image_url: Mapped[str | None] = mapped_column(
         String(1024), comment="商品主图链接"
     )  # required: gap, jcpenney, target
-    image_url_stored: Mapped[str | None] = mapped_column(
-        String(1024), comment="本地存储图片连接"
+    image_url_outer: Mapped[str | None] = mapped_column(
+        String(1024), comment="商品图片外链"
     )  # required: gap, jcpenney, target
     model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="模特图片链接")
     model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="模特图片链接列表")
@@ -41,9 +44,7 @@ class Product(Base):
     rating_count: Mapped[int | None] = mapped_column(
         Integer, nullable=True, default=0, comment="评分数"
     )  # optional: target
-    sku_id: Mapped[str | None] = mapped_column(
-        String(128), nullable=True, comment="主款号 ID"
-    )  # required: gap, jcpenney
+
     attributes: Mapped[dict | None] = mapped_column(
         JSON, comment="额外商品属性, 特点, 和描述bulletedCopyAttrs"
     )  # optional: jcpenney
@@ -134,6 +135,9 @@ class ProductSKU(Base):
     image_url: Mapped[str | None] = mapped_column(
         String(512), nullable=True, comment="商品图片"
     )  # optional: next, target
+    image_url_outer: Mapped[str | None] = mapped_column(
+        String(1024), comment="商品图片外链"
+    )  # required: gap, jcpenney, target
     model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="模特图片链接")
     model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="模特图片链接列表")
     style: Mapped[str | None] = mapped_column(String(128), comment="服装风格")
