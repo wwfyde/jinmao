@@ -1,6 +1,8 @@
+import time
 from typing import TypeVar, Type
 
 from sqlalchemy import select, insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Session
 
 from crawler import log
@@ -29,6 +31,8 @@ def save_review_data(data: dict | list[dict]):
     保存数据为json 和数据库
     主语
     """
+    start_time = time.time()  # 开始计时
+
     if isinstance(data, dict):
         data = [data]
 
@@ -80,7 +84,8 @@ def save_review_data(data: dict | list[dict]):
                     log.debug(
                         f"插入评论[review]数据成功, id={review.id}, product_id={review.product_id}, source={review.source}"
                     )
-
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存评论[review]数据完成，耗时 {end_time - start_time:.2f} 秒")
         return inserted_ids if inserted_ids else None
 
 
@@ -88,6 +93,7 @@ def save_sku_data(data: dict | list[dict]) -> list | None:
     """
     保存数据为json 和数据库
     """
+    start_time = time.time()
     if isinstance(data, dict):
         data = [data]
     data: list = field_filter(ProductSKU, data)
@@ -123,7 +129,8 @@ def save_sku_data(data: dict | list[dict]) -> list | None:
                     log.debug(
                         f"插入子款[SKU] 数据成功, id={sku.id}, sku_id={sku.sku_id}, product_id={sku.product_id}, source={sku.source}"
                     )
-
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存子款[sku]数据完成，耗时 {end_time - start_time:.2f} 秒")
         return inserted_ids if inserted_ids else None
 
 
@@ -131,6 +138,7 @@ def save_product_data(data: dict | list[dict]):
     """
     保存数据为json 和数据库
     """
+    start_time = time.time()
     if isinstance(data, dict):
         data = [data]
     data: list = field_filter(Product, data)
@@ -166,7 +174,77 @@ def save_product_data(data: dict | list[dict]):
                     log.debug(
                         f"插入商品[product]数据成功, id={product.id}, product_id={product.product_id}, source={product.source}"
                     )
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存商品[product]数据完成，耗时 {end_time - start_time:.2f} 秒")
         return inserted_ids if inserted_ids else None
+
+
+def save_review_data_bulk(data: dict | list[dict]):
+    """
+    批量保存数据到数据库
+    """
+    start_time = time.time()
+
+    if isinstance(data, dict):
+        data = [data]
+
+    data: list = field_filter(ProductReview, data)  # 假设field_filter是一个预处理数据的函数
+
+    with Session(engine) as session:
+        # 准备要插入或更新的对象列表
+        reviews_to_persist = []
+        existing_reviews = {}  # 用于缓存已存在的记录，避免多次查询
+
+        for item in data:
+            review_id = item.get("review_id")
+            source = item.get("source")
+            if review_id is None:
+                log.error("review_id is None")
+                continue
+
+            # 尝试从缓存中获取已存在的记录，减少查询次数
+            if (review_id, source) not in existing_reviews:
+                existing_review = (
+                    session.query(ProductReview)
+                    .filter(ProductReview.review_id == review_id, ProductReview.source == source)
+                    .one_or_none()
+                )
+                existing_reviews[(review_id, source)] = existing_review
+
+            review = existing_reviews[(review_id, source)]
+
+            if review:
+                # 更新现有记录
+                for key, value in item.items():
+                    setattr(review, key, value)
+                reviews_to_persist.append(review)
+            else:
+                # 准备新记录用于插入
+                reviews_to_persist.append(ProductReview(**item))
+
+        try:
+            # 执行批量插入/更新
+            # log.debug(reviews_to_persist)
+            session.bulk_save_objects(reviews_to_persist)
+            session.flush()  # 需要flush以生成主键（如果适用）
+            log.debug(f"批量插入评论[review]数据成功, 一共{len(reviews_to_persist)}条记录")
+        except IntegrityError as e:
+            # 处理可能的唯一性约束冲突等错误
+            session.rollback()
+            log.error(f"数据批量插入失败: {e}")
+            return None
+
+        # 提交事务
+        session.commit()
+
+        # 如果需要返回插入的ID，可以通过遍历reviews_to_persist并检查id来实现，但需注意这可能会有性能影响
+        inserted_ids = [review.review_id for review in reviews_to_persist if hasattr(review, "review_id")]
+
+        log.debug(f"批量操作完成，共处理{len(inserted_ids)}条记录")
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存评论[review]数据完成，耗时 {end_time - start_time:.2f} 秒")
+
+        return inserted_ids or None
 
 
 if __name__ == "__main__":
@@ -176,9 +254,48 @@ if __name__ == "__main__":
     log.warning("warning")
     # print(save_product_data({"product_id": 12, "name": "test", "source": "gap2"}))
     # print(save_review_data({"review_id": 3, "product_name": "test2", "source": "gap", "product_id": 1}))
+    # print(
+    #     "已插入数据: ",
+    #     save_product_data(
+    #         {"product_id": 999999, "sku_id": 5, "product_name": "test3", "source": "gap", "attributes": {"test": 12}}
+    #     ),
+    # )
     print(
         "已插入数据: ",
-        save_product_data(
-            {"product_id": 999999, "sku_id": 5, "product_name": "test3", "source": "gap", "attributes": {"test": 12}}
+        save_review_data_bulk(
+            [
+                {
+                    "product_id": 999999,
+                    "review_id": "test-001",
+                    "sku_id": 5,
+                    "product_name": "test3",
+                    "source": "other",
+                    "attributes": {"test": 12},
+                },
+                {
+                    "product_id": 999999,
+                    "review_id": "test-002",
+                    "sku_id": 5,
+                    "product_name": "test3",
+                    "source": "other",
+                    "attributes": {"test": 12},
+                },
+                {
+                    "product_id": 999999,
+                    "review_id": "test-003",
+                    "sku_id": 5,
+                    "product_name": "test3",
+                    "source": "other",
+                    "attributes": {"test": 12},
+                },
+                {
+                    "product_id": 999999,
+                    "review_id": "test-004",
+                    "sku_id": 5,
+                    "product_name": "test3",
+                    "source": "other",
+                    "attributes": {"test": 12},
+                },
+            ]
         ),
     )

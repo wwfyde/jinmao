@@ -70,6 +70,7 @@ yarn.lock
 *.tgz
 *.txz
 
+logs/
 
 # env file and config
 

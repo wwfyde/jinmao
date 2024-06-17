@@ -55,7 +55,7 @@ class Product(Base):
         String(16), nullable=True, comment="性别, 根据类别推断"
     )  # required gap, jcpeney
     released_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=func.now(), server_default=func.now(), nullable=True, comment="上新时间"
+        DateTime, default=func.now(), server_default=func.now(), nullable=True, index=True, comment="上新时间"
     )  # required: gap(none), jcpenney
     tags: Mapped[list[str] | None] = mapped_column(JSON, comment="标签")  # required
 

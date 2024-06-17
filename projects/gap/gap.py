@@ -5,12 +5,17 @@ from enum import Enum
 from pathlib import Path
 
 import httpx
+import redis.asyncio as redis
 from lxml import etree
 from playwright.async_api import async_playwright, Playwright, Page, Route, BrowserContext
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from crawler import log
 from crawler.config import settings
-from crawler.store import save_review_data, save_sku_data, save_product_data
+from crawler.db import engine
+from crawler.models import Product
+from crawler.store import save_sku_data, save_product_data, save_review_data_bulk
 
 # urls = [
 #     {
@@ -29,63 +34,64 @@ from crawler.store import save_review_data, save_sku_data, save_product_data
 #     {"men.all": "https://www.gap.com/browse/category.do?cid=1127944&department=75"},  # 男装 约1009
 # ]
 source = "gap"
-# primary_category = "women"  # 商品主类别
-# sub_category = "default"  # 商品子类别
-# urls = [
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
-#     ),
-#     (
-#         primary_category,
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
-#     ),
-# ]
+primary_category = "women"  # 商品主类别
+sub_category = "default"  # 商品子类别
+urls = [
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
+    # ),
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
+    # ),
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
+    # ),
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
+    # ),
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
+    # ),
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
+    # ),
+    # (
+    #     primary_category,
+    #     sub_category,
+    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
+    # ),
+    (
+        primary_category,
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
+    ),
+    (
+        primary_category,
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
+    ),
+]
 # primary_category = "boys"  # 商品主类别
 # sub_category = "default"  # 商品子类别
-urls = [("boys", "default", "https://www.gap.com/browse/category.do?cid=6189&department=16")]
+# urls = [("boys", "default", "https://www.gap.com/browse/category.do?cid=6189&department=16")]
 PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
+PLAYWRIGHT_CONCURRENCY: int = 12
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-# PLAYWRIGHT_HEADLESS: bool = True
+PLAYWRIGHT_HEADLESS: bool = True
 
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
@@ -202,6 +208,7 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
             # TODO 指定url
             # 导航到指定的URL
             await page.goto(base_url, timeout=PLAYWRIGHT_TIMEOUT)
+            log.info(f"打开类别[category]页面: {base_url}")
             # 其他操作...
             # 暂停执行
             # await page.pause()
@@ -233,7 +240,7 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
             # 等待路由事件完成
             await main_route_event.wait()
 
-            log.info(f"拦截路由更新: {products_list}")
+            # log.info(f"拦截路由更新: {products_list}")
             log.info(f"拦截路由更新: {product_count}")
             log.info(f"拦截路由更新: {pages}")
             log.info(f"拦截路由更新: 数量{len(sku_index)},  {sku_index}")
@@ -284,6 +291,14 @@ async def open_pdp_page(
 
         # sku_id = int(httpx.URL(pdp_url).params.get("pid", 0))
         log.info(f"{sku_id=}")
+        # 检查商品是否已抓取过
+        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+        async with r:
+            result = await r.get(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}")
+            log.info(f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {result=}")
+            if result == "done":
+                log.warning(f"商品{sku_id}已抓取过, 跳过")
+                return sku_id
         sub_page = await context.new_page()
         sub_page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
 
@@ -302,71 +317,95 @@ async def open_pdp_page(
                 request = route.request
 
                 if "/reviews" in request.url:
-                    response = await route.fetch()
-                    json_dict = await response.json()
-                    # 将评论信息保存到文件 注意分页
-                    product_raw_dir = settings.data_dir.joinpath(
-                        source, primary_category, sub_category, product_id, "raw_data"
-                    )
-                    product_raw_dir.mkdir(parents=True, exist_ok=True)
+                    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                    result = None
+                    async with r:
+                        result = await r.get(f"review_status:{source}:{primary_category}:{sub_category}:{product_id}")
+                        log.info(f"商品评论: {product_id} 评论, redis状态标记: {result=}")
+                        if result == "done":
+                            log.warning(f"商品{sku_id}已抓取过, 跳过")
 
-                    with open(f"{product_raw_dir}/review-{product_id}-00.json", "w") as f:
-                        f.write(json.dumps(json_dict, indent=4, ensure_ascii=False))
+                    if result is None:
+                        log.info(f"当前评论还未抓取: {request.url}")
+                        response = await route.fetch()
+                        json_dict = await response.json()
+                        # 将评论信息保存到文件 注意分页
 
-                    # TODO  获取评论信息
-                    reviews, total_count = parse_reviews_from_api(json_dict)
-                    log.info(f"预期评论数{total_count}, {len(reviews)}")
-                    page_size = 25
-                    total_pages = (total_count + page_size - 1) // page_size
-                    log.info(f"总页数{total_pages}")
-
-                    semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
-                    tasks = []
-                    for i in range(1, total_pages + 1):
-                        review_url = (
-                            request.url
-                            + "&sort=Newest"
-                            + f"&paging.from={10 + (i - 1) * page_size}"
-                            + f"&paging.size={page_size}"
-                            + "&filters=&search=&sort=Newest&image_only=false"
+                        product_raw_dir = settings.data_dir.joinpath(
+                            source, primary_category, sub_category, product_id, "raw_data"
                         )
-                        tasks.append(
-                            fetch_reviews(
-                                semaphore,
-                                review_url,
-                                request.headers,
-                                product_id=product_id,
-                                index=i,
-                                primary_category=primary_category,
-                                sub_category=sub_category,
+                        product_raw_dir.mkdir(parents=True, exist_ok=True)
+
+                        with open(f"{product_raw_dir}/review-{product_id}-00.json", "w") as f:
+                            f.write(json.dumps(json_dict, indent=4, ensure_ascii=False))
+
+                        # TODO  获取评论信息
+                        reviews, total_count = parse_reviews_from_api(json_dict)
+                        log.info(f"预期评论数{total_count}, {len(reviews)}")
+                        page_size = 25
+                        total_pages = (total_count + page_size - 1) // page_size
+                        log.info(f"总页数{total_pages}")
+
+                        semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
+                        tasks = []
+                        for i in range(1, total_pages + 1):
+                            review_url = (
+                                request.url
+                                + "&sort=Newest"
+                                + f"&paging.from={10 + (i - 1) * page_size}"
+                                + f"&paging.size={page_size}"
+                                + "&filters=&search=&sort=Newest&image_only=false"
                             )
+                            tasks.append(
+                                fetch_reviews(
+                                    semaphore,
+                                    review_url,
+                                    request.headers,
+                                    product_id=product_id,
+                                    index=i,
+                                    primary_category=primary_category,
+                                    sub_category=sub_category,
+                                )
+                            )
+
+                        new_reviews = await asyncio.gather(*tasks)
+                        for review in new_reviews:
+                            if review is not None:
+                                reviews.extend(review)
+
+                        log.info(f"实际评论数{len(reviews)}")
+                        # 存储评论信息
+                        product_store_dir = settings.data_dir.joinpath(
+                            source, primary_category, sub_category, product_id
                         )
+                        product_store_dir.mkdir(parents=True, exist_ok=True)
+                        with open(f"{product_store_dir}/review-{product_id}.json", "w") as f:
+                            log.info(f"存储评论到文件{product_store_dir}/review-{product_id}.json")
+                            f.write(json.dumps(reviews, indent=4, ensure_ascii=False))
+                        # 将评论保存到数据库
 
-                    new_reviews = await asyncio.gather(*tasks)
-                    for review in new_reviews:
-                        reviews.extend(review)
-
-                    log.info(f"实际评论数{len(reviews)}")
-                    # 存储评论信息
-                    product_store_dir = settings.data_dir.joinpath(source, primary_category, sub_category, product_id)
-                    product_store_dir.mkdir(parents=True, exist_ok=True)
-                    with open(f"{product_store_dir}/review-{product_id}.json", "w") as f:
-                        log.info(f"存储评论到文件{product_store_dir}/review-{product_id}.json")
-                        f.write(json.dumps(reviews, indent=4, ensure_ascii=False))
-                    # 将评论保存到数据库
-
-                    save_review_data(reviews)
-                    # # 聚合评论
-                    # product_store_dir2 = settings.data_dir.joinpath(source, "reviews")
-                    # product_store_dir2.mkdir(parents=True, exist_ok=True)
-                    # with open(f"{product_store_dir2}/review-{product_id}.json", "w") as f:
-                    #     log.info(f"存储评论到文件{product_store_dir}/review-{product_id}.json")
-                    #     f.write(json.dumps(reviews, indent=4, ensure_ascii=False))
-                    route_event.set()
-                    # log.info("获取评论信息")
-                    # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
-                    #     f.write(json.dumps(json_dict))
-                    # pass
+                        # save_review_data(reviews)
+                        log.warning("当前使用批量插入评论方式!")
+                        save_review_data_bulk(reviews)
+                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                        async with r:
+                            log.info(f"商品评论{product_id}抓取完毕, 标记redis状态")
+                            await r.set(
+                                f"review_status:{source}:{primary_category}:{sub_category}:{product_id}", "done"
+                            )
+                        # # 聚合评论
+                        # product_store_dir2 = settings.data_dir.joinpath(source, "reviews")
+                        # product_store_dir2.mkdir(parents=True, exist_ok=True)
+                        # with open(f"{product_store_dir2}/review-{product_id}.json", "w") as f:
+                        #     log.info(f"存储评论到文件{product_store_dir}/review-{product_id}.json")
+                        #     f.write(json.dumps(reviews, indent=4, ensure_ascii=False))
+                        route_event.set()
+                        # log.info("获取评论信息")
+                        # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
+                        #     f.write(json.dumps(json_dict))
+                        # pass
+                    else:
+                        route_event.set()
                 # if "api" in request.pdp_url or "service" in request.pdp_url:
                 #
                 #     log.info(f"API Request URL: {request.pdp_url}")
@@ -382,9 +421,10 @@ async def open_pdp_page(
             # 拦截所有api pdp_url
             await sub_page.wait_for_timeout(5 * 1000)
             scroll_pause_time = random.randrange(1500, 2500, 500)
-            # await page.wait_for_timeout(1000)
             await scroll_page(sub_page, scroll_pause_time=scroll_pause_time)
-            # await page.wait_for_load_state("load")
+            # await scroll_to_bottom_v1(sub_page)
+            await sub_page.wait_for_timeout(1000)
+            await sub_page.wait_for_load_state("domcontentloaded")
             content = await sub_page.content()
             raw_data_dir = settings.data_dir.joinpath(source, primary_category, sub_category, product_id, "raw_data")
             raw_data_dir.mkdir(parents=True, exist_ok=True)
@@ -434,6 +474,11 @@ async def open_pdp_page(
             await asyncio.sleep(random.randrange(5, 12, 3))
         # 返回sku_id 以标记任务成功
         log.info(f"任务完成: {sku_id}")
+        log.info(f"商品{sku_id}抓取完毕, 标记redis状态")
+        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+        async with r:
+            log.info(f"商品{sku_id}抓取完毕, 标记redis状态")
+            await r.set(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", "done")
         return sku_id
 
 
@@ -548,19 +593,24 @@ async def parse_sku_from_dom_content(
     )
     # 将从页面提取到的信息保存的数据库
     save_sku_data(pdp_info)
+    with Session(engine) as session:
+        stmt = select(Product.sku_id).where(Product.product_id == product_id, Product.source == source)
 
-    save_product_data(
-        dict(
-            product_id=product_id,
-            attributes=attributes,
-            product_url=product_url,
-            source=source,
-            color=color,
-            fit_size=fit_and_size,
-            product_details=product_details,
-            fabric_and_care=fabric_and_care,
-        )
-    )
+        product_sku_id = session.execute(stmt).scalar_one_or_none()
+        if sku_id == product_sku_id:
+            save_product_data(
+                dict(
+                    product_id=product_id,
+                    attributes=attributes,
+                    product_url=product_url,
+                    source=source,
+                    color=color,
+                    image_url_outer=image_url,
+                    fit_size=fit_and_size,
+                    product_details=product_details,
+                    fabric_and_care=fabric_and_care,
+                )
+            )
     return pdp_info
 
 
@@ -578,15 +628,19 @@ async def get_reviews_from_url_by_id(product_id: str):
 
 async def scroll_to_bottom_v1(page: Page):
     # 获取页面的高度
+    log.debug("尝试页面滚动")
+
     previous_height = await page.evaluate("document.body.scrollHeight")
     while True:
         # 滚动到页面底部
+
         await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         # 等待页面加载新内容
-        await page.wait_for_timeout(random.randrange(2000, 4000, 500))  # 等待 4~8 秒
+        await page.wait_for_timeout(random.randrange(1000, 3500, 500))  # 等待 4~8 秒
         # 获取新的页面高度
         new_height = await page.evaluate("document.body.scrollHeight")
         if new_height == previous_height:
+            log.debug("页面滚动完毕")
             break
         previous_height = new_height
 
@@ -618,8 +672,9 @@ async def scroll_to_bottom(page: Page, scroll_pause_time: int = 1000, max_scroll
         log.info(f"Scrolled to bottom after {scroll_attempts} attempts")
 
 
-async def scroll_page(page: Page, scroll_pause_time: int = 1000):
+async def scroll_page(page: Page, scroll_pause_time: int = 1000, max_times: int = 30):
     viewport_height = await page.evaluate("window.innerHeight")
+    log.debug("尝试滚动页面")
     i = 0
     current_scroll_position = 0
     while True:
@@ -643,7 +698,10 @@ async def scroll_page(page: Page, scroll_pause_time: int = 1000):
         # log.info(f"当前视口位置: {current_viewport_position}")
 
         if current_viewport_position >= scroll_height or current_scroll_position >= scroll_height:
-            # log.info("滚动到底部")
+            log.debug("滚动到底部")
+            break
+        if i >= max_times:
+            log.warning(f"超过最大滚动次数{max_times}")
             break
         # previous_height = new_height
 
@@ -752,17 +810,17 @@ async def parse_category_from_api(
     pass
 
 
-def parse_reviews_from_api(r: dict) -> tuple[list[dict], int | None]:
+def parse_reviews_from_api(review_data: dict) -> tuple[list[dict], int | None]:
     # 获取分页信息
     review_domain = "https://display.powerreviews.com"
-    paging_raw = r.get("paging", {})
+    paging_raw = review_data.get("paging", {})
     total_count = paging_raw.get("total_results", None) if paging_raw else None
     current_page = paging_raw.get("current_page_number", None) if paging_raw else None
     total_results = paging_raw.get("total_results", None) if paging_raw else None
     total_pages = paging_raw.get("pages_total", None) if paging_raw else None
 
     # 获取评论
-    reviews: list = r.get("results", [])[0].get("reviews", [])
+    reviews: list = review_data.get("results", [])[0].get("reviews", [])
 
     my_reviews = []
 
@@ -815,11 +873,13 @@ async def fetch_reviews(
                 return parse_reviews_from_api(json_dict)[0]
         except Exception as exc:
             log.error(f"获取评论失败, {exc}")
+            return None
 
 
 async def fetch_images(semaphore: asyncio.Semaphore, url, headers, file_path: Path | str):
     async with semaphore:
         try:
+            start_time = asyncio.get_event_loop().time()
             async with httpx.AsyncClient(timeout=60) as client:
                 log.debug(f"下载图片: {url}")
                 response = await client.get(url, headers=headers)
@@ -827,8 +887,10 @@ async def fetch_images(semaphore: asyncio.Semaphore, url, headers, file_path: Pa
                 image_bytes = response.content
                 with open(f"{str(file_path)}", "wb") as f:
                     f.write(image_bytes)
+            end_time = asyncio.get_event_loop().time()
+            log.debug(f"下载图片耗时: {end_time - start_time:.2f}s")
         except Exception as exc:
-            log.error(f"下载图片失败, {exc}")
+            log.error(f"下载图片失败, {exc=}")
 
 
 async def go_to_pdp_page(semapage: Page, pdp_url: str):
@@ -841,13 +903,6 @@ async def go_to_pdp_page(semapage: Page, pdp_url: str):
 async def main():
     # 创建一个playwright对象并将其传递给run函数
     async with async_playwright() as p:
-        # TODO 指定要下载的类别连接
-        # base_url: str = "https://www.gap.com/browse/category.do?cid=14417#pageId=0&department=48"
-        # base_url: str = "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0"
-        # for base_url in urls:
-        # log.info(f"开始抓取: {base_url}")
-        # tasks = [run(p, url) for url in urls]
-        # await asyncio.gather(*tasks)
         await run(p, urls)
         ...
 
@@ -856,7 +911,4 @@ async def main():
 # 它开始执行main函数。
 if __name__ == "__main__":
     # 指定本地代理
-    # os.environ["http_proxy"] = "http://127.0.0.1:23457"
-    # os.environ["https_proxy"] = "http://127.0.0.1:23457"
-    # os.environ["all_proxy"] = "socks5://127.0.0.1:23457"
     asyncio.run(main())

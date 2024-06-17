@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     user_data_dir: DirectoryPath | str = project_dir.joinpath("browser_data")
     aliyun: Aliyun
     redis: Redis
+    ark_api_key: str  # 豆包api-key
+    ark_base_url: str  # 豆包api-url
+    ark_prompt: str
+    ark_summary_prompt: str
 
     # @computed_field
     # def base_dir(self) -> DirectoryPath:
@@ -88,11 +92,11 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         yaml_file=[
             "config.yml",
-            "config.local.yml",
-            "config.dev.local.yml",
             "config.dev.yml",
             "config.staging.yml",
             "config.prod.yml",
+            "config.local.yml",
+            "config.dev.local.yml",
         ],
         env_file=[".env", ".env.local", ".env.staging", ".env.prod"],
         extra="ignore",
@@ -130,3 +134,4 @@ if __name__ == "__main__":
     log.info(settings.aliyun)
     log.info(settings.redis)
     log.info(settings.redis_dsn)
+    log.info(settings.ark_api_key)
