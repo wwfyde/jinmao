@@ -105,7 +105,7 @@ total_processing_time = 0
 
 start_time = time.time()  # 记录总开始时间
 
-with ThreadPoolExecutor(max_workers=10) as executor:
+with ThreadPoolExecutor(max_workers=40) as executor:
     future_to_review = {executor.submit(analyze_comment, review): review for review in reviews}
     for future in as_completed(future_to_review):
         result = future.result()
