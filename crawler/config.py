@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Type, Tuple
 
-from pydantic import BaseModel, computed_field, MySQLDsn, DirectoryPath
+from pydantic import BaseModel, computed_field, MySQLDsn
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -52,11 +52,11 @@ class Settings(BaseSettings):
     playwright: PlayWright
     httpx_timeout: int = 60
     save_login_state: bool = True  # 保存登录状态
-    base_dir: DirectoryPath | str = Path(__file__).resolve().parent
-    project_dir: DirectoryPath | str = base_dir.parent
-    log_file_path: str | DirectoryPath = project_dir.joinpath("logs")
-    data_dir: DirectoryPath | str = Path.home().joinpath("crawler")
-    user_data_dir: DirectoryPath | str = project_dir.joinpath("browser_data")
+    base_dir: Path | str = Path(__file__).resolve().parent
+    project_dir: Path | str = base_dir.parent
+    log_file_path: str | Path = project_dir.joinpath("logs")
+    data_dir: Path | str = Path.home().joinpath("crawler")
+    user_data_dir: Path | str = project_dir.joinpath("browser_data")
     aliyun: Aliyun
     redis: Redis
     ark_api_key: str  # 豆包api-key
