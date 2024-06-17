@@ -51,6 +51,8 @@ class Product(Base):
     category: Mapped[Literal["women", "men", "girls", "boys", "other"] | None] = mapped_column(
         String(256), comment="商品类别"
     )  # optional: jcpenney, target
+    sub_category: Mapped[str | None] = mapped_column(String(256), comment="子类别")  # optional: jcpenney, target
+    inner_category: Mapped[str | None] = mapped_column(String(256), comment="内部类别")  # optional: jcpenney, target
     gender: Mapped[Literal["F", "M", "O"]] = mapped_column(
         String(16), nullable=True, comment="性别, 根据类别推断"
     )  # required gap, jcpeney
@@ -121,6 +123,13 @@ class ProductSKU(Base):
     product_name: Mapped[str | None] = mapped_column(
         String(128), comment="商品名称"
     )  # required: gap, jcpenney, next, target
+    gender: Mapped[Literal["F", "M", "O"]] = mapped_column(
+        String(16), nullable=True, comment="性别, 根据类别推断, 主类别"
+    )  # required gap, jcpeney
+    sub_category: Mapped[Literal["women", "men", "girls", "boys", "other"] | None] = mapped_column(
+        String(256), comment="商品类别"
+    )  # optional: jcpenney, target
+    inner_category: Mapped[str | None] = mapped_column(String(256), comment="内部类别")  # optional: jcpenney, target
     size: Mapped[str | None] = mapped_column(String(64), comment="尺码")  # required: gap, jcpenney, next, target
     color: Mapped[str | None] = mapped_column(String(64), comment="颜色")  # required: gap, jcpenney, next, target
     material: Mapped[str | None] = mapped_column(String(128), comment="材质")
