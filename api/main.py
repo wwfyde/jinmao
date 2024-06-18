@@ -1,17 +1,28 @@
+from datetime import datetime
 from typing import Literal
 
 from fastapi import FastAPI, Depends, APIRouter
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, ConfigDict, field_serializer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 
 from api import log
+from api.doubao import analyze_dobao
 from crawler.db import get_db
 from crawler.models import ProductReview
 
-app = FastAPI(prefix="/api")
-
+app = FastAPI()
+# 设置允许跨域访问
+app.add_middleware(
+    CORSMiddleware,
+    # allow_origins=origins,
+    allow_origins=["molook.cn", "uat.molook.cn:543"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 router = APIRouter()
 
 
@@ -39,6 +50,52 @@ class ProductReviewIn(BaseModel):
     product_id: str
     source: str
     lang: Literal["zh", "en"] = "en"
+    from_api: bool | None = False  # 是否走API
+
+
+class ProductReviewModel(
+    BaseModel,
+):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    review_id: str
+    product_id: str
+    source: str
+    product_name: str | None = None
+    sku_id: str | None = None
+    rating: float | None = None
+    title: str | None = None
+    comment: str | None = None
+    nickname: str | None = None
+    helpful_votes: int | None = None
+    not_helpful_votes: int | None = None
+    helpful_score: int | None = None
+    is_deleted: bool | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+    @field_serializer("id", when_used="always")
+    def transform_id_to_str(id: int) -> str:
+        return str(id)
+
+
+class ProductReviewAnalysis(
+    BaseModel,
+):
+    model_config = ConfigDict(from_attributes=True)
+
+    review_id: str
+    product_id: str
+    source: str
+    product_name: str | None = None
+    rating: float | None = None
+    title: str | None = None
+    comment: str | None = None
+    nickname: str | None = None
+    helpful_votes: int | None = None
+    not_helpful_votes: int | None = None
+    helpful_score: int | None = None
 
 
 @app.get("/")
@@ -70,8 +127,10 @@ async def review_analysis_with_doubao(review: ProductReviewIn, db: Session = Dep
     reviews = db.execute(stmt).scalars().all()
 
     log.info(f"分析商品评论[{len(reviews)}]: {reviews}")
-
-    return reviews
+    review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
+    print(review_dicts)
+    result = analyze_dobao(review_dicts)
+    return result
 
 
 app.include_router(router, prefix="/api")

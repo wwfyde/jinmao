@@ -35,60 +35,60 @@ from crawler.store import save_sku_data, save_product_data, save_review_data
 # ]
 source = "gap"
 sub_category = "default"  # 商品子类别
-# urls = [
-#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=0"),
-#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=1"),
-#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=2"),
-#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=3"),
-#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=4"),
-# ]
 urls = [
-    # (
-    #     "women",
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
-    # ),
-    # (
-    #     "women",
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
-    # ),
-    # (
-    #     "women",
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
-    # ),
-    # (
-    #     "women",
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
-    # ),
-    # (
-    #     "women",
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
-    # ),
-    (
-        "women",
-        sub_category,
-        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
-    ),
-    (
-        "women",
-        sub_category,
-        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
-    ),
-    (
-        "women",
-        sub_category,
-        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
-    ),
-    (
-        "women",
-        sub_category,
-        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
-    ),
+    ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=0"),
+    ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=1"),
+    ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=2"),
+    ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=3"),
+    ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=4"),
 ]
+# urls = [
+#     # (
+#     #     "women",
+#     #     sub_category,
+#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
+#     # ),
+#     # (
+#     #     "women",
+#     #     sub_category,
+#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
+#     # ),
+#     # (
+#     #     "women",
+#     #     sub_category,
+#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
+#     # ),
+#     # (
+#     #     "women",
+#     #     sub_category,
+#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
+#     # ),
+#     # (
+#     #     "women",
+#     #     sub_category,
+#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
+#     # ),
+#     (
+#         "women",
+#         sub_category,
+#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
+#     ),
+#     (
+#         "women",
+#         sub_category,
+#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
+#     ),
+#     (
+#         "women",
+#         sub_category,
+#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
+#     ),
+#     (
+#         "women",
+#         sub_category,
+#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
+#     ),
+# ]
 # primary_category = "boys"  # 商品主类别
 # sub_category = "default"  # 商品子类别
 # urls = [("boys", "default", "https://www.gap.com/browse/category.do?cid=6189&department=16")]
@@ -376,11 +376,11 @@ async def open_pdp_page(
                             )
 
                         new_reviews = await asyncio.gather(*tasks)
+                        nonlocal review_status
                         for review in new_reviews:
                             if review is not None:
                                 reviews.extend(review)
                             else:
-                                nonlocal review_status
                                 review_status = "failed"
                                 log.warning(f"评论获取失败: {review}")
 
@@ -398,7 +398,6 @@ async def open_pdp_page(
                         save_review_data(reviews)
                         # log.warning("当前使用批量插入评论方式!")
                         # save_review_data_bulk(reviews)
-                        nonlocal review_status
                         if review_status == "failed":
                             log.warning(f"商品评论{product_id}抓取失败, 标记redis状态为  failed ")
                             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
@@ -513,17 +512,13 @@ async def open_pdp_page(
             # await sub_page.wait_for_timeout(60000)
             # await sub_page.wait_for_selector("h1")
 
-            # 商品标题
-            product_title = await sub_page.locator("#buy-box > div > h1").text_content()
-            # 商品id, pid
-            log.info(f"商品: {sku_id}, 标题: {product_title}")
-
             await route_event.wait()
+            log.info(f"商品[product]: {product_id}评论抓取完毕, 抓取状态: {review_status}")
             if review_status == "failed":
                 log.warning(f"商品评论{product_id}抓取失败, 跳过")
                 return sku_id
             log.debug("路由执行完毕")
-            await asyncio.sleep(random.randrange(5, 12, 3))
+            await asyncio.sleep(random.randrange(1, 8, 3))
         # 返回sku_id 以标记任务成功
         log.info(f"任务完成: {product_id=}, {sku_id=}")
         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)

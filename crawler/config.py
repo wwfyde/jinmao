@@ -63,6 +63,8 @@ class Settings(BaseSettings):
     ark_base_url: str  # 豆包api-url
     ark_prompt: str
     ark_summary_prompt: str
+    ark_model: str
+    ark_concurrency: int = 40
 
     # @computed_field
     # def base_dir(self) -> DirectoryPath:
@@ -98,7 +100,7 @@ class Settings(BaseSettings):
             "config.local.yml",
             "config.dev.local.yml",
         ],
-        env_file=[".env", ".env.local", ".env.staging", ".env.prod"],
+        env_file=[".env", ".env.staging", ".env.prod", ".env.local"],
         extra="ignore",
     )
 
@@ -135,3 +137,4 @@ if __name__ == "__main__":
     log.info(settings.redis)
     log.info(settings.redis_dsn)
     log.info(settings.ark_api_key)
+    log.info(settings.ark_model)
