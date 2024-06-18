@@ -15,7 +15,7 @@ from crawler import log
 from crawler.config import settings
 from crawler.db import engine
 from crawler.models import Product
-from crawler.store import save_sku_data, save_product_data, save_review_data_bulk
+from crawler.store import save_sku_data, save_product_data, save_review_data
 
 # urls = [
 #     {
@@ -34,51 +34,57 @@ from crawler.store import save_sku_data, save_product_data, save_review_data_bul
 #     {"men.all": "https://www.gap.com/browse/category.do?cid=1127944&department=75"},  # 男装 约1009
 # ]
 source = "gap"
-primary_category = "women"  # 商品主类别
 sub_category = "default"  # 商品子类别
+# urls = [
+#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=0"),
+#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=1"),
+#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=2"),
+#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=3"),
+#     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=4"),
+# ]
 urls = [
     # (
-    #     primary_category,
+    #     "women",
     #     sub_category,
     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
     # ),
     # (
-    #     primary_category,
+    #     "women",
     #     sub_category,
     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
     # ),
     # (
-    #     primary_category,
+    #     "women",
     #     sub_category,
     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
     # ),
     # (
-    #     primary_category,
+    #     "women",
     #     sub_category,
     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
     # ),
     # (
-    #     primary_category,
+    #     "women",
     #     sub_category,
     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
     # ),
-    # (
-    #     primary_category,
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
-    # ),
-    # (
-    #     primary_category,
-    #     sub_category,
-    #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
-    # ),
     (
-        primary_category,
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
+    ),
+    (
+        "women",
         sub_category,
         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
     ),
     (
-        primary_category,
+        "women",
         sub_category,
         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
     ),
@@ -89,9 +95,9 @@ urls = [
 PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
-PLAYWRIGHT_CONCURRENCY: int = 12
+PLAYWRIGHT_CONCURRENCY: int = 18
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-PLAYWRIGHT_HEADLESS: bool = True
+# PLAYWRIGHT_HEADLESS: bool = True
 
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
@@ -308,6 +314,7 @@ async def open_pdp_page(
                 "**/*",
                 lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
             )
+            review_status = None
             route_event = asyncio.Event()
 
             async def handle_route(route: Route):
@@ -372,6 +379,10 @@ async def open_pdp_page(
                         for review in new_reviews:
                             if review is not None:
                                 reviews.extend(review)
+                            else:
+                                nonlocal review_status
+                                review_status = "failed"
+                                log.warning(f"评论获取失败: {review}")
 
                         log.info(f"实际评论数{len(reviews)}")
                         # 存储评论信息
@@ -384,15 +395,25 @@ async def open_pdp_page(
                             f.write(json.dumps(reviews, indent=4, ensure_ascii=False))
                         # 将评论保存到数据库
 
-                        # save_review_data(reviews)
-                        log.warning("当前使用批量插入评论方式!")
-                        save_review_data_bulk(reviews)
-                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                        async with r:
-                            log.info(f"商品评论{product_id}抓取完毕, 标记redis状态")
-                            await r.set(
-                                f"review_status:{source}:{primary_category}:{sub_category}:{product_id}", "done"
-                            )
+                        save_review_data(reviews)
+                        # log.warning("当前使用批量插入评论方式!")
+                        # save_review_data_bulk(reviews)
+                        nonlocal review_status
+                        if review_status == "failed":
+                            log.warning(f"商品评论{product_id}抓取失败, 标记redis状态为  failed ")
+                            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                            async with r:
+                                await r.set(
+                                    f"review_status:{source}:{primary_category}:{sub_category}:{product_id}", "failed"
+                                )
+
+                        else:
+                            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                            async with r:
+                                log.info(f"商品评论{product_id}抓取完毕, 标记redis状态")
+                                await r.set(
+                                    f"review_status:{source}:{primary_category}:{sub_category}:{product_id}", "done"
+                                )
                         # # 聚合评论
                         # product_store_dir2 = settings.data_dir.joinpath(source, "reviews")
                         # product_store_dir2.mkdir(parents=True, exist_ok=True)
@@ -439,24 +460,52 @@ async def open_pdp_page(
             print(
                 f"{model_image_urls=}",
             )
-            base_url = "https://www.gap.com"
-            image_tasks = []
-            semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为10
-            sku_dir = settings.data_dir.joinpath(source, primary_category, sub_category, str(product_id), str(sku_id))
-            sku_model_dir = sku_dir.joinpath("model")
-            sku_model_dir.mkdir(parents=True, exist_ok=True)
-            for index, url in enumerate(model_image_urls):
-                url = url.replace("https://www.gap.com", "")
-                image_tasks.append(
-                    fetch_images(
-                        semaphore,
-                        base_url + url,
-                        {},
-                        file_path=sku_model_dir.joinpath(f"model-{(index + 1):02d}-{url.split('/')[-1]}"),
-                    )
+            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+            async with r:
+                image_status = await r.get(
+                    f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}"
                 )
+                if image_status == "done":
+                    log.warning(f"商品: {product_id}, sku:{sku_id}, 图片下载状态: {image_status}, 跳过")
+                else:
+                    base_url = "https://www.gap.com"
+                    image_tasks = []
+                    semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为10
+                    sku_dir = settings.data_dir.joinpath(
+                        source, primary_category, sub_category, str(product_id), str(sku_id)
+                    )
+                    sku_model_dir = sku_dir.joinpath("model")
+                    sku_model_dir.mkdir(parents=True, exist_ok=True)
+                    for index, url in enumerate(model_image_urls):
+                        url = url.replace("https://www.gap.com", "")
+                        image_tasks.append(
+                            fetch_images(
+                                semaphore,
+                                base_url + url,
+                                {},
+                                file_path=sku_model_dir.joinpath(f"model-{(index + 1):02d}-{url.split('/')[-1]}"),
+                            )
+                        )
 
-            await asyncio.gather(*image_tasks)
+                    image_download_status = await asyncio.gather(*image_tasks)
+                    if all(image_download_status):
+                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                        async with r:
+                            await r.set(
+                                f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}",
+                                "done",
+                            )
+                            log.warning(f"商品图片: {product_id}, sku:{sku_id}, 图片下载完成, 标记状态为done")
+                    else:
+                        log.warning(f"商品图片: {product_id}, sku:{sku_id}, 图片下载失败, 标记为failed")
+                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                        async with r:
+                            await r.set(
+                                f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}",
+                                "failed",
+                            )
+                        log.warning("商品图片抓取失败")
+                        return sku_id
 
             # await sub_page.get_by_label("close email sign up modal").click()
             log.info(f"进入商品页面: {pdp_url}")
@@ -470,14 +519,16 @@ async def open_pdp_page(
             log.info(f"商品: {sku_id}, 标题: {product_title}")
 
             await route_event.wait()
+            if review_status == "failed":
+                log.warning(f"商品评论{product_id}抓取失败, 跳过")
+                return sku_id
             log.debug("路由执行完毕")
             await asyncio.sleep(random.randrange(5, 12, 3))
         # 返回sku_id 以标记任务成功
-        log.info(f"任务完成: {sku_id}")
-        log.info(f"商品{sku_id}抓取完毕, 标记redis状态")
+        log.info(f"任务完成: {product_id=}, {sku_id=}")
         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
         async with r:
-            log.info(f"商品{sku_id}抓取完毕, 标记redis状态")
+            log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
             await r.set(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", "done")
         return sku_id
 
@@ -857,7 +908,7 @@ async def fetch_reviews(
     *,
     primary_category: str,
     sub_category: str,
-):
+) -> list | None:
     async with semaphore:
         try:
             async with httpx.AsyncClient(timeout=60) as client:
@@ -876,7 +927,7 @@ async def fetch_reviews(
             return None
 
 
-async def fetch_images(semaphore: asyncio.Semaphore, url, headers, file_path: Path | str):
+async def fetch_images(semaphore: asyncio.Semaphore, url, headers, file_path: Path | str) -> bool:
     async with semaphore:
         try:
             start_time = asyncio.get_event_loop().time()
@@ -889,8 +940,10 @@ async def fetch_images(semaphore: asyncio.Semaphore, url, headers, file_path: Pa
                     f.write(image_bytes)
             end_time = asyncio.get_event_loop().time()
             log.debug(f"下载图片耗时: {end_time - start_time:.2f}s")
+            return True
         except Exception as exc:
             log.error(f"下载图片失败, {exc=}")
+            return False
 
 
 async def go_to_pdp_page(semapage: Page, pdp_url: str):
