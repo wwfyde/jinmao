@@ -89,7 +89,7 @@ class Settings(BaseSettings):
 
     @computed_field
     def molook_db_dsn(self) -> MySQLDsn:
-        return f"mysql+mysqlconnector://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db}"
+        return f"mysql+mysqldb://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db}"
 
     model_config = SettingsConfigDict(
         yaml_file=[
