@@ -92,13 +92,13 @@ urls = [
 # primary_category = "boys"  # 商品主类别
 # sub_category = "default"  # 商品子类别
 # urls = [("boys", "default", "https://www.gap.com/browse/category.do?cid=6189&department=16")]
-urls = [
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=0"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=1"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=2"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=3"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=4"),
-]
+# urls = [
+#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=0"),
+#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=1"),
+#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=2"),
+#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=3"),
+#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=4"),
+# ]
 PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
@@ -793,7 +793,7 @@ async def parse_category_from_api(
             rating_count=product.get("reviewCount", None),  # 评分数量
             type=product.get("webProductType", None),  # 商品类型
             category=product.get("webProductType", None),  # 商品类别
-            released_at=product.get("releaseDate", None),  # 发布日期
+            # released_at=product.get("releaseDate", None),  # 发布日期
             brand="gap",  # 品牌
             gender=gender,  # 性别
             source=source,  # 数据来源
@@ -846,6 +846,8 @@ async def parse_category_from_api(
                 size=None,
                 inventory_status=sku.get("inventoryStatus", None),  # 库存状态
                 vendor=sku.get("vendorName", None),  # 供应商
+                gender=gender,
+                sub_category=sub_category,
                 source=source,
             )
             sub_results.append(sub_result)

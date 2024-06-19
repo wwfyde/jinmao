@@ -254,48 +254,55 @@ if __name__ == "__main__":
     log.warning("warning")
     # print(save_product_data({"product_id": 12, "name": "test", "source": "gap2"}))
     # print(save_review_data({"review_id": 3, "product_name": "test2", "source": "gap", "product_id": 1}))
-    # print(
-    #     "已插入数据: ",
-    #     save_product_data(
-    #         {"product_id": 999999, "sku_id": 5, "product_name": "test3", "source": "gap", "attributes": {"test": 12}}
-    #     ),
-    # )
     print(
         "已插入数据: ",
-        save_review_data_bulk(
-            [
-                {
-                    "product_id": 999999,
-                    "review_id": "test-001",
-                    "sku_id": 5,
-                    "product_name": "test3",
-                    "source": "other",
-                    "attributes": {"test": 12},
-                },
-                {
-                    "product_id": 999999,
-                    "review_id": "test-002",
-                    "sku_id": 5,
-                    "product_name": "test3",
-                    "source": "other",
-                    "attributes": {"test": 12},
-                },
-                {
-                    "product_id": 999999,
-                    "review_id": "test-003",
-                    "sku_id": 5,
-                    "product_name": "test3",
-                    "source": "other",
-                    "attributes": {"test": 12},
-                },
-                {
-                    "product_id": 999999,
-                    "review_id": "test-004",
-                    "sku_id": 5,
-                    "product_name": "test3",
-                    "source": "other",
-                    "attributes": {"test": 12},
-                },
-            ]
+        save_product_data(
+            {
+                "product_id": 9999991,
+                "sku_id": 5,
+                "product_name": "test3",
+                "source": "othter",
+                "released_at": None,
+                "attributes": {"test": 12},
+            }
         ),
     )
+    # print(
+    #     "已插入数据: ",
+    #     save_review_data_bulk(
+    #         [
+    #             {
+    #                 "product_id": 999999,
+    #                 "review_id": "test-001",
+    #                 "sku_id": 5,
+    #                 "product_name": "test3",
+    #                 "source": "other",
+    #                 "attributes": {"test": 12},
+    #             },
+    #             {
+    #                 "product_id": 999999,
+    #                 "review_id": "test-002",
+    #                 "sku_id": 5,
+    #                 "product_name": "test3",
+    #                 "source": "other",
+    #                 "attributes": {"test": 12},
+    #             },
+    #             {
+    #                 "product_id": 999999,
+    #                 "review_id": "test-003",
+    #                 "sku_id": 5,
+    #                 "product_name": "test3",
+    #                 "source": "other",
+    #                 "attributes": {"test": 12},
+    #             },
+    #             {
+    #                 "product_id": 999999,
+    #                 "review_id": "test-004",
+    #                 "sku_id": 5,
+    #                 "product_name": "test3",
+    #                 "source": "other",
+    #                 "attributes": {"test": 12},
+    #             },
+    #         ]
+    #     ),
+    # )
