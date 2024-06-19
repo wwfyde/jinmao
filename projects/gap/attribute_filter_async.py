@@ -54,33 +54,34 @@ import httpx
 import redis.asyncio as redis
 from openai import AsyncOpenAI
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from crawler import log
 from crawler.config import settings
-from crawler.db import engine
+from crawler.db import async_engine
 from crawler.models import Product
 
 
 async def attributes_filter(data: str):
     proxies = {"http://": settings.proxy_url, "https://": settings.proxy_url}
     http_client = httpx.AsyncClient(proxies=proxies)
-    client = AsyncOpenAI(http_client=http_client)
-    chat_completion = await client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": __doc__,
-            },
-            {
-                "role": "user",
-                "content": data,
-            },
-        ],
-        model="gpt-4o",
-    )
-    print(chat_completion.choices[0].message.content)
-    return chat_completion.choices[0].message.content.replace("```json", "").replace("```", "").strip()
+    async with httpx.AsyncClient(proxies=proxies) as http_client:
+        client = AsyncOpenAI(http_client=http_client)
+        chat_completion = await client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": __doc__,
+                },
+                {
+                    "role": "user",
+                    "content": data,
+                },
+            ],
+            model="gpt-4o",
+        )
+        print(chat_completion.choices[0].message.content)
+        return chat_completion.choices[0].message.content.replace("```json", "").replace("```", "").strip()
 
 
 async def process_product(product_db, semaphore, session):
@@ -105,9 +106,9 @@ async def process_product(product_db, semaphore, session):
             log.debug(f"{product_id=}数据清洗耗时: {(end_time - start_time):.3f}")
             log.warning(f"提取到: product_id: {product_id} attributes: {attributes}")
             product_db.attributes = json.loads(attributes)
-            session.add(product_db)
-            session.commit()
-            session.refresh(product_db)
+            await session.add(product_db)
+            await session.commit()
+            await session.refresh(product_db)
             log.info(f"product_id: {product_db.product_id} attributes: {product_db.attributes}")
             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
             async with r:
@@ -122,10 +123,10 @@ async def process_product(product_db, semaphore, session):
 
 
 async def main():
-    with Session(engine) as session:
+    async with AsyncSession(async_engine) as session:
         stmt = select(Product).where(Product.source == "gap")  # noqa
-        results: list[Product] = session.execute(stmt).scalars().all()
-        semaphore = asyncio.Semaphore(40)
+        results: list[Product] = (await session.execute(stmt)).scalars().all()
+        semaphore = asyncio.Semaphore(80)
         for product_db in results:
             await process_product(product_db, semaphore=semaphore, session=session)
 
