@@ -29,6 +29,50 @@ if __name__ == "__main__":
     main_pattern = "status:gap:men:default*"
     image_download_pattern = "image_download_status:gap:men:default*"
     # image_pattern = "image_status:gap:men:default*"
-    delete_keys_by_pattern(image_pattern)
-    delete_keys_by_pattern(image_download_pattern)
-    delete_keys_by_pattern(main_pattern)
+    # delete_keys_by_pattern(image_pattern)
+    # delete_keys_by_pattern(image_download_pattern)
+    # delete_keys_by_pattern(main_pattern)
+    products = [
+        "1000080",
+        "829184",
+        "429892",
+        "720206",
+        "737296",
+        "585699",
+        "413831",
+        "513718",
+        "598134",
+        "709142",
+        "472757",
+        "880824",
+        "238137",
+        "881249",
+        "881251",
+        "497104",
+        "618700",
+        "541753",
+        "795282",
+        "541759",
+        "429217",
+        "472760",
+        "720137",
+        "410337",
+        "769041",
+        "429574",
+        "619568",
+        "440460",
+        "716455",
+        "819576",
+        "737295",
+        "496157",
+        "715036",
+        "582435",
+    ]
+    for product in products:
+        image_pattern = f"image_status:gap:men:default:{product}*"
+        main_pattern = f"status:gap:men:default:{product}*"
+        image_download_pattern = f"image_download_status:gap:men:default:{product}*"
+        # image_pattern = "image_status:gap:men:default*"
+        delete_keys_by_pattern(image_pattern)
+        delete_keys_by_pattern(image_download_pattern)
+        delete_keys_by_pattern(main_pattern)

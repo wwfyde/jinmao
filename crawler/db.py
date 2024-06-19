@@ -3,6 +3,7 @@ from typing import Mapping, Generator
 
 import structlog
 from sqlalchemy import create_engine, text
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import Session
 
 from crawler.config import settings
@@ -16,6 +17,12 @@ def dumps(obj: Mapping) -> str:
 
 engine = create_engine(
     str(settings.mysql_dsn),
+    connect_args={},
+    # echo=True,
+    # json_serializer=dumps,
+)
+async_engine = create_async_engine(
+    str(settings.mysql_async_dsn),
     connect_args={},
     # echo=True,
     # json_serializer=dumps,

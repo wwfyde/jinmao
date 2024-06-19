@@ -649,6 +649,7 @@ async def parse_sku_from_dom_content(
         image_url_outer=image_url,
         model_image_urls=model_image_urls,
         attributes=attributes,
+        attributes_raw=attributes,
     )
     # 将从页面提取到的信息保存的数据库
     save_sku_data(pdp_info)
@@ -661,6 +662,7 @@ async def parse_sku_from_dom_content(
                 dict(
                     product_id=product_id,
                     attributes=attributes,
+                    attributes_raw=attributes,
                     product_url=product_url,
                     source=source,
                     color=color,

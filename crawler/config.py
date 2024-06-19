@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Type, Tuple
 
-from pydantic import BaseModel, computed_field, MySQLDsn
+from pydantic import BaseModel, computed_field, MySQLDsn, AnyHttpUrl, field_validator, field_serializer
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -46,11 +46,17 @@ class PlayWright(BaseModel):
     headless: bool = True
 
 
+class HTTPX(BaseModel):
+    timeout: int = 60
+    proxy_url: str | None = None
+
+
 class Settings(BaseSettings):
     mysql: MySQL
     molook_db: MySQLMoLook
     playwright: PlayWright
     httpx_timeout: int = 60
+    proxy_url: AnyHttpUrl | str
     save_login_state: bool = True  # 保存登录状态
     base_dir: Path | str = Path(__file__).resolve().parent
     project_dir: Path | str = base_dir.parent
@@ -66,6 +72,15 @@ class Settings(BaseSettings):
     ark_model: str
     ark_concurrency: int = 40
 
+    @field_serializer("proxy_url", when_used="always")
+    def proxy_url_serializer(self, proxy_url: AnyHttpUrl) -> str:
+        return str(proxy_url)
+
+    @classmethod
+    @field_validator("proxy_url", mode="after")
+    def proxy_url_validator(cls, proxy_url: AnyHttpUrl) -> str:
+        return str(proxy_url)
+
     # @computed_field
     # def base_dir(self) -> DirectoryPath:
     #     return Path(__file__).resolve().parent
@@ -78,6 +93,11 @@ class Settings(BaseSettings):
     def mysql_dsn(self) -> MySQLDsn:
         ...
         return f"mysql+mysqldb://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
+
+    @computed_field
+    def mysql_async_dsn(self) -> MySQLDsn:
+        ...
+        return f"mysql+aiomysql://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
 
     @computed_field
     def redis_dsn(self) -> str:
@@ -138,3 +158,4 @@ if __name__ == "__main__":
     log.info(settings.redis_dsn)
     log.info(settings.ark_api_key)
     log.info(settings.ark_model)
+    log.info(f"type:{type(settings.proxy_url)}, value:{settings.proxy_url}")

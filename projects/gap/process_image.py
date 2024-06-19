@@ -153,6 +153,6 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
 if __name__ == "__main__":
     data_dir = settings.data_dir
     log.info(f"Processing directory: {str(data_dir)}")
-    result = process_directory(data_dir, source="gap", category_identify="women")
+    result = process_directory(data_dir, source="gap", category_identify="men")
 
     print(result)

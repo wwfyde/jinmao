@@ -48,6 +48,7 @@ class Product(Base):
     attributes: Mapped[dict | None] = mapped_column(
         JSON, comment="额外商品属性, 特点, 和描述bulletedCopyAttrs"
     )  # optional: jcpenney
+    attributes_raw: Mapped[dict | list | None] = mapped_column(JSON, comment="原始属性")  # optional: gap专用
     category: Mapped[Literal["women", "men", "girls", "boys", "other"] | None] = mapped_column(
         String(256), comment="商品类别"
     )  # optional: jcpenney, target
@@ -139,6 +140,7 @@ class ProductSKU(Base):
     attributes: Mapped[dict | None] = mapped_column(
         JSON, comment="额外商品属性, 特点, 和描述bulletedCopyAttrs"
     )  # optional: jcpenney, next
+    attributes_raw: Mapped[dict | list | None] = mapped_column(JSON, comment="原始属性")  # optional: gap专用
     product_url: Mapped[str | None] = mapped_column(String(1024), comment="商品链接")  # optional: jcpenney, next
     category_id: Mapped[int | None] = mapped_column(BigInteger, comment="类别ID")
     image_url: Mapped[str | None] = mapped_column(
