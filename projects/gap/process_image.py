@@ -117,15 +117,33 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                                 save_product_data(sku_data_db)
 
                                             product_data["skus"].append(sku_data)
-                                            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                                            with r:
-                                                r.set(
-                                                    f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
-                                                    "done",
+                                            if len(sku_images) > 0:
+                                                r = redis.from_url(
+                                                    settings.redis_dsn, decode_responses=True, protocol=3
                                                 )
-                                                log.debug(
-                                                    f"图片上传成功: {source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
+                                                with r:
+                                                    r.set(
+                                                        f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                        "done",
+                                                    )
+                                                    log.debug(
+                                                        f"图片上传成功: {source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
+                                                    )
+                                            else:
+                                                log.error(
+                                                    f"图片上传失败: {source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
                                                 )
+                                                r = redis.from_url(
+                                                    settings.redis_dsn, decode_responses=True, protocol=3
+                                                )
+                                                with r:
+                                                    r.set(
+                                                        f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                        "none",
+                                                    )
+                                                    log.warning(
+                                                        f"图片不存在, 待重新尝试: {source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
+                                                    )
 
                                     results.append(product_data)
 

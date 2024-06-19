@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal
 
 from fastapi import FastAPI, Depends, APIRouter
-from pydantic import BaseModel, model_validator, ConfigDict, field_serializer
+from pydantic import BaseModel, model_validator, ConfigDict, field_serializer, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -18,7 +18,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     # allow_origins=origins,
-    allow_origins=["molook.cn", "uat.molook.cn:543"],
+    allow_origins=["molook.cn", "uat.molook.cn:543", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,10 +47,21 @@ class ReviewIn(BaseModel):
 
 
 class ProductReviewIn(BaseModel):
-    product_id: str
-    source: str
-    lang: Literal["zh", "en"] = "en"
-    from_api: bool | None = False  # 是否走API
+    product_id: str = Field(..., description="商品ID")
+    source: str = Field(..., description="来源")
+    lang: Literal["zh", "en"] = Field("en", description="语言")
+    from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "product_id": "728681",
+                "source": "gap",
+                "lang": "en",
+                "from_api": False,
+            }
+        }
+    )
 
 
 class ProductReviewModel(
@@ -104,7 +115,20 @@ async def root():
     return RedirectResponse(url="/docs")
 
 
-@router.post("/review/analysis/haiku", summary="分析")
+@router.post(
+    "/review/analysis/haiku",
+    summary="分析",
+    responses={
+        200: {
+            "description": "分析结果",
+            "content": {
+                "application/json": {
+                    "example": {"product_id": "001", "source": "sourceA", "analysis_result": "分析结果示例"}
+                }
+            },
+        }
+    },
+)
 async def haiku_analysis(review: ReviewIn, db: Session = Depends(get_db)):
     if review.id:
         stmt = select(ProductReview).where(ProductReview.id == review.id)
@@ -119,7 +143,185 @@ async def haiku_analysis(review: ReviewIn, db: Session = Depends(get_db)):
     return review_obj
 
 
-@router.post("/product/review_analysis/doubao", summary="商品评论分析")
+@router.post(
+    "/product/review_analysis/doubao",
+    summary="商品评论分析",
+    responses={
+        200: {
+            "description": "分析结果",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "analyses": [
+                            {
+                                "review_id": "503835754",
+                                "analysis": "quality: 8, warmth: 5, comfort: 6, softness: 5, likability: 7, repurchase intent: 7, positive sentiment: 8",
+                                "input_tokens": 97,
+                                "output_tokens": 16,
+                                "processing_time": 1.5923347473144531,
+                            },
+                            {
+                                "review_id": "490445066",
+                                "analysis": "quality: 8, warmth: 5, comfort: 7, softness: 5, likability: 7, repurchase intent: 7, positive sentiment: 8",
+                                "input_tokens": 98,
+                                "output_tokens": 16,
+                                "processing_time": 1.6581623554229736,
+                            },
+                            {
+                                "review_id": "505749329",
+                                "analysis": "quality: 8, warmth: 7, comfort: 7, softness: 7, likability: 8, repurchase intent: 8, positive sentiment: 9",
+                                "input_tokens": 96,
+                                "output_tokens": 16,
+                                "processing_time": 1.7821581363677979,
+                            },
+                            {
+                                "review_id": "516109171",
+                                "analysis": "quality: 7, warmth: 5, comfort: 8, softness: 7, likability: 6, repurchase intent: 5, positive sentiment: 5",
+                                "input_tokens": 96,
+                                "output_tokens": 16,
+                                "processing_time": 1.8928513526916504,
+                            },
+                            {
+                                "review_id": "513190270",
+                                "analysis": "quality: 8, warmth: 7, comfort: 8, softness: 7, likability: 9, repurchase intent: 8, positive sentiment: 9",
+                                "input_tokens": 101,
+                                "output_tokens": 16,
+                                "processing_time": 2.0875539779663086,
+                            },
+                            {
+                                "review_id": "508122371",
+                                "analysis": "quality: 8, warmth: 6, comfort: 7, softness: 7, likability: 8, repurchase intent: 8, positive sentiment: 8",
+                                "input_tokens": 116,
+                                "output_tokens": 16,
+                                "processing_time": 2.1419029235839844,
+                            },
+                            {
+                                "review_id": "501740352",
+                                "analysis": "quality: 8, warmth: 6, comfort: 7, softness: 6, likability: 7, repurchase intent: 7, positive sentiment: 8",
+                                "input_tokens": 101,
+                                "output_tokens": 16,
+                                "processing_time": 2.151305913925171,
+                            },
+                            {
+                                "review_id": "507029223",
+                                "analysis": "quality: 8, warmth: 6, comfort: 8, softness: 6, likability: 8, repurchase intent: 7, positive sentiment: 9",
+                                "input_tokens": 93,
+                                "output_tokens": 16,
+                                "processing_time": 2.154877185821533,
+                            },
+                            {
+                                "review_id": "507705422",
+                                "analysis": "quality: 8, warmth: 5, comfort: 7, softness: 6, likability: 8, repurchase intent: 8, positive sentiment: 8",
+                                "input_tokens": 113,
+                                "output_tokens": 16,
+                                "processing_time": 2.1589910984039307,
+                            },
+                            {
+                                "review_id": "511518077",
+                                "analysis": "quality: 8, warmth: 5, comfort: 7, softness: 5, likability: 7, repurchase intent: 7, positive sentiment: 7",
+                                "input_tokens": 115,
+                                "output_tokens": 16,
+                                "processing_time": 2.170419931411743,
+                            },
+                            {
+                                "review_id": "511630032",
+                                "analysis": "quality: 9, warmth: 7, comfort: 8, softness: 7, likability: 8, repurchase intent: 8, positive sentiment: 8",
+                                "input_tokens": 160,
+                                "output_tokens": 16,
+                                "processing_time": 2.219525098800659,
+                            },
+                            {
+                                "review_id": "513459580",
+                                "analysis": "quality: 7, warmth: 5, comfort: 8, softness: 6, likability: 8, repurchase intent: 7, positive sentiment: 8",
+                                "input_tokens": 103,
+                                "output_tokens": 16,
+                                "processing_time": 2.2469570636749268,
+                            },
+                            {
+                                "review_id": "497351171",
+                                "analysis": "quality: 7, warmth: 0, comfort: 6, softness: 0, likability: 6, repurchase intent: 6, positive sentiment: 5",
+                                "input_tokens": 122,
+                                "output_tokens": 16,
+                                "processing_time": 2.266998052597046,
+                            },
+                            {
+                                "review_id": "510328810",
+                                "analysis": "quality: 8, warmth: 6, comfort: 7, softness: 6, likability: 9, repurchase intent: 7, positive sentiment: 9",
+                                "input_tokens": 103,
+                                "output_tokens": 16,
+                                "processing_time": 2.3023157119750977,
+                            },
+                            {
+                                "review_id": "521547319",
+                                "analysis": "quality: 8, warmth: 5, comfort: 6, softness: 5, likability: 7, repurchase intent: 7, positive sentiment: 7",
+                                "input_tokens": 119,
+                                "output_tokens": 16,
+                                "processing_time": 2.3248939514160156,
+                            },
+                            {
+                                "review_id": "511176409",
+                                "analysis": "quality: 8, warmth: 5, comfort: 6, softness: 6, likability: 7, repurchase intent: 7, positive sentiment: 7",
+                                "input_tokens": 134,
+                                "output_tokens": 16,
+                                "processing_time": 2.336843729019165,
+                            },
+                            {
+                                "review_id": "513259754",
+                                "analysis": "quality: 8, warmth: 7, comfort: 7, softness: 6, likability: 8, repurchase intent: 7, positive sentiment: 8",
+                                "input_tokens": 101,
+                                "output_tokens": 16,
+                                "processing_time": 2.49733304977417,
+                            },
+                            {
+                                "review_id": "510291900",
+                                "analysis": "quality: 9, warmth: 7, comfort: 7, softness: 7, likability: 8, repurchase intent: 8, positive sentiment: 9",
+                                "input_tokens": 121,
+                                "output_tokens": 16,
+                                "processing_time": 2.5150039196014404,
+                            },
+                            {
+                                "review_id": "506182776",
+                                "analysis": "quality: 8, warmth: 7, comfort: 9, softness: 8, likability: 9, repurchase intent: 8, positive sentiment: 9",
+                                "input_tokens": 136,
+                                "output_tokens": 16,
+                                "processing_time": 2.628852128982544,
+                            },
+                            {
+                                "review_id": "507273305",
+                                "analysis": "quality: 7, warmth: 5, comfort: 7, softness: 5, likability: 7, repurchase intent: 7, positive sentiment: 7",
+                                "input_tokens": 95,
+                                "output_tokens": 16,
+                                "processing_time": 2.6776041984558105,
+                            },
+                            {
+                                "review_id": "511653232",
+                                "analysis": "quality: 9, warmth: 7, comfort: 7, softness: 7, likability: 8, repurchase intent: 8, positive sentiment: 9",
+                                "input_tokens": 98,
+                                "output_tokens": 16,
+                                "processing_time": 2.709049940109253,
+                            },
+                            {
+                                "review_id": "513459465",
+                                "analysis": "quality: 8, warmth: 5, comfort: 7, softness: 6, likability: 8, repurchase intent: 7, positive sentiment: 8",
+                                "input_tokens": 98,
+                                "output_tokens": 16,
+                                "processing_time": 2.7234981060028076,
+                            },
+                            {
+                                "review_id": "507277327",
+                                "analysis": "quality: 8, warmth: 7, comfort: 8, softness: 7, likability: 9, repurchase intent: 8, positive sentiment: 9",
+                                "input_tokens": 101,
+                                "output_tokens": 16,
+                                "processing_time": 2.7462518215179443,
+                            },
+                        ],
+                        "summary": "综合这些评论分析，可以看出该产品在整体上具有较好的表现。产品质量的评分普遍较高，多数给予了 7 到 9 分的评价。在舒适度方面，平均得分较为不错，大多在 6 到 9 分之间，表明用户在使用过程中能感受到较好的舒适度。温暖程度的评价较为多样，分数在 0 到 7 之间，但总体来说处于中等水平。柔软度方面，评分集中在 5 到 7 分，表现尚可。在受人喜欢的程度、回购意愿以及正面情感方面，多数评分都在 6 到 9 分之间，反映出消费者对产品有较高的满意度和积极的态度。总体而言，该产品具有较高的质量和不错的舒适度，在温暖程度和柔软度上还有一定的提升空间，但仍受到消费者的普遍喜爱和认可，具有较好的市场前景。",
+                    }
+                }
+            },
+        }
+    },
+)
 async def review_analysis_with_doubao(review: ProductReviewIn, db: Session = Depends(get_db)):
     stmt = select(ProductReview).where(
         ProductReview.product_id == review.product_id, ProductReview.source == review.source

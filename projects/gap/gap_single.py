@@ -92,13 +92,6 @@ urls = [
 # primary_category = "boys"  # 商品主类别
 # sub_category = "default"  # 商品子类别
 # urls = [("boys", "default", "https://www.gap.com/browse/category.do?cid=6189&department=16")]
-urls = [
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=0"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=1"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=2"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=3"),
-    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=4"),
-]
 PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
@@ -152,137 +145,789 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
     # context = await browser.new_context(viewport={"width": 1920, "height": 1080})
     # 在浏览器上下文中打开一个新页面
 
-    # 打开新的页面
-    for index, (primary_category, sub_category, base_url) in enumerate(urls):
-        page = await context.new_page()
-        async with page:
-            # 拦截所有图像
-            await page.route(
-                "**/*",
-                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+    # 并发抓取商品
+    semaphore = asyncio.Semaphore(PLAYWRIGHT_CONCURRENCY)  # 设置并发请求数限制为10
+    log.debug(f"并发请求数: {PLAYWRIGHT_CONCURRENCY}")
+    tasks = []
+    # TODO 修改此处参数
+    sku_index = [("814639", "814639002")]
+    sku_ids = [
+        "545906002",
+        "883550062",
+        "409146032",
+        "500584012",
+        "508982002",
+        "438023002",
+        "411679012",
+        "568218182",
+        "431842002",
+        "416638062",
+        "260636432",
+        "403540002",
+        "728863002",
+        "871386002",
+        "1000185002",
+        "869730052",
+        "869726132",
+        "558957002",
+        "855967032",
+        "356168652",
+        "871336002",
+        "729618122",
+        "821866002",
+        "880266022",
+        "540687002",
+        "568217092",
+        "880878002",
+        "875081002",
+        "563012002",
+        "869722092",
+        "260230112",
+        "406725002",
+        "794579002",
+        "803567002",
+        "570868002",
+        "1000191002",
+        "429165002",
+        "660018002",
+        "1000187002",
+        "448087002",
+        "474285002",
+        "479461042",
+        "794965092",
+        "821325052",
+        "431253002",
+        "407881002",
+        "407882002",
+        "431248002",
+        "431256002",
+        "563335002",
+        "563007002",
+        "562984002",
+        "655107002",
+        "373509102",
+        "729652002",
+        "670538042",
+        "664665002",
+        "586769012",
+        "586732002",
+        "576561002",
+        "536721012",
+        "870589022",
+        "854755022",
+        "890601042",
+        "890842002",
+        "871357002",
+        "855745002",
+        "855025002",
+        "857632002",
+        "905272032",
+        "869732002",
+        "890860002",
+        "729783002",
+        "885257002",
+        "871372002",
+        "464373002",
+        "855965012",
+        "429014002",
+        "540610002",
+        "592037022",
+        "540609002",
+        "523562052",
+        "834853112",
+        "260277012",
+        "873269002",
+        "848883292",
+        "447979002",
+        "659618002",
+        "871510002",
+        "540613002",
+        "540615042",
+        "841725002",
+        "586039002",
+        "431159002",
+        "585582012",
+        "1000130002",
+        "857615012",
+        "480071002",
+        "889933002",
+        "876107042",
+        "803528002",
+        "857272002",
+        "871438002",
+        "763097042",
+        "790890012",
+        "873500002",
+        "853476002",
+        "891995002",
+        "540664002",
+        "885270012",
+        "755814342",
+        "586063002",
+        "870580002",
+        "661059042",
+        "871390002",
+        "1000184002",
+        "1000186002",
+        "855189012",
+        "592231052",
+        "855740002",
+        "558870002",
+        "711766002",
+        "431230002",
+        "883001002",
+        "504521002",
+        "562295002",
+        "410052002",
+        "409151002",
+        "871323002",
+        "873266002",
+        "857646002",
+        "432356012",
+        "806999002",
+        "409154102",
+        "873616002",
+        "749402002",
+        "1000189002",
+        "1000196002",
+        "558943002",
+        "558851002",
+        "871509002",
+        "853453002",
+        "855181002",
+        "570975002",
+        "1000193002",
+        "1000195002",
+        "474278002",
+        "474300002",
+        "475858002",
+        "448029002",
+        "1000135002",
+        "1000136002",
+        "468180002",
+        "467557002",
+        "443611002",
+        "558861002",
+        "562980002",
+        "562999002",
+        "563004002",
+        "562982002",
+        "469007002",
+        "539614072",
+        "569554002",
+        "855193002",
+        "854731022",
+        "869173002",
+        "563344002",
+        "563377002",
+        "875076002",
+        "790919002",
+        "870565002",
+        "810502002",
+        "729367012",
+        "866810022",
+        "838328002",
+        "892218002",
+        "885267002",
+        "883004002",
+        "884446002",
+        "884441002",
+        "882985002",
+        "431601002",
+        "871493002",
+        "873397002",
+        "464370002",
+        "756653002",
+        "570424002",
+        "665864002",
+        "882138002",
+        "523563052",
+        "891557002",
+        "570479002",
+        "873496002",
+        "854613002",
+        "852795002",
+        "802546112",
+        "570098002",
+        "586765002",
+        "772532002",
+        "406849002",
+        "853466002",
+        "977167012",
+        "570471002",
+        "484999002",
+        "803547002",
+        "875997002",
+        "860146032",
+        "853455002",
+        "857259002",
+        "703503002",
+        "853367002",
+        "728757002",
+        "571079002",
+        "725276002",
+        "817987002",
+        "474292002",
+        "1000194002",
+        "448104002",
+        "1000139002",
+        "448163002",
+        "438382002",
+        "467558002",
+        "431194002",
+        "563359002",
+        "562986002",
+        "563002002",
+        "563028002",
+        "570930002",
+        "514109012",
+        "409147012",
+        "586767002",
+        "876171042",
+        "875131002",
+        "821307032",
+        "607068022",
+        "885306002",
+        "790823002",
+        "728756002",
+        "801175082",
+        "586771012",
+        "570657032",
+        "880359002",
+        "870049002",
+        "508797002",
+        "870045002",
+        "870308012",
+        "891308002",
+        "433077002",
+        "484774002",
+        "538544002",
+        "703536002",
+        "767285112",
+        "853484002",
+        "431270002",
+        "607134002",
+        "853372002",
+        "852810002",
+        "871457002",
+        "853472002",
+        "416427002",
+        "615913002",
+        "451501022",
+        "431236002",
+        "853457002",
+        "541190062",
+        "1169518002",
+        "1169504002",
+        "448066002",
+        "571390002",
+        "564498002",
+        "475981002",
+        "521943002",
+        "479573002",
+        "664970012",
+        "409122022",
+        "742352002",
+        "721402002",
+        "876170002",
+        "876173002",
+        "872134002",
+        "872139002",
+        "803676002",
+        "876183002",
+        "876282002",
+        "876278002",
+        "404582032",
+        "708566012",
+        "795299002",
+        "729770002",
+        "810824012",
+        "708824052",
+        "565000012",
+        "880336012",
+        "706814022",
+        "540641002",
+        "513541002",
+        "876046002",
+        "771691022",
+        "825962012",
+        "825968052",
+        "819065042",
+        "754014012",
+        "851358002",
+        "876195002",
+        "736395022",
+        "851299002",
+        "745051012",
+        "1169505002",
+        "1169506002",
+        "1169503002",
+        "1169502002",
+        "728747002",
+        "709931002",
+        "876255002",
+        "826477002",
+        "876176002",
+        "709337012",
+        "876264002",
+        "505871002",
+        "742330022",
+        "792265012",
+        "866823002",
+        "1000243002",
+        "1000246002",
+        "835830002",
+        "569075002",
+        "542723012",
+        "542894002",
+        "670622032",
+        "601259002",
+        "741321052",
+        "753357002",
+        "778551002",
+        "778679002",
+        "682533012",
+        "851343002",
+        "851357002",
+        "876280002",
+        "569147002",
+        "750149002",
+        "708564022",
+        "797975002",
+        "795303002",
+        "542693122",
+        "542783002",
+        "662339022",
+        "873614002",
+        "876325002",
+        "446507002",
+        "586766002",
+        "794580012",
+        "818313002",
+        "873494002",
+        "409527012",
+        "1000249002",
+        "563005002",
+        "880265002",
+        "816860022",
+        "416417002",
+        "513506002",
+        "463709032",
+        "415800042",
+        "231856572",
+        "706808062",
+        "664974002",
+        "790822002",
+        "816857002",
+        "795344012",
+        "795398032",
+        "857725002",
+        "824315022",
+        "823165002",
+        "823673002",
+        "684836022",
+        "814639002",
+        "795345022",
+    ]
+    products = [
+        "795346",
+        "883550",
+        "409146",
+        "500584",
+        "508982",
+        "438023",
+        "411679",
+        "568218",
+        "431842",
+        "416638",
+        "260636",
+        "403540",
+        "818866",
+        "794565",
+        "558802",
+        "421104",
+        "421102",
+        "558957",
+        "855967",
+        "356168",
+        "871336",
+        "729618",
+        "821866",
+        "880266",
+        "540687",
+        "568217",
+        "880878",
+        "875081",
+        "563012",
+        "421103",
+        "260230",
+        "406725",
+        "794579",
+        "852814",
+        "570868",
+        "558758",
+        "892217",
+        "660034",
+        "562241",
+        "448087",
+        "474285",
+        "479461",
+        "794965",
+        "821325",
+        "431253",
+        "407881",
+        "407882",
+        "431248",
+        "431256",
+        "563335",
+        "563007",
+        "562984",
+        "655107",
+        "373509",
+        "729652",
+        "670538",
+        "664665",
+        "586769",
+        "586732",
+        "576561",
+        "536721",
+        "870589",
+        "854755",
+        "890601",
+        "890842",
+        "871357",
+        "855745",
+        "855025",
+        "857632",
+        "905272",
+        "869732",
+        "890860",
+        "729783",
+        "885257",
+        "871372",
+        "464373",
+        "855965",
+        "429014",
+        "540610",
+        "592037",
+        "540609",
+        "523562",
+        "834853",
+        "260277",
+        "873269",
+        "848883",
+        "447979",
+        "659618",
+        "871510",
+        "540613",
+        "540615",
+        "841725",
+        "586039",
+        "431159",
+        "585582",
+        "1000130",
+        "857615",
+        "480071",
+        "889933",
+        "876107",
+        "803528",
+        "857272",
+        "871438",
+        "763097",
+        "790890",
+        "873500",
+        "853476",
+        "891995",
+        "540664",
+        "885270",
+        "755814",
+        "586063",
+        "870580",
+        "661059",
+        "871390",
+        "1000184",
+        "1000186",
+        "855189",
+        "592231",
+        "855740",
+        "558870",
+        "711766",
+        "431230",
+        "883001",
+        "504521",
+        "562295",
+        "410052",
+        "409151",
+        "871323",
+        "873266",
+        "857646",
+        "432356",
+        "806999",
+        "409154",
+        "873616",
+        "749402",
+        "1000189",
+        "1000183",
+        "558943",
+        "559065",
+        "794603",
+        "570897",
+        "855181",
+        "703551",
+        "1000193",
+        "1000195",
+        "474278",
+        "474300",
+        "475858",
+        "448029",
+        "1000135",
+        "1000136",
+        "468180",
+        "467557",
+        "443611",
+        "558861",
+        "562980",
+        "562999",
+        "563004",
+        "562982",
+        "469007",
+        "539614",
+        "569554",
+        "855193",
+        "854731",
+        "869173",
+        "563344",
+        "563377",
+        "875076",
+        "790919",
+        "870565",
+        "810502",
+        "729367",
+        "866810",
+        "838328",
+        "892218",
+        "885267",
+        "883004",
+        "884446",
+        "884441",
+        "882985",
+        "431601",
+        "871493",
+        "873397",
+        "464370",
+        "756653",
+        "570424",
+        "665864",
+        "882138",
+        "523563",
+        "891557",
+        "570479",
+        "873496",
+        "854613",
+        "852795",
+        "802546",
+        "570098",
+        "586765",
+        "772532",
+        "406849",
+        "853466",
+        "977167",
+        "570471",
+        "484999",
+        "803547",
+        "875997",
+        "860146",
+        "853455",
+        "857259",
+        "703505",
+        "853477",
+        "728757",
+        "795399",
+        "570955",
+        "817987",
+        "474292",
+        "1000194",
+        "448104",
+        "1000139",
+        "448163",
+        "438382",
+        "467558",
+        "431194",
+        "563359",
+        "562986",
+        "563002",
+        "563028",
+        "570930",
+        "514109",
+        "409147",
+        "586767",
+        "876171",
+        "875131",
+        "821307",
+        "607068",
+        "885306",
+        "790823",
+        "728756",
+        "801175",
+        "586771",
+        "570657",
+        "880359",
+        "870049",
+        "508797",
+        "870045",
+        "870308",
+        "891308",
+        "433077",
+        "484774",
+        "538544",
+        "703536",
+        "767285",
+        "853484",
+        "431270",
+        "607134",
+        "853372",
+        "852810",
+        "871457",
+        "853472",
+        "416427",
+        "615913",
+        "451501",
+        "431236",
+        "853457",
+        "541190",
+        "1169518",
+        "1169504",
+        "448066",
+        "571390",
+        "564498",
+        "475981",
+        "521943",
+        "479573",
+        "664970",
+        "409122",
+        "742352",
+        "721402",
+        "876170",
+        "876173",
+        "872134",
+        "872139",
+        "803676",
+        "876183",
+        "876282",
+        "876278",
+        "404582",
+        "708566",
+        "795299",
+        "729770",
+        "810824",
+        "708824",
+        "565000",
+        "880336",
+        "706814",
+        "540641",
+        "513541",
+        "876046",
+        "771691",
+        "825962",
+        "825968",
+        "819065",
+        "754014",
+        "851358",
+        "876195",
+        "736395",
+        "851299",
+        "745051",
+        "1169505",
+        "1169506",
+        "1169503",
+        "1169502",
+        "728747",
+        "709931",
+        "876255",
+        "826477",
+        "876176",
+        "709337",
+        "876264",
+        "505871",
+        "742330",
+        "792265",
+        "866823",
+        "1000245",
+        "1000090",
+        "798281",
+        "569075",
+        "542723",
+        "542894",
+        "670622",
+        "601259",
+        "741321",
+        "753357",
+        "778551",
+        "778679",
+        "682533",
+        "851343",
+        "851357",
+        "876280",
+        "569147",
+        "750149",
+        "708564",
+        "797975",
+        "795303",
+        "542693",
+        "542783",
+        "662339",
+        "873614",
+        "876325",
+        "446507",
+        "586766",
+        "794580",
+        "818313",
+        "873494",
+        "409527",
+        "1000249",
+        "563005",
+        "880265",
+        "816860",
+        "416417",
+        "513506",
+        "463709",
+        "415800",
+        "231856",
+        "706808",
+        "664974",
+        "790822",
+        "816857",
+        "795344",
+        "795398",
+        "857725",
+        "824315",
+        "823165",
+        "823673",
+        "684836",
+        "814639",
+        "795345",
+    ]
+    sku_index = zip(products, sku_ids)
+    primary_category = "women"
+    sub_category = "default"
+    for product_id, sku_id in sku_index:
+        tasks.append(
+            open_pdp_page(
+                context,
+                semaphore,
+                product_id,
+                sku_id,
+                primary_category=primary_category,
+                sub_category=sub_category,
+                source=source,
             )
-            products_list = []
-            product_count: int = 0
-            pages: dict = {}
-            sku_index: list = []
-            main_route_event = asyncio.Event()
+        )
 
-            async def handle_main_route(route: Route):
-                """拦截api"""
-                request = route.request
-                log.info(request.url)
-                # api 连接可优化
-                if ("cc" and "products" in request.url) and request.resource_type in ("xhr", "fetch"):
-                    log.info("获取 headers和Cookie")
-                    log.info(request.headers)
-                    # 获取cookie
-                    cookies = await context.cookies(request.url)
-                    cookie_str = "; ".join([f"{cookie['name']}={cookie['value']}" for cookie in cookies])
+    result = await asyncio.gather(*tasks)
+    log.info(f"获取到的商品sku_id 列表: {result}")
 
-                    response = await route.fetch()
-                    log.info(response.url)
-                    # log.info(f"接口原始数据: {await response.text()}")
-                    json_dict = await response.json()
-                    # log.info(f"类别接口数据: \n{json_dict}")
-                    categories_dir = settings.data_dir.joinpath(source)
-                    categories_dir.mkdir(parents=True, exist_ok=True)
-
-                    with open(
-                        f"{categories_dir}/category-{primary_category}-{primary_category}-{index:03d}.json", "w"
-                    ) as f:
-                        f.write(json.dumps(json_dict))
-
-                    # TODO  获取products by categories
-                    log.info(f"从类别[category]页面: {primary_category}-{sub_category}获取商品数据")
-                    products, _product_count, _pages, _sku_index = await parse_category_from_api(
-                        json_dict,
-                        page,
-                        gender=primary_category,
-                        source=source,
-                        primary_category=primary_category,
-                        sub_category=sub_category,
-                    )
-                    nonlocal product_count
-                    product_count = _product_count
-                    nonlocal pages
-                    pages = _pages
-                    nonlocal sku_index
-                    sku_index = _sku_index
-
-                    products_list.extend(products)
-
-                    # log.info(f"序列化后数据: {products}")
-                    main_route_event.set()
-                await route.continue_()
-
-            # 拦截 API
-            await page.route("**/api.gap.com/**", handle_main_route)
-
-            # TODO 指定url
-            # 导航到指定的URL
-            await page.goto(base_url, timeout=PLAYWRIGHT_TIMEOUT)
-            log.info(f"打开类别[category]页面: {base_url}")
-            # 其他操作...
-            # 暂停执行
-            # await page.pause()
-            await page.wait_for_timeout(3000)
-            await page.wait_for_load_state("load")  # 等待页面加载
-
-            # TODO 不再滚动
-            # scroll_pause_time = random.randrange(1000, 2500, 500)
-            # # await page.wait_for_timeout(1000)
-            # await scroll_page(page, scroll_pause_time=scroll_pause_time)
-            # # await page.pause()
-            # await page.wait_for_load_state("load")  # 等待页面加载完成
-            # log.info(f"页面加载完成后页面高度{await page.evaluate('document.body.scrollHeight')}")
-            #
-            # element = page.get_by_label("items in the product grid")
-            #
-            # if not element:
-            #     log.info("未获取到选择器")
-            #     await page.pause()
-            # text = await element.first.text_content()
-            # items: int = int(re.match(r"(\d+)", text).group(1)) if text else 0
-            # log.info(f"共发现{items}件商品")
-            # # await page.pause()
-            # # 提取所有商品链接
-            # main_content = await page.content()
-            # main_tree = etree.HTML(main_content)
-            # # log.info("从route获取到的数据: ", result)
-
-            # 等待路由事件完成
-            await main_route_event.wait()
-
-            # log.info(f"拦截路由更新: {products_list}")
-            log.info(f"拦截路由更新: {product_count}")
-            log.info(f"拦截路由更新: {pages}")
-            log.info(f"拦截路由更新: 数量{len(sku_index)},  {sku_index}")
-
-            # pdp_urls = main_tree.xpath("//*[@id='faceted-grid']/section/div/div/div/div[1]/a/@href")
-            # log.info(f"获取到{len(pdp_urls)}个商品链接")
-
-            # 并发抓取商品
-            semaphore = asyncio.Semaphore(PLAYWRIGHT_CONCURRENCY)  # 设置并发请求数限制为10
-            log.debug(f"并发请求数: {PLAYWRIGHT_CONCURRENCY}")
-            tasks = []
-            for product_id, sku_id in sku_index:
-                tasks.append(
-                    open_pdp_page(
-                        context,
-                        semaphore,
-                        product_id,
-                        sku_id,
-                        primary_category=primary_category,
-                        sub_category=sub_category,
-                        source=source,
-                    )
-                )
-
-            result = await asyncio.gather(*tasks)
-            log.info(f"获取到的商品sku_id 列表: {result}")
-
-            # break
-        # 商品摘取完毕
+    # break
+    # 商品摘取完毕
     # 关闭浏览器context
     log.info("商品抓取完毕, 关闭浏览器")
     await context.close()
@@ -310,14 +955,14 @@ async def open_pdp_page(
             result = await r.get(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}")
             log.info(f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {result=}")
             if result == "done":
-                log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
+                log.warning(f"商品{product_id=}, {sku_id=}已抓取过, 跳过")
                 return sku_id
         sub_page = await context.new_page()
         sub_page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
 
         async with sub_page:
             # await sub_page.goto(pdp_url)
-            log.warning("当前未进行图片拦截")
+            log.warning("当前未拦截图像")
             # await sub_page.route(
             #     "**/*",
             #     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
@@ -338,7 +983,7 @@ async def open_pdp_page(
                         result = await r.get(f"review_status:{source}:{primary_category}:{sub_category}:{product_id}")
                         log.info(f"商品评论: {product_id} 评论, redis状态标记: {result=}")
                         if result == "done":
-                            log.warning(f"商品{product_id=}, {sku_id=}的评论已抓取过, 跳过")
+                            log.warning(f"商品评{sku_id}已抓取过, 跳过")
 
                     if result is None:
                         log.info(f"当前评论还未抓取: {request.url}")
@@ -442,8 +1087,10 @@ async def open_pdp_page(
             await sub_page.route("**/display.powerreviews.com/**", handle_route)
 
             # 进入新页面
-            log.info(f"进入商品{product_id=}, {sku_id=}, 产品详情页[PDP]: {pdp_url}")
+
             await sub_page.goto(pdp_url, timeout=PLAYWRIGHT_TIMEOUT)
+            log.info(f"进入商品页面: {pdp_url}")
+
             # sub_page.on("request", lambda request: log.info(f"Request: {request.pdp_url}"))
             # sub_page.on("response", lambda response: log.info(f"Request: {response.pdp_url}"))
 
@@ -452,8 +1099,8 @@ async def open_pdp_page(
             scroll_pause_time = random.randrange(1500, 2500, 500)
             await scroll_page(sub_page, scroll_pause_time=scroll_pause_time)
             # await scroll_to_bottom_v1(sub_page)
-            await sub_page.wait_for_timeout(1000)
-            await sub_page.wait_for_load_state("domcontentloaded")
+            await sub_page.wait_for_timeout(3000)
+            await sub_page.wait_for_load_state()
             content = await sub_page.content()
             raw_data_dir = settings.data_dir.joinpath(source, primary_category, sub_category, product_id, "raw_data")
             raw_data_dir.mkdir(parents=True, exist_ok=True)
@@ -465,9 +1112,7 @@ async def open_pdp_page(
             )
             # TODO 更新信息到数据库和json文件 或者等从接口拿取后统一写入
             model_image_urls = dom_pdp_info.get("model_image_urls", [])
-            print(
-                f"{model_image_urls=}",
-            )
+            log.debug(f"从 dom中解析到的图片列表{model_image_urls=}")
             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
             async with r:
                 image_status = await r.get(
@@ -614,12 +1259,18 @@ async def parse_sku_from_dom_content(
     log.info(fabric_and_care)
     # TODO  下载 模特图片
 
-    model_image_urls_raw: list = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div/a/@href")
-    model_image_urls_raw2: list = tree.xpath(
+    # model_image_urls_raw = tree.xpath("//*[@id="product"]/div[1]/div[1]/div[3]/div[2]/div/div/div[1]/div/div/div/div/div/div/a/@href")  # noqa
+
+    # FIXME 模特图片
+    # """#product > div.l--sticky-wrapper.pdp-mfe-wjfrns > div.l--breadcrumb-photo-wrapper.pdp-mfe-19rjz4o > div.product_photos-container > div.l--carousel.pdp-mfe-m9u4rn > div > div > div.product-photo.pdp-mfe-83e5v2 > div > div > div > div > div.slick-slide.slick-active.slick-current > div > a"""
+    model_image_urls_raw = tree.xpath("//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div/a/@href")
+    # 旧款
+    model_image_urls_raw2 = tree.xpath(
         "//*[@id='product']/div[1]/div[1]/div[3]/div[2]/div/div/div[1]/div/div/div/div/div/div/a/@href"
     )
-    model_image_urls_raw.extend(model_image_urls_raw2)
+    # """//*[@id="product"]/div[1]/div[1]/div[3]/div[2]/div/div/div[1]/div/div/div/div/div[3]/div/a"""
     model_image_urls = []
+    model_image_urls_raw.extend(model_image_urls_raw2)
     for item in model_image_urls_raw:
         log.info(item)
         model_image_urls.append("https://www.gap.com" + item)
