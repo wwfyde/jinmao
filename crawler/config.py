@@ -77,7 +77,7 @@ class Settings(BaseSettings):
     @computed_field
     def mysql_dsn(self) -> MySQLDsn:
         ...
-        return f"mysql+mysqlconnector://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
+        return f"mysql+mysqldb://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
 
     @computed_field
     def redis_dsn(self) -> str:
@@ -85,7 +85,7 @@ class Settings(BaseSettings):
 
     @computed_field
     def molook_db2_dsn(self) -> MySQLDsn:
-        return f"mysql+mysqlconnector://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db2}"
+        return f"mysql+mysqldb://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db2}"
 
     @computed_field
     def molook_db_dsn(self) -> MySQLDsn:
