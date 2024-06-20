@@ -5,7 +5,7 @@ from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # 设置API密钥
-api_key = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmstY29uc29sZSIsImV4cCI6MTcxOTg0OTE1NywiaWF0IjoxNzE4ODQ5MTU3LCJ0IjoidXNlciIsImt2IjoxLCJhaWQiOiIyMTAwMjUwMDk0IiwidWlkIjoiMCIsImlzX291dGVyX3VzZXIiOnRydWUsInJlc291cmNlX3R5cGUiOiJlbmRwb2ludCIsInJlc291cmNlX2lkcyI6WyJlcC0yMDI0MDYxODA1MzI1MC00NGdyayJdfQ.MlSdTmzuNDDqMXk5R2GgWaBo_SzFgfRn9v6QBYcpfZ0ng4SePVCDIvr2FnFScJa5NIDYcUjsezOMeGVeBS1bnM4ruagrzTJJUk0B9qWY2bLon7-X7HLUbwylALMT7tVOZa2Q34lZz7GDjyGGGprQpDGtIJqZkBJ4vkE1mCadD59Ard4vVUuvgTeToOZksv0_1JSE0ZCb30a8fE9caUoG2ioX0MlVAUM-3MIffJzpdqM3atAZikoAyG_hqwTVED2u40Bn9ABl5KBjFCRgGEtNZhQraEYkukZayQclh4QEWJLK6siJwv9DR7SymKt_7Bv2D8w2WMWG0qgAMPRc_cmH1A"
+api_key = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmstY29uc29sZSIsImV4cCI6MTcxOTg2MDA1NCwiaWF0IjoxNzE4ODYwMDU0LCJ0IjoidXNlciIsImt2IjoxLCJhaWQiOiIyMTAwMjUwMDk0IiwidWlkIjoiMCIsImlzX291dGVyX3VzZXIiOnRydWUsInJlc291cmNlX3R5cGUiOiJlbmRwb2ludCIsInJlc291cmNlX2lkcyI6WyJlcC0yMDI0MDYxODA1MzI1MC00NGdyayJdfQ.mfCjuxu1QbSkd4hWuRfAyspTCOV2bPpvNy62JhcnAr3MOkQx_KkwH0pXEc5Y-sWPU5wA55EwMfMkX-S56FNAd5Yz90zDQnmzCdOyUQiGqYLxrK7CJ4mhbOpur-1LQDFijnCG0n9pKRJpJwRbCTcWRZ6nvVRGUzcDXs-Y_itmdfUlS6fM1GUsJFcN2zyFz030VNTTQ921lvPBx2YcFHGuUNT81Gk9dOiJLxG7Fte7pNP6mCO-eCdoqzFT-ejAG2T972qBnf2iwvkdZReA9NkcL6jJBgmlnn46vOKtpkdTTEaWXBjgOPsfmhMo_C36lVBVd8cdTgcWdQde6QvAKKWT5Q"
 
 # 设置OpenAI客户端
 client = OpenAI(
@@ -58,24 +58,36 @@ def analyze_comments_batch(reviews_batch):
     processing_time = end_time - start_time
 
     usage = response.usage
-    response_content = response.choices[0].message.content
+    response_content = response.choices[0].message.content.strip()
 
-    analysis_results = []
-    for i, chunk in enumerate(response_content.split("\n\n")):
-        analysis_results.append({
-            "review_id": reviews_batch[i]["review_id"],
-            "analysis": chunk.strip(),
-            "input_tokens": usage.prompt_tokens,
-            "output_tokens": usage.completion_tokens,
-            "processing_time": processing_time / len(comments),
-            "comment": comments[f"评论{i + 1}"]
-        })
+    # 提取评分信息并转换为字典格式
+    scores = {}
+    for line in response_content.split(','):
+        parts = line.split(':')
+        if len(parts) == 2:
+            key, value = parts
+            try:
+                scores[key.strip()] = float(value.strip().replace("'", ""))
+            except ValueError:
+                print(f"Could not convert value to float: {value.strip()}")
+
+    if not scores:
+        print(f"Warning: No scores extracted for batch: {comments}")
+
+    analysis_results = {
+        "review_ids": [review["review_id"] for review in reviews_batch],
+        "scores": scores,
+        "input_tokens": usage.prompt_tokens,
+        "output_tokens": usage.completion_tokens,
+        "processing_time": processing_time / len(comments),
+        "comments": comments
+    }
 
     return analysis_results
 
 
 def summarize_reviews(analyses):
-    combined_analyses = " ".join([analysis['analysis'] for analysis in analyses])
+    combined_analyses = " ".join([str(analysis['scores']) for analysis in analyses])
     summary_content = f"以下是产品的所有评论分析: {combined_analyses}"
 
     try:
@@ -95,7 +107,7 @@ def summarize_reviews(analyses):
 
 
 # 并行处理评论分析
-batch_size = 1
+batch_size = 1  # 每次处理一个评论，以提高并行度
 analysis_results = []
 total_input_tokens = 0
 total_output_tokens = 0
@@ -103,7 +115,7 @@ total_processing_time = 0
 
 start_time = time.time()
 
-with ThreadPoolExecutor(max_workers=200) as executor:
+with ThreadPoolExecutor(max_workers=200) as executor:  # 增加最大工作线程数
     futures = []
     for i in range(0, len(reviews), batch_size):
         reviews_batch = reviews[i:i + batch_size]
@@ -112,10 +124,10 @@ with ThreadPoolExecutor(max_workers=200) as executor:
     for future in as_completed(futures):
         result = future.result()
         if result:
-            analysis_results.extend(result)
-            total_input_tokens += sum(r["input_tokens"] for r in result)
-            total_output_tokens += sum(r["output_tokens"] for r in result)
-            total_processing_time += sum(r["processing_time"] for r in result)
+            analysis_results.append(result)
+            total_input_tokens += result["input_tokens"]
+            total_output_tokens += result["output_tokens"]
+            total_processing_time += result["processing_time"]
 
 end_time = time.time()
 total_runtime = end_time - start_time
