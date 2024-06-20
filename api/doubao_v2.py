@@ -4,19 +4,24 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from IPython.lib.pretty import pprint
 from openai import OpenAI
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from api.main import ProductReviewAnalysis
 from crawler import log
 from crawler.config import settings
+from crawler.db import engine
+from crawler.models import ProductReview
 
 
 # from openai import AsyncOpenAI
 
 
-def analyze_comments_batch(reviews_batch):
+def analyze_comments_batch(reviews: list[dict]):
     """
     批量分析评论
     """
-    comments = {f"评论{i + 1}": review["comment"] for i, review in enumerate(reviews_batch) if review.get("comment")}
+    comments = {f"评论{i + 1}": review["comment"] for i, review in enumerate(reviews) if review.get("comment")}
     if not comments:
         return []
     prompt_template = settings.ark_prompt
@@ -29,7 +34,7 @@ def analyze_comments_batch(reviews_batch):
 
     try:
         response = client.chat.completions.create(
-            model="ep-20240618053250-44grk", messages=[{"role": "system", "content": prompt}]
+            model=settings.ark_model, messages=[{"role": "system", "content": prompt}]
         )
     except Exception as e:
         log.debug(f"Error occurred: {e}")
@@ -50,13 +55,14 @@ def analyze_comments_batch(reviews_batch):
             try:
                 scores[key.strip()] = float(value.strip().replace("'", ""))
             except ValueError:
+
                 log.debug(f"Could not convert value to float: {value.strip()}")
 
     if not scores:
         log.debug(f"Warning: No scores extracted for batch: {comments}")
 
     analysis_results = {
-        "review_ids": [review["review_id"] for review in reviews_batch],
+        "review_ids": [review["review_id"] for review in reviews],
         "scores": scores,
         "input_tokens": usage.prompt_tokens,
         "output_tokens": usage.completion_tokens,
@@ -103,7 +109,7 @@ def analyze_doubao(reviews: list[dict]):
     with ThreadPoolExecutor(max_workers=200) as executor:  # 增加最大工作线程数
         futures = []
         for i in range(0, len(reviews), batch_size):
-            reviews_batch = reviews[i : i + batch_size]
+            reviews_batch = reviews[i: i + batch_size]
             futures.append(executor.submit(analyze_comments_batch, reviews_batch))
 
         for future in as_completed(futures):
@@ -136,8 +142,19 @@ def analyze_doubao(reviews: list[dict]):
 
 if __name__ == "__main__":
     # 读取评论文件
-    with open("review_test.json", "r", encoding="utf-8") as file:
-        reviews = json.load(file)
-    result = analyze_doubao(reviews=reviews)
+    # with open("review_ana/review_test.json", "r", encoding="utf-8") as file:
+    #     reviews = json.load(file)
+
+    product_id, source = '866986', 'gap'
+
+    with Session(engine) as session:
+        stmt = select(ProductReview).where(
+            ProductReview.product_id == product_id, ProductReview.source == source
+        )
+        reviews = session.execute(stmt).scalars().all()
+        review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in
+                        reviews]
+
+    result = analyze_doubao(reviews=review_dicts)
     log.info(result)
     pprint(result)

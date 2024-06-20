@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
+from uvicorn import run
 
 from api import log
 from api.doubao import analyze_doubao
@@ -403,5 +404,5 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
 app.include_router(router, prefix="/api")
 
 if __name__ == "__main__":
-    # run(app="api.main:app", reload=True, port=8199, workers=4)
+    run(app="api.main:app", reload=True, port=8199, host='0.0.0.0', workers=4)
     pass
