@@ -90,7 +90,7 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                                                 content = f.read()
                                                                 source = "gap"
                                                                 image_url = upload_image(
-                                                                    str(image_file).split("/")[-1],
+                                                                    image_file.name,
                                                                     content,
                                                                     prefix=f"crawler/{source}",
                                                                     rename=False,
