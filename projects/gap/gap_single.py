@@ -95,7 +95,7 @@ urls = [
 PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
-PLAYWRIGHT_CONCURRENCY: int = 8
+PLAYWRIGHT_CONCURRENCY: int = 1
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
 # PLAYWRIGHT_HEADLESS: bool = True
 
@@ -910,79 +910,35 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
     sku_index = zip(products, sku_ids)
     sku_index = [("440866002", "440866")]
     products = [
-        "1000080",
-        "829184",
-        "429892",
-        "720206",
-        "737296",
-        "585699",
-        "413831",
-        "513718",
-        "598134",
-        "709142",
-        "472757",
-        "880824",
-        "238137",
-        "881249",
-        "881251",
-        "497104",
-        "618700",
-        "541753",
-        "795282",
-        "541759",
-        "429217",
-        "472760",
-        "720137",
-        "410337",
-        "769041",
-        "429574",
-        "619568",
-        "440460",
-        "716455",
-        "819576",
-        "737295",
-        "496157",
-        "715036",
-        "582435",
+        "831714",
+        "876972",
+        "891210",
+        "733481",
+        "876899",
+        "701485",
+        "669887",
+        "735905",
+        "595342",
+        "858571",
+        "1169556",
+        "564645",
     ]
     sku_ids = [
-        "1000255002",
-        "823343022",
-        "429892002",
-        "789983002",
-        "737296712",
-        "802535202",
-        "413831002",
-        "513718082",
-        "834783002",
-        "819577002",
-        "472757072",
-        "880824022",
-        "238137022",
-        "881249032",
-        "881251012",
-        "497104232",
-        "618700102",
-        "541753032",
-        "795282032",
-        "541759012",
-        "429217022",
-        "472760012",
-        "720137032",
-        "410337022",
-        "769041012",
-        "429574012",
-        "619568012",
-        "440460012",
-        "796275002",
-        "819576002",
-        "829188002",
-        "496157122",
-        "715036012",
-        "582435012",
+        "831714132",
+        "876974002",
+        "891210002",
+        "733481192",
+        "876899012",
+        "701485162",
+        "669887222",
+        "735905112",
+        "595342002",
+        "858571032",
+        "1169556002",
+        "564645002",
     ]
     sku_index = zip(products, sku_ids)
-    primary_category = "men"
+    primary_category = "boys"
     sub_category = "default"
     for product_id, sku_id in sku_index:
         tasks.append(
@@ -1057,7 +1013,7 @@ async def open_pdp_page(
                         result = await r.get(f"review_status:{source}:{primary_category}:{sub_category}:{product_id}")
                         log.info(f"商品评论: {product_id} 评论, redis状态标记: {result=}")
                         if result == "done":
-                            log.warning(f"商品评{sku_id}已抓取过, 跳过")
+                            log.warning(f"商品评论{product_id=}已抓取过, 跳过")
 
                     if result is None:
                         log.info(f"当前评论还未抓取: {request.url}")

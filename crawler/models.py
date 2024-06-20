@@ -61,6 +61,7 @@ class Product(Base):
         DateTime, default=func.now(), server_default=func.now(), nullable=True, index=True, comment="上新时间"
     )  # required: gap(none), jcpenney
     tags: Mapped[list[str] | None] = mapped_column(JSON, comment="标签")  # required
+    review_summary: Mapped[str | None] = mapped_column(String(2048), comment="评论总结")
 
     style: Mapped[str | None] = mapped_column(String(64), comment="款式")  # deprecated 对应 商品名称name
     style_number: Mapped[str | None] = mapped_column(String(64), comment="款号")  # deprecated 对应product_id
@@ -214,6 +215,13 @@ class ProductReview(Base):
     # quality: Mapped[float | None] = mapped_column(
     #     Numeric(3, 1), comment="质量"
     # )  # required: gap, jcpenney, next, target
+    analysis: Mapped[dict | None] = mapped_column(JSON, comment="评论分析")  # required: gap, jcpenney, next, target
+    metrics: Mapped[dict | list | None] = mapped_column(
+        JSON, comment="评论指标"
+    )  # required: gap, jcpenney, next, target
+    token_usage: Mapped[dict | list | None] = mapped_column(
+        JSON, comment="LLM token 消耗"
+    )  # required: gap, jcpenney, next, target
     helpful_score: Mapped[float | None] = mapped_column(Numeric(6, 1), comment="有用评分")  # optional: gap
     is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")
     created_at: Mapped[datetime | None] = mapped_column(

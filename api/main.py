@@ -9,9 +9,9 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 
 from api import log
-from api.doubao import analyze_dobao
+from api.doubao import analyze_doubao
 from crawler.db import get_db
-from crawler.models import ProductReview
+from crawler.models import ProductReview, Product
 
 app = FastAPI()
 # 设置允许跨域访问
@@ -50,6 +50,7 @@ class ProductReviewIn(BaseModel):
     product_id: str = Field(..., description="商品ID")
     source: str = Field(..., description="来源")
     lang: Literal["zh", "en"] = Field("en", description="语言")
+    llm: Literal["ark", "haiku", "azure", "haiku", "openai"] | None = Field("ark", description="llm模型")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
 
     model_config = ConfigDict(
@@ -59,6 +60,7 @@ class ProductReviewIn(BaseModel):
                 "source": "gap",
                 "lang": "en",
                 "from_api": False,
+                "llm": "ark",
             }
         }
     )
@@ -109,6 +111,19 @@ class ProductReviewAnalysis(
     helpful_score: int | None = None
 
 
+class ReviewAnalysisMetrics(BaseModel):
+    quality: float | None = None
+    warmth: float | None = None
+    comfort: float | None = None
+    softness: float | None = None
+    likability: float | None = None
+    repurchase_intent: float | None = None
+    positive_sentiment: float | None = None
+    input_tokens: float | None = None
+    output_tokens: float | None = None
+    processing_time: float | None = None
+
+
 @app.get("/")
 async def root():
     log.info("访问根目录")
@@ -118,6 +133,7 @@ async def root():
 @router.post(
     "/review/analysis/haiku",
     summary="分析",
+    deprecated=True,
     responses={
         200: {
             "description": "分析结果",
@@ -144,7 +160,7 @@ async def haiku_analysis(review: ReviewIn, db: Session = Depends(get_db)):
 
 
 @router.post(
-    "/product/review_analysis/doubao",
+    "/product/review_analysis",
     summary="商品评论分析",
     responses={
         200: {
@@ -322,17 +338,66 @@ async def haiku_analysis(review: ReviewIn, db: Session = Depends(get_db)):
         }
     },
 )
-async def review_analysis_with_doubao(review: ProductReviewIn, db: Session = Depends(get_db)):
+async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Depends(get_db)):
+    """
+    1. 优先从数据库查询, 如果没有则调用doubao分析;
+    2. 当
+
+    """
     stmt = select(ProductReview).where(
-        ProductReview.product_id == review.product_id, ProductReview.source == review.source
+        ProductReview.product_id == params.product_id, ProductReview.source == params.source
     )
     reviews = db.execute(stmt).scalars().all()
 
     log.info(f"分析商品评论[{len(reviews)}]: {reviews}")
     review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
     print(review_dicts)
-    result = analyze_dobao(review_dicts)
-    return result
+    params.from_api = True
+    if params.from_api is True:
+        if params.llm == "ark":
+            result = analyze_doubao(review_dicts)
+        else:
+            result = analyze_doubao(review_dicts)
+
+        return dict(
+            analyses=result.get("analyses"),
+            summary=result.get("summary"),
+            statistics="",
+        )
+
+    summary_stmt = select(Product.review_summary).where(
+        Product.product_id == params.product_id, Product.source == params.source
+    )
+    summary = db.execute(summary_stmt).scalar_one_or_none()
+
+    if summary:
+        metrics_stmt = select(ProductReview.metrics).where(
+            ProductReview.product_id == params.product_id, ProductReview.source == params.source
+        )
+        metrics = db.execute(metrics_stmt).scalar().all()
+        return {"analyses": metrics, "summary": summary, "statistics": ""}
+    else:
+        if params.llm == "ark":
+            result = analyze_doubao(review_dicts)
+        else:
+            result = analyze_doubao(review_dicts)
+
+        return dict(
+            analyses=result.get("analyses"),
+            summary=result.get("summary"),
+            statistics="",
+        )
+
+    if params.llm == "ark":
+        result = analyze_doubao(review_dicts)
+    else:
+        result = analyze_doubao(review_dicts)
+
+    return dict(
+        analyses=result.get("analyses"),
+        summary=result.get("summary"),
+        statistics="",
+    )
 
 
 app.include_router(router, prefix="/api")

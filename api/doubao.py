@@ -74,7 +74,7 @@ def summarize_reviews(analyses: list):
     return summary_result.strip()
 
 
-def analyze_dobao(reviews: list[dict]):
+def analyze_doubao(reviews: list[dict]):
     """
     分析评论
     """
@@ -408,7 +408,7 @@ if __name__ == "__main__":
     ]
 
     start_time = time.time()
-    output = analyze_dobao(reviews)
+    output = analyze_doubao(reviews)
     end_time = start_time - time.time()
     print(f"Total runtime: {end_time}")
     pprint(output)
