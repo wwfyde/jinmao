@@ -10,7 +10,7 @@ from starlette.responses import RedirectResponse
 from uvicorn import run
 
 from api import log
-from api.doubao import analyze_doubao
+from api.doubao_v3 import analyze_doubao
 from crawler.db import get_db
 from crawler.models import ProductReview, Product
 
@@ -356,7 +356,7 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
     params.from_api = True
     if params.from_api is True:
         if params.llm == "ark":
-            result = analyze_doubao(review_dicts)
+            result = await analyze_doubao(review_dicts)
         else:
             result = analyze_doubao(review_dicts)
 
