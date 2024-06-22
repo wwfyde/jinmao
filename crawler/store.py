@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from typing import TypeVar, Type
 
 from sqlalchemy import select, insert
@@ -254,6 +255,12 @@ if __name__ == "__main__":
     log.warning("warning")
     # print(save_product_data({"product_id": 12, "name": "test", "source": "gap2"}))
     # print(save_review_data({"review_id": 3, "product_name": "test2", "source": "gap", "product_id": 1}))
+    timestamp = 1715911559159 / 1000  # 转换为秒
+    time_string = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+    print(time_string)
+    datetime_obj = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S")
+    print(datetime_obj)
+
     print(
         "已插入数据: ",
         save_product_data(
@@ -261,12 +268,13 @@ if __name__ == "__main__":
                 "product_id": 9999991,
                 "sku_id": 5,
                 "product_name": "test3",
-                "source": "othter",
-                "released_at": None,
+                "source": "other",
+                "released_at": time_string,
                 "attributes": {"test": 12},
             }
         ),
     )
+
     # print(
     #     "已插入数据: ",
     #     save_review_data_bulk(

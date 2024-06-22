@@ -393,6 +393,8 @@ def parse_target_review_from_api(
             proudct_name=product_name,  # TODO 该平台不存在
             title=review.get("title", None)[:128] if review.get("title") else None,
             comment=review.get("text", None)[:1024] if review.get("text") else None,
+            photos=review.get("photos", None),
+            photos_outer=review.get("photos", None),
             nickname=review.get("UserNickname", None),
             product_id=review.get("Tcin", None),
             # sku_id=review.get("product_variant", None) if review.get("details") else None,

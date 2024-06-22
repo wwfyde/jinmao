@@ -3,7 +3,7 @@ from typing import Literal
 
 from fastapi import FastAPI, Depends, APIRouter
 from pydantic import BaseModel, model_validator, ConfigDict, field_serializer, Field
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
@@ -110,19 +110,6 @@ class ProductReviewAnalysis(
     helpful_votes: int | None = None
     not_helpful_votes: int | None = None
     helpful_score: int | None = None
-
-
-class ReviewAnalysisMetrics(BaseModel):
-    quality: float | None = None
-    warmth: float | None = None
-    comfort: float | None = None
-    softness: float | None = None
-    likability: float | None = None
-    repurchase_intent: float | None = None
-    positive_sentiment: float | None = None
-    input_tokens: float | None = None
-    output_tokens: float | None = None
-    processing_time: float | None = None
 
 
 @app.get("/")
@@ -351,6 +338,8 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
     reviews = db.execute(stmt).scalars().all()
 
     log.info(f"分析商品评论[{len(reviews)}]: {reviews}")
+
+    # 将 ORM对象转换为字典
     review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
     print(review_dicts)
     params.from_api = True
@@ -382,6 +371,16 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
             result = analyze_doubao(review_dicts)
         else:
             result = analyze_doubao(review_dicts)
+        # 将分析结果保存到数据库
+
+        summary = result.summary
+        stmt = (
+            update(Product)
+            .where(Product.product_id == params.product_id, Product.source == params.source)
+            .values(review_summary=summary)
+        )
+        db.execute(stmt)
+        db.commit()  # 显式提交事务
 
         return dict(
             analyses=result.get("analyses"),
@@ -404,5 +403,5 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
 app.include_router(router, prefix="/api")
 
 if __name__ == "__main__":
-    run(app="api.main:app", reload=True, port=8199, host='0.0.0.0', workers=4)
+    run(app="api.main:app", reload=True, port=8199, host="0.0.0.0", workers=4)
     pass

@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     project_dir: Path | str = base_dir.parent
     log_file_path: str | Path = project_dir.joinpath("logs")
     data_dir: Path | str = Path.home().joinpath("crawler")
+    cong_dir: Path | str = Path.home().joinpath("congcong")
     user_data_dir: Path | str = project_dir.joinpath("browser_data")
     aliyun: Aliyun
     redis: Redis
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     log.info(settings.base_dir)
     log.info(settings.project_dir)
     # log.info(settings.log_file_path)
-    log.info(settings.data_dir)
+    log.info(f"{settings.data_dir=}")
     log.info(settings.aliyun)
     log.info(settings.redis)
     log.info(settings.redis_dsn)

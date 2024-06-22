@@ -208,6 +208,8 @@ class ProductReview(Base):
     )  # CheckConstraint('rating >= 1 AND rating <= 5'  # required: gap, jcpenney, next
     title: Mapped[str | None] = mapped_column(String(1024), comment="评论标题")  # required: gap, jcpenney, next
     comment: Mapped[str | None] = mapped_column(Text, comment="评论内容")  # required: gap, jcpenney, next
+    photos: Mapped[list[str] | None] = mapped_column(JSON, comment="评论图片")  # optional: target
+    photos_outer: Mapped[list[str] | None] = mapped_column(JSON, comment="评论外部数据源")  # optional: target
     nickname: Mapped[str | None] = mapped_column(String(64), comment="昵称")  # required: gap, jcpenney, next
     helpful_votes: Mapped[int | None] = mapped_column(Integer, default=0, comment="按顶票数")  # required: gap, jcpenney
     not_helpful_votes: Mapped[int | None] = mapped_column(Integer, comment="按踩票数")  # required: gap, jcpenney

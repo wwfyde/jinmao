@@ -32,6 +32,7 @@ alembic = "^1.13.1"
 openai = "^1.34.0"
 mysqlclient = "^2.2.4"
 aiomysql = "^0.2.0"
+pillow = "^10.3.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"
