@@ -65,7 +65,10 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                                 image_status = r.get(
                                                     f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
                                                 )
-                                                if image_status == "done":
+                                                image_download_status = r.get(
+                                                    f"image_download_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                )
+                                                if image_status == "done" or image_download_status != "done":
                                                     log.warning(
                                                         f"商品: {product_id}, sku:{sku_id}, 图片抓取状态: {image_status}, 跳过"
                                                     )
@@ -117,10 +120,11 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                                 save_product_data(sku_data_db)
 
                                             product_data["skus"].append(sku_data)
-                                            if len(sku_images) > 0:
-                                                r = redis.from_url(
-                                                    settings.redis_dsn, decode_responses=True, protocol=3
-                                                )
+                                            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                                            image_download_status = r.get(
+                                                f"image_download_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                            )
+                                            if len(sku_images) > 0 and image_download_status == "done":
                                                 with r:
                                                     r.set(
                                                         f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
@@ -142,7 +146,7 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                                         "none",
                                                     )
                                                     log.warning(
-                                                        f"图片不存在, 待重新尝试: {source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
+                                                        f"图片不存在, 或未下载完, 待重新尝试: {source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
                                                     )
 
                                     results.append(product_data)

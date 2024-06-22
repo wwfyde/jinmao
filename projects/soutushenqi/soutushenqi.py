@@ -1,5 +1,4 @@
 import asyncio
-import os
 from mimetypes import guess_extension
 
 import httpx
@@ -39,7 +38,8 @@ async def run(playwright: Playwright) -> None:
 
     page = await context.new_page()
     async with page:
-        await page.goto("https://www.soutushenqi.com/image/search?searchWord=%E5%88%98%E4%BA%A6%E8%8F%B2")
+        keyword = "侯雯元"
+        await page.goto(f"https://www.soutushenqi.com/image/search?searchWord={keyword}")
 
         await page.get_by_text("自定义尺寸").click()
         await page.get_by_placeholder("最小宽度").click()
@@ -92,9 +92,9 @@ async def run(playwright: Playwright) -> None:
                                     else image_basename + exstension
                                 )
 
-                                store_path = settings.cong_dir.joinpath("liuyifei")
+                                store_path = settings.cong_dir.joinpath(keyword)
                                 store_path.mkdir(parents=True, exist_ok=True)
-                                image_path = str(store_path.joinpath(image_name))
+                                image_path = store_path.joinpath(image_name)
                                 print(f"{image_path=}")
                                 with open(image_path, "wb") as f:
                                     log.debug(f"开始下载图片：{image_url}")
@@ -104,9 +104,9 @@ async def run(playwright: Playwright) -> None:
                                     # 判断写入的文件是否存在
                                     if not image_path.exists():
                                         log.error("下载图片失败")
-                                    else:
-                                        # 通过mac open 命令打开图片
-                                        os.system(f"open {image_path}")
+                                    # else:
+                                    #     # 通过mac open 命令打开图片
+                                    #     os.system(f"open {image_path}")
                         except Exception as exc:
                             log.error(f"下载图片失败：{exc}")
                     await asyncio.sleep(1)
