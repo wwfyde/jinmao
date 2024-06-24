@@ -3,7 +3,7 @@ __doc__ = """
 可能的键名有:
     - 材质: material
     - 产地: origin
-    - 领口: collar
+    - 领口: neckline
     - 适合场景: fit
     - 面料: fabric
     - 服装风格: style 
@@ -11,7 +11,7 @@ __doc__ = """
 # 约束
 - 最终数据为一个 json给我 
 - 键的命名风格下划线格式(snake_case, pothole_case), 比如: product_id
-- 必须字段:  fit, origin, fabric, material, collar, size, style; 如果这些必选字段未提起到, 请赋值字符串 "-"
+- 必须字段:  fit, origin, fabric, material, neckline, size, style; 如果这些必选字段未提起到, 请赋值字符串 "-"
 - 对于额外字段, 请根据输入对象的上下文信息推断其键名, 可以结合各大电商平台的数据库和商品属性的常见字段来为其设置键名
 - #880272"类似的数据,是商品ID, 可将其键设置为 "priduct_id"
 - 提取输入所有字段, 为字段设置合适的键名
