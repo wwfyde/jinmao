@@ -17,4 +17,4 @@ class ReviewAnalysisMetrics(BaseModel):
 class APIAnalysisResult(BaseModel):
     summary: str
     analyses: list[dict] = Field(..., description="分析结构")
-    statistics: list
+    statistics: list | None = None
