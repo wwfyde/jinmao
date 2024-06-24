@@ -345,13 +345,13 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
     params.from_api = True
     if params.from_api is True:
         if params.llm == "ark":
-            result = await analyze_doubao(review_dicts)
+            result = analyze_doubao(review_dicts)
         else:
             result = analyze_doubao(review_dicts)
 
         return dict(
-            analyses=result.get("analyses"),
-            summary=result.get("summary"),
+            analyses=result.analyses,
+            summary=result.summary,
             statistics="",
         )
 
