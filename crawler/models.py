@@ -104,6 +104,22 @@ class Product(Base):
         nullable=True,
         comment="更新时间",
     )
+    created_at_inner: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        server_default=func.now(),
+        nullable=True,
+        comment="内部创建时间",
+    )
+    updated_at_inner: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        server_default=func.now(),
+        server_onupdate=func.now(),
+        nullable=True,
+        comment="内部更新时间",
+    )
     resource_url: Mapped[str | None] = mapped_column(String(1024), comment="外部资源链接")  # deprecated 同 商品url
 
 
@@ -183,6 +199,22 @@ class ProductSKU(Base):
         nullable=True,
         comment="更新时间",
     )
+    created_at_inner: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        server_default=func.now(),
+        nullable=True,
+        comment="内部创建时间",
+    )
+    updated_at_inner: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        server_default=func.now(),
+        server_onupdate=func.now(),
+        nullable=True,
+        comment="内部更新时间",
+    )
 
 
 class ProductReview(Base):
@@ -241,6 +273,22 @@ class ProductReview(Base):
         server_onupdate=func.now(),
         nullable=True,
         comment="更新时间",
+    )
+    created_at_inner: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        server_default=func.now(),
+        nullable=True,
+        comment="内部创建时间",
+    )
+    updated_at_inner: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        default=func.now(),
+        onupdate=func.now(),
+        server_default=func.now(),
+        server_onupdate=func.now(),
+        nullable=True,
+        comment="内部更新时间",
     )
 
 
