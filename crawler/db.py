@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import Session
 
 from crawler.config import settings
-from crawler.models import Base
 
 
 def dumps(obj: Mapping) -> str:
@@ -40,4 +39,11 @@ if __name__ == "__main__":
         result = session.execute(stmt).scalars().one_or_none()
         log = structlog.get_logger()
         log.info(result)
-        Base.metadata.create_all(engine)
+        # Base.metadata.create_all(engine)
+
+    with next(get_db()) as session:
+        stmt = text("select version()")
+        result = session.execute(stmt).scalars().one_or_none()
+        log = structlog.get_logger()
+        log.info(result)
+        # Base.metadata.create_all(engine)

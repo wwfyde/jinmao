@@ -1,12 +1,13 @@
 import asyncio
-import json
 import random
 import re
 import uuid
+from datetime import datetime
 
 import httpx
+import orjson
 import redis.asyncio as redis
-from playwright.async_api import Playwright, async_playwright, BrowserContext, Route, Page
+from playwright.async_api import Playwright, async_playwright, BrowserContext, Route
 
 from crawler import log
 from crawler.config import settings
@@ -152,7 +153,8 @@ async def open_pdp_page(context: BrowserContext, url: str):
                 log.info(f"实际评论数{len(reviews)}")
                 review_event.set()
                 with open("review.json", "w") as f:
-                    f.write(json.dumps(reviews))
+                    # 使用orjson以支持datetime格式
+                    f.write(orjson.dumps(reviews, option=orjson.OPT_NAIVE_UTC).decode("utf-8"))
 
                 # log.info("获取评论信息")
                 # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
@@ -192,7 +194,9 @@ async def open_pdp_page(context: BrowserContext, url: str):
         # 导航到指定的URL
         # 其他操作...
         # 暂停执行
-        await page.goto(url, timeout=PLAYWRIGHT_TIMEOUT)
+        response = await page.goto(url, timeout=PLAYWRIGHT_TIMEOUT)
+        cookies = await context.cookies(url)
+        cookie_dict = {cookie["name"]: cookie["value"] for cookie in cookies}
 
         # await page.pause()
         log.info("等待页面加载")
@@ -389,7 +393,7 @@ async def open_pdp_page(context: BrowserContext, url: str):
         product.update(dict(attributes=attributes))
         # 保存产品信息到数据库
         save_product_data(product)
-        await page.pause()
+        # await page.pause()
 
         log.info(color)
         # fit_size 适合人群
@@ -440,7 +444,7 @@ def parse_target_review_from_api(
             comment=review.get("text", None)[:1024] if review.get("text") else None,
             photos=review.get("photos", None),
             photos_outer=review.get("photos", None),
-            nickname=review.get("UserNickname", None),
+            nickname=review.get("author", {}).get("nickname") if review.get("author", {}) else None,
             product_id=review.get("Tcin", None),
             # sku_id=review.get("product_variant", None) if review.get("details") else None,
             sku_id=None,  # TODO 该平台的评论没有sku_id
@@ -457,6 +461,12 @@ def parse_target_review_from_api(
             released_at=review.get("firstActivationDate", None),
             helpful_score=None,
             source="target",
+            created_at=datetime.fromisoformat(review.get("submitted_at").replace("Z", "+00:00"))
+            if review.get("submitted_at")
+            else None,
+            updated_at=datetime.fromisoformat(review.get("modified_at").replace("Z", "+00:00"))
+            if review.get("modified_at")
+            else None,
         )
         parsed_reviews.append(parsed_review)
     # 将评论保持到数据库
@@ -565,34 +575,34 @@ def map_attribute_field(input: dict) -> dict:
     pass
 
 
-async def scroll_page(page: Page, scroll_pause_time: int = 1000):
-    viewport_height = await page.evaluate("window.innerHeight")
-    i = 0
-    current_scroll_position = 0
-    while True:
-        # 滚动视口高度
-        i += 1
-        # log.info(f"第{i}次滚动, 滚动高度: {viewport_height}")
-        current_scroll_position += viewport_height
-        # log.info(f"当前滚动位置: {current_scroll_position}")
-        # 滚动到新的位置
-        await page.evaluate(f"window.scrollTo(0, {current_scroll_position})")
-        # 滚动到页面底部
-        # await page.evaluate(f"window.scrollTo(0, document.body.scrollHeight)")
-        await asyncio.sleep(scroll_pause_time / 1000)
-        # await page.wait_for_timeout(scroll_pause_time)
-        await page.wait_for_load_state("domcontentloaded")
-        # 重新获取页面高度
-        scroll_height = await page.evaluate("document.body.scrollHeight")
-        # 获取当前视口位置
-        current_viewport_position = await page.evaluate("window.scrollY + window.innerHeight")
-        # log.info(f"页面高度: {scroll_height}")
-        # log.info(f"当前视口位置: {current_viewport_position}")
-
-        if current_viewport_position >= scroll_height or current_scroll_position >= scroll_height:
-            # log.info("滚动到底部")
-            break
-        # previous_height = new_height
+# async def scroll_page(page: Page, scroll_pause_time: int = 1000):
+#     viewport_height = await page.evaluate("window.innerHeight")
+#     i = 0
+#     current_scroll_position = 0
+#     while True:
+#         # 滚动视口高度
+#         i += 1
+#         # log.info(f"第{i}次滚动, 滚动高度: {viewport_height}")
+#         current_scroll_position += viewport_height
+#         # log.info(f"当前滚动位置: {current_scroll_position}")
+#         # 滚动到新的位置
+#         await page.evaluate(f"window.scrollTo(0, {current_scroll_position})")
+#         # 滚动到页面底部
+#         # await page.evaluate(f"window.scrollTo(0, document.body.scrollHeight)")
+#         await asyncio.sleep(scroll_pause_time / 1000)
+#         # await page.wait_for_timeout(scroll_pause_time)
+#         await page.wait_for_load_state("domcontentloaded")
+#         # 重新获取页面高度
+#         scroll_height = await page.evaluate("document.body.scrollHeight")
+#         # 获取当前视口位置
+#         current_viewport_position = await page.evaluate("window.scrollY + window.innerHeight")
+#         # log.info(f"页面高度: {scroll_height}")
+#         # log.info(f"当前视口位置: {current_viewport_position}")
+#
+#         if current_viewport_position >= scroll_height or current_scroll_position >= scroll_height:
+#             # log.info("滚动到底部")
+#             break
+#         # previous_height = new_height
 
 
 async def main():

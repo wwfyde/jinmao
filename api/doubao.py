@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from openai import OpenAI
 from rich.pretty import pprint
 
-from api.schemas import APIAnalysisResult
 from crawler.config import settings
 
 summary_prompt = settings.ark_summary_prompt
@@ -75,7 +74,7 @@ def summarize_reviews(analyses: list):
     return summary_result.strip()
 
 
-def analyze_doubao(reviews: list[dict]) -> APIAnalysisResult:
+def analyze_doubao(reviews: list[dict]) -> dict:
     """
     分析评论
     """
@@ -102,7 +101,7 @@ def analyze_doubao(reviews: list[dict]) -> APIAnalysisResult:
     summary = summarize_reviews(analysis_results)
     output_data = {"analyses": analysis_results, "summary": summary}
     print(total_runtime)
-    return APIAnalysisResult(**output_data)
+    return output_data
 
 
 if __name__ == "__main__":

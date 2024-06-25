@@ -20,7 +20,7 @@ class ReviewAnalysisMetrics(BaseModel):
 class APIAnalysisResult(BaseModel):
     summary: str
     analyses: list[dict] = Field(..., description="分析结构")
-    # statistics: list | None = None
+    statistics: list | dict | str | None = None
 
 
 class ReviewIn(BaseModel):
@@ -43,6 +43,27 @@ class ReviewIn(BaseModel):
         return self
 
 
+class ProductReviewAnalysisByMetricsIn(BaseModel):
+    product_id: str | None = None
+    id: str | None = None
+    # comment: str
+    source: str | None = None
+    metrics: list[str] | str | None = Field(None, description="需要分析的指标")
+
+    @model_validator(mode="after")
+    def check_fields_after(self):
+        if self.product_id and self.source:
+            print("Product ID and Source are provided.")
+        if self.id:
+            print("ID is provided.")
+
+        # if not ((self.review_id and self.source) or self.id):
+        if not (self.product_id and self.source) and not self.id:
+            raise ValueError("请传入id ,或review_id和source.")
+
+        return self
+
+
 class ProductReviewIn(BaseModel):
     product_id: str = Field(..., description="商品ID")
     source: str = Field(..., description="来源")
@@ -59,7 +80,8 @@ class ProductReviewIn(BaseModel):
                 "from_api": False,
                 "llm": "ark",
             }
-        }
+        },
+        title="评论分析输入验证",
     )
 
 
@@ -84,7 +106,7 @@ class ProductReviewModel(
     is_deleted: bool | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
-    updated_at_inner: datetime | None = None
+    created_at_inner: datetime | None = None
     updated_at_inner: datetime | None = None
 
     @field_serializer("id", when_used="always")

@@ -1,4 +1,5 @@
 import asyncio
+from typing import AsyncGenerator
 
 import redis.asyncio as redis
 
@@ -16,6 +17,14 @@ async def create_pool() -> redis.ConnectionPool:
     )
     # r = redis.Redis(connection_pool=pool, decode_responses=True, protocol=3)
     return pool
+
+
+async def get_redis_cache() -> AsyncGenerator[redis.Redis, None]:
+    pool = redis.ConnectionPool.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+    r = redis.Redis(connection_pool=pool, decode_responses=True, protocol=3)
+    async with r:
+        print(await r.get("a"))
+        yield r
 
 
 class RedisClient:
@@ -39,6 +48,13 @@ async def main():
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
     async with r:
         print(await r.get("a"))
+    # return
+    async with await get_redis_cache().__anext__() as r:
+        print(await r.get("a"))
+
+    # r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+    # async with r:
+    #     print(await r.get("a"))
 
 
 if __name__ == "__main__":

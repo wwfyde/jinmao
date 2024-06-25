@@ -61,6 +61,8 @@ class Product(Base):
         DateTime, default=func.now(), server_default=func.now(), nullable=True, index=True, comment="上新时间"
     )  # required: gap(none), jcpenney
     tags: Mapped[list[str] | None] = mapped_column(JSON, comment="标签")  # required
+    is_review_analyzed: Mapped[bool | None] = mapped_column(Boolean, default=False, comment="是否已分析")
+    review_analyses: Mapped[list[dict] | None] = mapped_column(JSON, comment="评论分析结果汇总")
     review_summary: Mapped[str | None] = mapped_column(String(2048), comment="评论总结")
 
     style: Mapped[str | None] = mapped_column(String(64), comment="款式")  # deprecated 对应 商品名称name
@@ -98,9 +100,7 @@ class Product(Base):
     updated_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
-        onupdate=func.now(),
         server_default=func.now(),
-        server_onupdate=func.now(),
         nullable=True,
         comment="更新时间",
     )
@@ -193,9 +193,7 @@ class ProductSKU(Base):
     updated_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
-        onupdate=func.now(),
         server_default=func.now(),
-        server_onupdate=func.now(),
         nullable=True,
         comment="更新时间",
     )
@@ -268,9 +266,7 @@ class ProductReview(Base):
     updated_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
-        onupdate=func.now(),
         server_default=func.now(),
-        server_onupdate=func.now(),
         nullable=True,
         comment="更新时间",
     )

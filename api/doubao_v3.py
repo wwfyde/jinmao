@@ -1,7 +1,7 @@
 import asyncio
+import logging
 import time
 
-from IPython.lib.pretty import pprint
 from openai import AsyncOpenAI
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,10 +12,12 @@ from crawler.config import settings
 from crawler.db import engine
 from crawler.models import ProductReview
 
-
-# 设置API密钥
-
-# 设置OpenAI客户端
+crawler_logger = logging.getLogger("crawler")
+crawler_logger.setLevel(logging.INFO)
+log_libraries = ["httpx", "httpcore", "openai"]
+for library in log_libraries:
+    library_logger = logging.getLogger(library)
+    library_logger.setLevel(logging.INFO)
 
 
 async def analyze_single_comment(comment: str):
@@ -31,7 +33,7 @@ async def analyze_single_comment(comment: str):
             model=settings.ark_model,  # 指定的模型
             messages=[
                 {"role": "system", "content": settings.ark_prompt},  # 系统角色的预设提示
-                {"role": "user", "content": comment},                # 用户角色的评论内容
+                {"role": "user", "content": comment},  # 用户角色的评论内容
             ],
         )
     except Exception as e:
@@ -44,6 +46,8 @@ async def analyze_single_comment(comment: str):
 
     # 从响应中获取API的使用情况信息
     usage = response.usage
+    response_raw_content = response.choices[0].message.content
+    log.info(response_raw_content)
     # 提取响应内容，并去除首尾空格
     response_content = response.choices[0].message.content.strip()
 
@@ -94,7 +98,7 @@ async def summarize_reviews(analyses):
             model="ep-20240618053250-44grk",
             messages=[
                 {"role": "system", "content": settings.ark_summary_prompt},  # 系统角色的预设提示
-                {"role": "user", "content": summary_content},                # 用户角色的汇总评论内容
+                {"role": "user", "content": summary_content},  # 用户角色的汇总评论内容
             ],
         )
     except Exception as e:
@@ -114,7 +118,7 @@ async def analyze_doubao(reviews: list[dict]):
     analysis_results = []  # 用来存储每条评论分析的结果
     start_time = time.perf_counter()
 
-    tasks = [] # 初始化任务列表
+    tasks = []  # 初始化任务列表
     for review in reviews:
         # 为每条评论创建一个分析任务，并添加到任务列表
         task = analyze_comments_batch(review, analysis_results)
@@ -125,7 +129,7 @@ async def analyze_doubao(reviews: list[dict]):
 
     total_input_tokens = 0  # 输入标记的总数
     total_output_tokens = 0  # 输出标记的总数
-    total_processing_time = 0 # 总处理时间
+    total_processing_time = 0  # 总处理时间
 
     # 遍历每个任务的结果，累计相关统计数据
     for res in results:
@@ -188,6 +192,9 @@ if __name__ == "__main__":
     #     reviews = json.load(file)
 
     # asyncio.run(main())
-    result = asyncio.run(analyze_single_comment(
-        'Love these.  They are the perfect staple pieces that will go with anything in my wardrobe.  Perfect for a capsule wardrobe.'))
+    result = asyncio.run(
+        analyze_single_comment(
+            "Love these.  They are the perfect staple pieces that will go with anything in my wardrobe.  Perfect for a capsule wardrobe."
+        )
+    )
     print(result)
