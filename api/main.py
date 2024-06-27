@@ -126,22 +126,7 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         db.commit()  # 显式提交事务
 
         # 获取空间数据
-        if result.analyses is not None:
-            total_reviews = len(result.analyses)
-            metrics_counts = {}
-            for item in result.analyses:
-                for key, value in item.get("scores", {}).items():
-                    if float(value) >= 5:
-                        if key not in metrics_counts:
-                            metrics_counts[key] = dict(count=0)
-                        metrics_counts[key]["count"] += 1
-
-            for key, value in metrics_counts:
-                metrics_counts[key]["ratio"] = f'{round(metrics_counts[key]["count"] / total_reviews * 100)}%'
-                metrics_counts[key]["total"] = total_reviews
-
-        else:
-            metrics_counts = {}
+        metrics_counts = metrics_statistics(result.analyses) if result.analyses else {}
         result.statistics = metrics_counts
         log.debug(result.statistics)
         return result
@@ -151,27 +136,28 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         #     cast(ColumnElement, ProductReview.source == params.source),
         # )
         # metrics = db.execute(metrics_stmt).scalar().all()
-        if product_db.review_analyses is not None:
-            total_reviews = len(product_db.review_analyses)
-            metrics_counts = {}
-            for item in product_db.review_analyses:
-                for key, value in item.get("scores", {}).items():
-                    if float(value) >= 5:
-                        if key not in metrics_counts:
-                            metrics_counts[key] = dict(count=0)
-                        metrics_counts[key]["count"] += 1
-
-            for key, value in metrics_counts.items():
-                metrics_counts[key]["ratio"] = f'{round(metrics_counts[key]["count"] / total_reviews * 100)}%'
-                metrics_counts[key]["total"] = total_reviews
-        else:
-            metrics_counts = {}
-
+        metrics_counts = metrics_statistics(product_db.review_analyses) if product_db.review_analyses else {}
         result = APIAnalysisResult.model_validate(
             {"analyses": product_db.review_analyses, "summary": product_db.review_summary, "statistics": metrics_counts}
         )
         log.debug(result.statistics)
         return result
+
+
+def metrics_statistics(reviews: list[dict]) -> dict:
+    total_reviews = len(reviews)
+    metrics_counts = {}
+    for item in reviews:
+        for key, value in item.get("scores", {}).items():
+            if float(value) >= 5:
+                if key not in metrics_counts:
+                    metrics_counts[key] = dict(count=0)
+                metrics_counts[key]["count"] += 1
+
+    for key, value in metrics_counts.items():
+        metrics_counts[key]["ratio"] = f'{round(metrics_counts[key]["count"] / total_reviews * 100)}%'
+        metrics_counts[key]["total"] = total_reviews
+    return metrics_counts
 
 
 @router.post("/product/analyze_review_by_metrics")

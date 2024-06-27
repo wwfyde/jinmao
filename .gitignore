@@ -82,3 +82,5 @@ logs/
 # playwright
 browser_data/
 .browser_data/
+
+*.lock
