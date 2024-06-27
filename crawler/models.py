@@ -30,11 +30,15 @@ class Product(Base):
     image_url: Mapped[str | None] = mapped_column(
         String(1024), comment="商品主图链接"
     )  # required: gap, jcpenney, target
-    image_url_outer: Mapped[str | None] = mapped_column(
+    outer_image_url: Mapped[str | None] = mapped_column(
         String(1024), comment="商品图片外链"
     )  # required: gap, jcpenney, target
     model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="模特图片链接")
+    outer_model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="外部模特图片链接")
+
     model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="模特图片链接列表")
+    outer_model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="外部模特图片链接列表")
+
     rating: Mapped[float | None] = mapped_column(
         Numeric(2, 1), nullable=True, comment="评分"
     )  # required: gap, jcpenney, target
@@ -104,14 +108,14 @@ class Product(Base):
         nullable=True,
         comment="更新时间",
     )
-    created_at_inner: Mapped[datetime | None] = mapped_column(
+    inner_created_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
         server_default=func.now(),
         nullable=True,
         comment="内部创建时间",
     )
-    updated_at_inner: Mapped[datetime | None] = mapped_column(
+    inner_updated_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
         onupdate=func.now(),
@@ -163,11 +167,15 @@ class ProductSKU(Base):
     image_url: Mapped[str | None] = mapped_column(
         String(512), nullable=True, comment="商品图片"
     )  # optional: next, target
-    image_url_outer: Mapped[str | None] = mapped_column(
+    outer_image_url: Mapped[str | None] = mapped_column(
         String(1024), comment="商品图片外链"
     )  # required: gap, jcpenney, target
     model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="模特图片链接")
+    outer_model_image_url: Mapped[str | None] = mapped_column(String(1024), comment="外部模特图片链接")
+
     model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="模特图片链接列表")
+    outer_model_image_urls: Mapped[list[str] | None] = mapped_column(JSON, comment="外部模特图片链接列表")
+
     style: Mapped[str | None] = mapped_column(String(128), comment="服装风格")
     inventory: Mapped[int | None] = mapped_column(Integer, comment="库存")
     inventory_status: Mapped[str | None] = mapped_column(String(32), comment="库存状态")
@@ -197,14 +205,14 @@ class ProductSKU(Base):
         nullable=True,
         comment="更新时间",
     )
-    created_at_inner: Mapped[datetime | None] = mapped_column(
+    inner_created_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
         server_default=func.now(),
         nullable=True,
         comment="内部创建时间",
     )
-    updated_at_inner: Mapped[datetime | None] = mapped_column(
+    inner_updated_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
         onupdate=func.now(),
@@ -239,7 +247,7 @@ class ProductReview(Base):
     title: Mapped[str | None] = mapped_column(String(1024), comment="评论标题")  # required: gap, jcpenney, next
     comment: Mapped[str | None] = mapped_column(Text, comment="评论内容")  # required: gap, jcpenney, next
     photos: Mapped[list[str] | None] = mapped_column(JSON, comment="评论图片")  # optional: target
-    photos_outer: Mapped[list[str] | None] = mapped_column(JSON, comment="评论外部数据源")  # optional: target
+    outer_photos: Mapped[list[str] | None] = mapped_column(JSON, comment="评论外部数据源")  # optional: target
     nickname: Mapped[str | None] = mapped_column(String(64), comment="昵称")  # required: gap, jcpenney, next
     helpful_votes: Mapped[int | None] = mapped_column(Integer, default=0, comment="按顶票数")  # required: gap, jcpenney
     not_helpful_votes: Mapped[int | None] = mapped_column(Integer, comment="按踩票数")  # required: gap, jcpenney
@@ -251,6 +259,15 @@ class ProductReview(Base):
     metrics: Mapped[dict | list | None] = mapped_column(
         JSON, comment="评论指标"
     )  # required: gap, jcpenney, next, target
+    quality: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品质量指标")
+    warmth: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品保暖性指标")
+    comfort: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品舒适度指标")
+    softness: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品柔软性指标")
+    preference: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品偏好指标")
+    repurchase_intent: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品回购意愿指标")
+    appearance: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品外观指标")
+    fit: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="商品合身度指标")
+    extra_metrics: Mapped[dict | list | None] = mapped_column(JSON, comment="额外评论指标")
     token_usage: Mapped[dict | list | None] = mapped_column(
         JSON, comment="LLM token 消耗"
     )  # required: gap, jcpenney, next, target
@@ -270,14 +287,14 @@ class ProductReview(Base):
         nullable=True,
         comment="更新时间",
     )
-    created_at_inner: Mapped[datetime | None] = mapped_column(
+    inner_created_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
         server_default=func.now(),
         nullable=True,
         comment="内部创建时间",
     )
-    updated_at_inner: Mapped[datetime | None] = mapped_column(
+    inner_updated_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
         onupdate=func.now(),

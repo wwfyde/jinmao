@@ -53,7 +53,10 @@ async def root():
         }
     },
 )
-async def haiku_analysis(review: ReviewIn, db: Session = Depends(get_db)):
+async def haiku_analysis(
+    review: ReviewIn,
+    db: Session = Depends(get_db),
+):
     if review.id:
         stmt = select(ProductReview).where(cast(ColumnElement, ProductReview.id == review.id))
     elif review.review_id and review.source:
@@ -72,15 +75,18 @@ async def haiku_analysis(review: ReviewIn, db: Session = Depends(get_db)):
     "/product/review_analysis",
     summary="商品评论分析",
 )
-async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Depends(get_db)):
+async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)):
     """
     1. 优先从数据库查询, 如果没有则调用doubao分析;
     2. 当
+     评论总数
+     指标项: 大于等于阈值的评论数
+     每个指标的得分和数量, 质量好占比/总评论数
 
     """
     stmt = select(ProductReview).where(
-        ProductReview.product_id == params.product_id,  # noqa
-        ProductReview.source == params.source,  # noqa
+        cast(ColumnElement, ProductReview.product_id == params.product_id),
+        cast(ColumnElement, ProductReview.source == params.source),
     )
     reviews = db.execute(stmt).scalars().all()
 
@@ -97,11 +103,13 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
     )
     product_db = db.execute(stmt).scalars().one_or_none()
     # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
+    if isinstance(params.extra_metrics, list):
+        params.extra_metrics = ", ".join(params.extra_metrics)
     if not product_db.is_review_analyzed or params.from_api is True:
         if params.llm == "ark":
-            result = await analyze_doubao(review_dicts)
+            result = await analyze_doubao(review_dicts, params.extra_metrics)
         else:
-            result = await analyze_doubao(review_dicts)
+            result = await analyze_doubao(review_dicts, params.extra_metrics)
         # 将分析结果保存到数据库
         result = APIAnalysisResult.model_validate(result)
         summary = result.summary
@@ -117,6 +125,25 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
         product_db.review_analyses = result.analyses
         db.commit()  # 显式提交事务
 
+        # 获取空间数据
+        if result.analyses is not None:
+            total_reviews = len(result.analyses)
+            metrics_counts = {}
+            for item in result.analyses:
+                for key, value in item.get("scores", {}).items():
+                    if float(value) >= 5:
+                        if key not in metrics_counts:
+                            metrics_counts[key] = dict(count=0)
+                        metrics_counts[key]["count"] += 1
+
+            for key, value in metrics_counts:
+                metrics_counts[key]["ratio"] = f'{round(metrics_counts[key]["count"] / total_reviews * 100)}%'
+                metrics_counts[key]["total"] = total_reviews
+
+        else:
+            metrics_counts = {}
+        result.statistics = metrics_counts
+        log.debug(result.statistics)
         return result
     else:
         # metrics_stmt = select(ProductReview.metrics).where(
@@ -124,8 +151,27 @@ async def review_analysis_with_doubao(params: ProductReviewIn, db: Session = Dep
         #     cast(ColumnElement, ProductReview.source == params.source),
         # )
         # metrics = db.execute(metrics_stmt).scalar().all()
+        if product_db.review_analyses is not None:
+            total_reviews = len(product_db.review_analyses)
+            metrics_counts = {}
+            for item in product_db.review_analyses:
+                for key, value in item.get("scores", {}).items():
+                    if float(value) >= 5:
+                        if key not in metrics_counts:
+                            metrics_counts[key] = dict(count=0)
+                        metrics_counts[key]["count"] += 1
 
-        return {"analyses": product_db.review_analyses, "summary": product_db.review_summary, "statistics": ""}
+            for key, value in metrics_counts.items():
+                metrics_counts[key]["ratio"] = f'{round(metrics_counts[key]["count"] / total_reviews * 100)}%'
+                metrics_counts[key]["total"] = total_reviews
+        else:
+            metrics_counts = {}
+
+        result = APIAnalysisResult.model_validate(
+            {"analyses": product_db.review_analyses, "summary": product_db.review_summary, "statistics": metrics_counts}
+        )
+        log.debug(result.statistics)
+        return result
 
 
 @router.post("/product/analyze_review_by_metrics")

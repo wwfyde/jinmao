@@ -89,9 +89,10 @@ async def scroll_page(
     scroll_pause_time: int = 1000,
     max_attempt: int | None = None,
     source: str | None = None,
+    step: int = 1,
     page_size: int = 50,
 ):
-    viewport_height = await page.evaluate("window.innerHeight")
+    viewport_height = await page.evaluate("window.innerHeight") / step
     i = 0
     current_scroll_position = 0
     while True:
@@ -113,7 +114,7 @@ async def scroll_page(
         current_viewport_position = await page.evaluate("window.scrollY + window.innerHeight")
         # log.info(f"页面高度: {scroll_height}")
         # log.info(f"当前视口位置: {current_viewport_position}")
-        log.debug(f"当前url:{page.url}")
+        # log.debug(f"当前url:{page.url}")
         if current_viewport_position >= scroll_height or current_scroll_position >= scroll_height:
             # log.info("滚动到底部")
             break

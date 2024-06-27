@@ -5,21 +5,25 @@ from pydantic import BaseModel, Field, ConfigDict, field_serializer, model_valid
 
 
 class ReviewAnalysisMetrics(BaseModel):
-    quality: float | None = None
-    warmth: float | None = None
-    comfort: float | None = None
-    softness: float | None = None
-    likability: float | None = None
-    repurchase_intent: float | None = None
-    positive_sentiment: float | None = None
-    input_tokens: float | None = None
-    output_tokens: float | None = None
-    processing_time: float | None = None
+    quality: float | None = Field(0, description="质量")
+    warmth: float | None = Field(0, description="保暖性")
+    comfort: float | None = Field(0, description="舒适度")
+    softness: float | None = Field(0, description="柔软性")
+    preference: float | None = Field(0, description="偏好度")
+    repurchase_intent: float | None = Field(0, description="回购意向")
+    appearance: float | None = Field(0, description="外观")
+    fit: float | None = Field(0, description="合身度")
+
+    # __pydantic_extra__: dict  # 对额外字段添加约束
+    model_config = ConfigDict(
+        extra="allow",
+        # coerce_numbers_to_str=True,  # 允许将数组转换成字符串
+    )
 
 
 class APIAnalysisResult(BaseModel):
-    summary: str
-    analyses: list[dict] = Field(..., description="分析结构")
+    summary: str | None = None
+    analyses: list[dict] | None = Field(None, description="分析结构")
     statistics: list | dict | str | None = None
 
 
@@ -70,6 +74,7 @@ class ProductReviewIn(BaseModel):
     lang: Literal["zh", "en"] = Field("en", description="语言")
     llm: Literal["ark", "haiku", "azure", "haiku", "openai"] | None = Field("ark", description="llm模型")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
+    extra_metrics: list[str] | str | None = Field(False, description="额外分析指标")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -79,6 +84,7 @@ class ProductReviewIn(BaseModel):
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",
+                "extra_metrics": ["cost-effectiveness"],
             }
         },
         title="评论分析输入验证",
@@ -130,3 +136,8 @@ class ProductReviewAnalysis(
     helpful_votes: int | None = None
     not_helpful_votes: int | None = None
     helpful_score: int | None = None
+
+
+if __name__ == "__main__":
+    metrics = ReviewAnalysisMetrics(c="9.9").model_dump()
+    print(metrics)
