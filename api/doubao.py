@@ -118,10 +118,26 @@ async def summarize_reviews(reviews: list) -> str:
     使用空格将所有分析结果中的评分信息连接成一个长字符串
     combined_analyses = " ".join([str(analysis["scores"]) for analysis in reviews])
     格式化汇总内容，包括所有评论的评分
+
+    从评论中获取
     """
     loop = asyncio.get_running_loop()
     start_time = loop.time()
-    summary_content = f"以下是产品的所有评论分析: {reviews}"
+    # 提取评论
+    comments = []
+    totoal_str = 0
+    for review in reviews:
+        comment = review.get("comment", "")
+        if len(comment) >= 1024:
+            comment = comment[:1024]
+        totoal_str += len(comment)
+        if totoal_str >= 1024 * 28:
+            break
+        comments.append(comment)
+
+    comment_str = "\n".join(comments)
+
+    summary_content = f"{comment_str}"
 
     client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
 
@@ -139,6 +155,10 @@ async def summarize_reviews(reviews: list) -> str:
         return "Summary generation failed due to an error."
 
     # 从响应中提取汇总结果，并去除首尾空格
+    usage = response.usage
+    log.info(
+        f"【评论总结接口】用户输入token:{usage.prompt_tokens}, 输出token: {usage.completion_tokens}, 总计token: {usage.total_tokens}"
+    )
     summary_result = response.choices[0].message.content.strip()
     end_time = loop.time()
     log.info(f"评论总结耗时: Task took {end_time - start_time:.2f} seconds")
@@ -255,16 +275,16 @@ async def main():
 
     # 并发处理评论分析和评论总结
     async with asyncio.TaskGroup() as tg:
-        analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts))
+        # analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts))
         summary_task = tg.create_task(summarize_reviews(reviews=review_dicts))
-        single_summary_task = tg.create_task(
-            analyze_single_comment(
-                ProductReviewSchema.model_validate(random.choice(review_dicts)), semaphore=asyncio.Semaphore(1)
-            )
-        )
-        analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
+        # single_summary_task = tg.create_task(
+        #     analyze_single_comment(
+        #         ProductReviewSchema.model_validate(random.choice(review_dicts)), semaphore=asyncio.Semaphore(1)
+        #     )
+        # )
+        # analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
         summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
-        single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
+        # single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
 
 
 if __name__ == "__main__":
