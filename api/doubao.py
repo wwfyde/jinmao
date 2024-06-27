@@ -1,414 +1,282 @@
+import asyncio
+import json
+import logging
+import random
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import cast
 
-from openai import OpenAI
-from rich.pretty import pprint
+from jinja2 import Template
+from openai import AsyncOpenAI
+from sqlalchemy import select, ColumnElement
+from sqlalchemy.orm import Session
 
+from api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
+from crawler import log
 from crawler.config import settings
+from crawler.db import engine
+from crawler.models import ProductReview
 
-summary_prompt = settings.ark_summary_prompt
+crawler_logger = logging.getLogger("crawler")
+crawler_logger.setLevel(logging.INFO)
+log_libraries = ["httpx", "httpcore", "openai"]
+for library in log_libraries:
+    library_logger = logging.getLogger(library)
+    library_logger.setLevel(logging.WARN)
 
-
-def analyze_comment(review: dict):
-    comment = review.get("comment")
-    if not comment:
-        return None
-
-    print(f"----- Analyzing review {review['review_id']} -----")
-    content = f"评论内容: {comment}"
-    start_time = time.time()  # 记录开始时间
-    # 创建OpenAI客户端
-    client = OpenAI(
-        api_key=settings.ark_api_key,
-        base_url=settings.ark_base_url,
-        timeout=60,
-    )
-    stream = client.chat.completions.create(
-        model=settings.ark_model,  # 您的模型端点ID
-        messages=[{"role": "system", "content": settings.ark_prompt}, {"role": "user", "content": content}],
-        stream=True,
-    )
-
-    analysis_result = ""
-    for chunk in stream:
-        if not chunk.choices:
-            continue
-        analysis_result += chunk.choices[0].delta.content
-
-    end_time = time.time()  # 记录结束时间
-    processing_time = end_time - start_time
-
-    return {
-        "review_id": review["review_id"],
-        "analysis": analysis_result.strip(),
-        "input_tokens": len(settings.ark_prompt.split()) + len(content.split()),  # 计算输入token数量
-        "output_tokens": len(analysis_result.split()),  # 计算输出token数量
-        "processing_time": processing_time,
-    }
+settings.ark_prompt = """用途：作为电子商务和情感分析专家，全面分析客户反馈,根据评论的情感倾向和语义内容，推断并给出每个属性的评分
+功能说明：该模块不仅分析评论中直接提到的内容，还推断并评分以下属性：quality, warmth, comfort, softness, preference, repurchase_intent, appearance, fit, {{ extra_metrics }}。每个属性的最高分为10分。
+实现方法：通过综合分析评论的整体情感和语义内容，即使某些属性没有直接提到，也能进行推断和评分。
+输入：一组电商评论文本。
+输出：针对每条评论，输出包含各属性评分的 JSON 格式结果。确保没有属性得分为零。
+输出格式示例：
+{
+     "quality": X,
+     "warmth": Y,
+     "comfort": Z,
+     "softness": W,
+     "preference": A,
+     "repurchase_intent": B,
+     "appearance": C,
+     "fit": E,
+     ...
+}"""
 
 
-def summarize_reviews(analyses: list):
-    combined_analyses = " ".join([analysis["analysis"] for analysis in analyses])
-    summary_content = f"以下是产品的所有评论分析: {combined_analyses}"
-    # 创建OpenAI客户端
-    client = OpenAI(
-        api_key=settings.ark_api_key,
-        base_url=settings.ark_base_url,
-        timeout=60,
-    )
-    stream = client.chat.completions.create(
-        model=settings.ark_model,  # 您的模型端点ID
-        messages=[
-            {"role": "system", "content": settings.ark_summary_prompt},
-            {"role": "user", "content": summary_content},
-        ],
-        stream=True,
-    )
-
-    summary_result = ""
-    for chunk in stream:
-        if not chunk.choices:
-            continue
-        summary_result += chunk.choices[0].delta.content
-
-    return summary_result.strip()
-
-
-def analyze_doubao(reviews: list[dict]) -> dict:
+async def analyze_single_comment(
+    review: ProductReviewSchema,
+    semaphore: asyncio.Semaphore,
+    extra_metrics: str | None = None,
+) -> dict | None:
     """
-    分析评论
+    单一评论分析
     """
-    start_time = time.time()  # 记录总开始时间
-    # 并行处理评论分析
-    analysis_results = []
-    total_input_tokens = 0
-    total_output_tokens = 0
-    total_processing_time = 0
+    async with semaphore:
+        start_time = time.time()
+        # 通过async OpenAI与ark交互
+        client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
 
-    with ThreadPoolExecutor(max_workers=settings.ark_concurrency) as executor:
-        future_to_review = {executor.submit(analyze_comment, review): review for review in reviews}
-        for future in as_completed(future_to_review):
-            result = future.result()
-            if result:
-                analysis_results.append(result)
-                total_input_tokens += result["input_tokens"]
-                total_output_tokens += result["output_tokens"]
-                total_processing_time += result["processing_time"]
+        # 通过jinjia2 处理settings.ark_prompt 以替换其中的 {{extra_prompt}}
+        # 允许额外的指标
+        if extra_metrics:
+            settings.ark_prompt = Template(settings.ark_prompt).render(extra_metrics=extra_metrics)
+        else:
+            settings.ark_prompt = Template(settings.ark_prompt).render()
+        # log.info(f"模版语法渲染后的提示词{settings.ark_prompt}")
+        try:
+            response = await client.chat.completions.create(
+                timeout=settings.httpx_timeout,
+                model=settings.ark_model,  # 指定的模型
+                messages=[
+                    {"role": "system", "content": settings.ark_prompt},  # 系统角色的预设提示
+                    {"role": "user", "content": review.comment},  # 用户角色的评论内容
+                ],
+            )
+        except Exception as e:
+            # 捕获并处理任何异常，打印错误信息并返回None
+            print(f"Error occurred: {e}")
+            return None
 
-    end_time = time.time()  # 记录总结束时间
-    total_runtime = end_time - start_time
+        end_time = time.time()
 
-    summary = summarize_reviews(analysis_results)
-    output_data = {"analyses": analysis_results, "summary": summary}
-    print(total_runtime)
-    return output_data
+        # 从响应中获取API的使用情况信息
+        usage = response.usage
+        response_raw_content = response.choices[0].message.content
+        # log.debug(response_raw_content)
+        # 提取响应内容，并去除首尾空格
+        # 尝试格式化输出
+        try:
+            response_content = json.loads(response_raw_content)
+        except Exception as exc:
+            log.error(f"解析LLM结果失败, 错误提示: {exc}")
+
+            # 解析失败时对指标分数进行置零
+            response_content = ReviewAnalysisMetrics().model_dump()
+
+        # 通过pydantic对象对其进行校验
+        scores = ReviewAnalysisMetrics.model_validate(response_content).model_dump()
+
+        # 返回解析的评分数据、使用情况和处理时间
+        processing_time = end_time - start_time  # 计算处理总时间
+
+        log.info(f"单一评论耗时: Task took {processing_time:.2f} seconds")
+
+        result = {
+            "review_id": review.review_id,
+            "scores": scores,  # 评论的分析评分
+            "input_tokens": usage.prompt_tokens,
+            "output_tokens": usage.completion_tokens,
+            "processing_time": processing_time,
+            "comment": review.comment,
+        }
+
+        return result
+
+
+# 汇总评论summarize分析结果
+async def summarize_reviews(reviews: list) -> str:
+    """
+    使用空格将所有分析结果中的评分信息连接成一个长字符串
+    combined_analyses = " ".join([str(analysis["scores"]) for analysis in reviews])
+    格式化汇总内容，包括所有评论的评分
+    """
+    loop = asyncio.get_running_loop()
+    start_time = loop.time()
+    summary_content = f"以下是产品的所有评论分析: {reviews}"
+
+    client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
+
+    try:
+        response = await client.chat.completions.create(
+            model=settings.ark_model,
+            timeout=settings.httpx_timeout,
+            messages=[
+                {"role": "system", "content": settings.ark_summary_prompt},  # 系统角色的预设提示
+                {"role": "user", "content": summary_content},  # 用户角色的汇总评论内容
+            ],
+        )
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return "Summary generation failed due to an error."
+
+    # 从响应中提取汇总结果，并去除首尾空格
+    summary_result = response.choices[0].message.content.strip()
+    end_time = loop.time()
+    log.info(f"评论总结耗时: Task took {end_time - start_time:.2f} seconds")
+    return summary_result
+
+
+# 旨在分析一组评论,通过并行处理每个评论来提高效率，并将结果汇总和记录
+async def analyze_reviews(reviews: list[dict], extra_metrics: str | None = None) -> list[dict | None]:
+    """
+    分析商品所有评论
+    """
+    # 打印待分析的评论数量
+    log.debug(f"待分析评论数量{len(reviews)}")
+    loop = asyncio.get_running_loop()
+    start_time = loop.time()
+
+    semaphore = asyncio.Semaphore(settings.review_analysis_concurrency)
+    tasks = []  # 初始化任务列表
+    for review in reviews:
+        # 为每条评论创建一个分析任务，并添加到任务列表
+        review = ProductReviewSchema.model_validate(review)
+        task = analyze_single_comment(review, semaphore=semaphore, extra_metrics=extra_metrics)
+        tasks.append(task)
+
+    # 使用 asyncio.gather 并行执行所有任务，等待所有任务完成
+    results: tuple[dict | None] = await asyncio.gather(*tasks)
+
+    total_input_tokens = 0  # 输入标记的总数
+    total_output_tokens = 0  # 输出标记的总数
+    total_processing_time = 0  # 总处理时间
+
+    # 遍历每个任务的结果，累计相关统计数据
+    analysis_results = []  # 用来存储每条评论分析的结果
+
+    # 统计总的评论分析耗时
+    for res in results:
+        if res:
+            # print(f"{res=}")
+            total_input_tokens += int(res["input_tokens"])
+            total_output_tokens += int(res["output_tokens"])
+            total_processing_time += float(res["processing_time"])
+            analysis_results.append(res)
+
+    # 记录分析结果到日志
+    log.info(f"Total processing time: {total_processing_time:.2f} seconds")
+    log.info(f"Total input tokens: {total_input_tokens}")
+    log.info(f"Total output tokens: {total_output_tokens}")
+
+    end_time = loop.time()
+    log.info(f"评论分析耗时: Task took {end_time - start_time:.2f} seconds")
+    # 返回分析结果和总结
+    return analysis_results
+
+
+async def main():
+    # 定义产品ID和来源
+    product_id, source = "866986", "gap"
+    product_ids = [
+        "89394973",
+        "89634544",
+        "90075687",
+        "90129333",
+        "90143622",
+        "90176248",
+        "90230476",
+        "90253050",
+        "90268462",
+        "90306773",
+        "90310504",
+        "90354405",
+        "90368246",
+        "90378603",
+        "90413945",
+        "90528664",
+        "90559291",
+        "90587094",
+        "90587245",
+        "90596977",
+        "90601051",
+        "90757853",
+        "90798860",
+        "90872976",
+        "90929496",
+        "90929560",
+        "90929587",
+        "90946680",
+        "91116005",
+        "91153463",
+        "91497189",
+        "91530344",
+        "91736623",
+        "92152092",
+    ]
+    sources = ["target"] * len(product_ids)
+    products = list(zip(product_ids, sources))
+    product_id, source = random.choice(products)  # 从列表中随机取一个
+    product_id, source = "89779562", "target"  # 一共600条评论, 实际有评论的235条
+    # product_id, source = "795346", "gap"  # 一共3901条评论, 实际2760 条
+
+    # 创建数据库会话 并从数据库中拉取商品所有评论
+    with Session(engine) as session:
+        # 构建SQL查询语句，获取特定产品ID和来源的所有评论
+        stmt = select(ProductReview).where(
+            cast(ColumnElement, ProductReview.product_id == product_id),
+            cast(ColumnElement, ProductReview.source == source),
+        )
+        # 执行查询并获取结果
+        reviews = session.execute(stmt).scalars().all()
+        # 将查询结果中的每个评论对象转换为字典格式，方便后续处理
+        review_dicts = [
+            ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews
+        ]
+        log.debug(f"当前商品{product_id=}, 共有{len(review_dicts)}条")
+
+    # 并发处理评论分析和评论总结
+    async with asyncio.TaskGroup() as tg:
+        analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts))
+        summary_task = tg.create_task(summarize_reviews(reviews=review_dicts))
+        single_summary_task = tg.create_task(
+            analyze_single_comment(
+                ProductReviewSchema.model_validate(random.choice(review_dicts)), semaphore=asyncio.Semaphore(1)
+            )
+        )
+        analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
+        summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
+        single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
 
 
 if __name__ == "__main__":
-    reviews = [
-        {
-            "review_id": "521547319",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Quality denim",
-            "comment": "Well made jeans. I ordered an 8 Slim for my son and they're still a bit big in the pelvis area but the length and quality are exceptional.",
-            "nickname": "Caris, C",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 1433,
-        },
-        {
-            "review_id": "516109171",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 3.0,
-            "title": "Meh",
-            "comment": "Nice feel but weird cut.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "513459580",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Love!",
-            "comment": "Love the color and they fit wonderfully on a very thin boy.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "513459465",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Great!",
-            "comment": "Great jeans for an very thin boy!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "513259754",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "True to size",
-            "comment": "Sturdy material. We know how boys are. Great fit too",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "513190270",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Awesome jeans",
-            "comment": "They fit my son really nice we love gap jeans!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "511653232",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Awesome jeans",
-            "comment": "Great quality material, true to size fit.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "511630032",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "#sweepstakes",
-            "comment": "#sweepstakes\n\nThese are stable jeans. I wish gap made slim skinny jeans in different colors other than blue/black denim. Fits perfect for my slim son. Also, the quality in the denim is well worth the money! I typically purchase the jeans two sizes bigger because he grows so fast and needless to say they hold up for two school years! I do not dry his jeans at all fyi",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "511518077",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Perfect",
-            "comment": "My son needed to size down in these jeans compared to the skinny jeans. I love the fit once I had the right size!!!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "511176409",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Thank you Gap for carrying slim!",
-            "comment": "My son is on the slimmer side so these slim jeans fit better than the regular version. Thank you Gap for carrying these! My only complaint would be that they would be a little more comfortable if they had more stretch in them.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "510328810",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "My nephew loves it!",
-            "comment": "Perfect for my nephew, for me it's enough that he loves it!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "510291900",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Great fit, wash and price",
-            "comment": "Great fit ~ love the slim cut so the legs are not too wide and baggy.\nNice even medium black wash.\nGreat price - can't beat it for the quality!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "508122371",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Picky skinny-boy approved!",
-            "comment": "Love these jeans for my skinny boy. Adjustable buttons in the waist but already slim so they don't look puckered even when tightened a lot.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "507705422",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Good fit for skinny kids w/o looking like jeggings",
-            "comment": "These fit my skinny kid without being too tight. The denim feels like Gap's usual good quality, too. I will get more!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "507277327",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Great Jeans!",
-            "comment": "My son love these Jean! Great color and washes well!!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "507273305",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Love Gap.",
-            "comment": "Fit good looked good.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "507029223",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Great Purchase",
-            "comment": "Perfect fit!!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "506182776",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Excellent Quality",
-            "comment": "These are the best jeans! My son is very slim and on smaller side so I love that Gap has many options with sizes. I also appreciate the waist sinch they still put in this size. They wear very well and are comfortable and fashionable!",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "505749329",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Looks great style",
-            "comment": "Great purchase and the price",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "503835754",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Slim jeans",
-            "comment": "Great slim jeans, not too skinny",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "501740352",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "Best jeans",
-            "comment": "The best jeans for kids. True to size. Fits perfect",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "497351171",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 3.0,
-            "title": "Cute but runs small",
-            "comment": "Cute jeans but these run small. My 11.5 year old wears size 14 Gap jeans (he needs a 14 for the length) and these were too small overall. Need a 16.",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-        {
-            "review_id": "490445066",
-            "product_id": "728681",
-            "source": "gap",
-            "product_name": None,
-            "rating": 5.0,
-            "title": "True to size",
-            "comment": "Fits perfect no sagging just enough room",
-            "nickname": "anonymous",
-            "helpful_votes": 0,
-            "not_helpful_votes": 0,
-            "helpful_score": 0,
-        },
-    ]
+    # 读取评论文件
+    # with open("review_ana/review_test.json", "r", encoding="utf-8") as file:
+    #     reviews = json.load(file)
 
-    start_time = time.time()
-    output = analyze_doubao(reviews)
-    end_time = start_time - time.time()
-    print(f"Total runtime: {end_time}")
-    pprint(output)
+    result = asyncio.run(main())
+    # result = asyncio.run(
+    #     analyze_single_comment(
+    #         "Love these.  They are the perfect staple pieces that will go with anything in my wardrobe.  Perfect for a capsule wardrobe."
+    #     )
+    # )
+    print(result)
+    # pprint(result)

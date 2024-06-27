@@ -75,6 +75,7 @@ class ProductReviewIn(BaseModel):
     llm: Literal["ark", "haiku", "azure", "haiku", "openai"] | None = Field("ark", description="llm模型")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
     extra_metrics: list[str] | str | None = Field(False, description="额外分析指标")
+    threshold: float | None = Field(5.0, description="指标阈值")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -118,6 +119,10 @@ class ProductReviewModel(
     @field_serializer("id", when_used="always")
     def transform_id_to_str(id: int) -> str:
         return str(id)
+
+
+class ProductReviewSchema(ProductReviewModel):
+    id: int | str | None = None
 
 
 class ProductReviewAnalysis(

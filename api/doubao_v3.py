@@ -10,7 +10,7 @@ from openai import AsyncOpenAI
 from sqlalchemy import select, ColumnElement
 from sqlalchemy.orm import Session
 
-from api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics
+from api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
 from crawler import log
 from crawler.config import settings
 from crawler.db import engine
@@ -42,90 +42,108 @@ settings.ark_prompt = """用途：作为电子商务和情感分析专家，全�
 }"""
 
 
-async def analyze_single_comment(comment: str, extra_metrics: str | None = None):
+async def analyze_single_comment(
+    review: ProductReviewSchema,
+    semaphore: asyncio.Semaphore,
+    extra_metrics: str | None = None,
+) -> dict | None:
     """
     单一评论分析
     """
-    start_time = time.time()
-    # 通过async OpenAI与ark交互
-    client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
+    async with semaphore:
+        start_time = time.time()
+        # 通过async OpenAI与ark交互
+        client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
 
-    # 通过jinjia2 处理settings.ark_prompt 以替换其中的 {{extra_prompt}}
-    # 允许额外的指标
-    if extra_metrics:
-        settings.ark_prompt = Template(settings.ark_prompt).render(extra_metrics=extra_metrics)
-    else:
-        settings.ark_prompt = Template(settings.ark_prompt).render()
-    log.info(f"模版语法渲染后的提示词{settings.ark_prompt}")
-    try:
-        response = await client.chat.completions.create(
-            model=settings.ark_model,  # 指定的模型
-            messages=[
-                {"role": "system", "content": settings.ark_prompt},  # 系统角色的预设提示
-                {"role": "user", "content": comment},  # 用户角色的评论内容
-            ],
-        )
-    except Exception as e:
-        # 捕获并处理任何异常，打印错误信息并返回None
-        print(f"Error occurred: {e}")
-        return None
+        # 通过jinjia2 处理settings.ark_prompt 以替换其中的 {{extra_prompt}}
+        # 允许额外的指标
+        if extra_metrics:
+            settings.ark_prompt = Template(settings.ark_prompt).render(extra_metrics=extra_metrics)
+        else:
+            settings.ark_prompt = Template(settings.ark_prompt).render()
+        # log.info(f"模版语法渲染后的提示词{settings.ark_prompt}")
+        try:
+            response = await client.chat.completions.create(
+                timeout=settings.httpx_timeout,
+                model=settings.ark_model,  # 指定的模型
+                messages=[
+                    {"role": "system", "content": settings.ark_prompt},  # 系统角色的预设提示
+                    {"role": "user", "content": review.comment},  # 用户角色的评论内容
+                ],
+            )
+        except Exception as e:
+            # 捕获并处理任何异常，打印错误信息并返回None
+            print(f"Error occurred: {e}")
+            return None
 
-    end_time = time.time()
-    processing_time = end_time - start_time  # 计算处理总时间
+        end_time = time.time()
 
-    # 从响应中获取API的使用情况信息
-    usage = response.usage
-    response_raw_content = response.choices[0].message.content
-    log.info(response_raw_content)
-    # 提取响应内容，并去除首尾空格
-    # 尝试格式化输出
-    try:
-        response_content = json.loads(response_raw_content)
-    except Exception as exc:
-        log.error(f"解析LLM结果失败, 错误提示: {exc}")
-        response_content = ReviewAnalysisMetrics().model_dump()
+        # 从响应中获取API的使用情况信息
+        usage = response.usage
+        response_raw_content = response.choices[0].message.content
+        log.info(response_raw_content)
+        # 提取响应内容，并去除首尾空格
+        # 尝试格式化输出
+        try:
+            response_content = json.loads(response_raw_content)
+        except Exception as exc:
+            log.error(f"解析LLM结果失败, 错误提示: {exc}")
+            response_content = ReviewAnalysisMetrics().model_dump()
 
-    # response_content = response.choices[0].message.content.strip()
+        # response_content = response.choices[0].message.content.strip()
 
-    # 提取评分信息并转换为字典格式
-    # scores = {}  # 初始化一个字典用于存储评分信息
-    # for line in response_content.split(","):
-    #     # 使用冒号分割每一行，分离键和值
-    #     parts = line.split(":")
-    #     if len(parts) == 2:  # 确保分割后有两个元素
-    #         key, value = parts
-    #         try:
-    #             # 将值转换为浮点数并存入字典
-    #             scores[key.strip()] = float(value.strip().replace("'", ""))
-    #         except ValueError:
-    #             print(f"Could not convert value to float: {value.strip()}")
+        # 提取评分信息并转换为字典格式
+        # scores = {}  # 初始化一个字典用于存储评分信息
+        # for line in response_content.split(","):
+        #     # 使用冒号分割每一行，分离键和值
+        #     parts = line.split(":")
+        #     if len(parts) == 2:  # 确保分割后有两个元素
+        #         key, value = parts
+        #         try:
+        #             # 将值转换为浮点数并存入字典
+        #             scores[key.strip()] = float(value.strip().replace("'", ""))
+        #         except ValueError:
+        #             print(f"Could not convert value to float: {value.strip()}")
 
-    # 通过pydantic对象对其进行校验
-    scores = ReviewAnalysisMetrics.model_validate(response_content).model_dump()
+        # 通过pydantic对象对其进行校验
+        scores = ReviewAnalysisMetrics.model_validate(response_content).model_dump()
 
-    # 返回解析的评分数据、使用情况和处理时间
-    return scores, usage, processing_time
+        # 返回解析的评分数据、使用情况和处理时间
+        processing_time = end_time - start_time  # 计算处理总时间
 
+        log.info(f"单一评论耗时: Task took {processing_time:.2f} seconds")
 
-# 批量分析评论数据
-async def analyze_comments_batch(review: dict, analysis_results: list, extra_metrics: str | None = None):
-    comment = review.get("comment")  # 从review字典中安全获取评论文本
-    scores, usage, processing_time = await analyze_single_comment(comment, extra_metrics=extra_metrics)
-
-    analysis_results.append(
-        {
-            "review_id": review["review_id"],
+        result = {
+            "review_id": review.review_id,
             "scores": scores,  # 评论的分析评分
             "input_tokens": usage.prompt_tokens,
             "output_tokens": usage.completion_tokens,
             "processing_time": processing_time,
-            "comment": review.get("comment"),
+            "comment": review.comment,
         }
-    )
+
+        return result
+
+
+# 批量分析评论数据
+# async def analyze_comments_batch(review: dict, analysis_results: list, extra_metrics: str | None = None):
+#     comment = review.get("comment")  # 从review字典中安全获取评论文本
+#     scores, usage, processing_time = await analyze_single_comment(comment, extra_metrics=extra_metrics)
+#
+#     analysis_results.append(
+#         {
+#             "review_id": review["review_id"],
+#             "scores": scores,  # 评论的分析评分
+#             "input_tokens": usage.prompt_tokens,
+#             "output_tokens": usage.completion_tokens,
+#             "processing_time": processing_time,
+#             "comment": review.get("comment"),
+#         }
+#     )
 
 
 # 汇总评论summarize分析结果
-async def summarize_reviews(analyses):
+async def summarize_reviews(analyses: list):
     # 使用空格将所有分析结果中的评分信息连接成一个长字符串
     combined_analyses = " ".join([str(analysis["scores"]) for analysis in analyses])
     # 格式化汇总内容，包括所有评论的评分
@@ -135,6 +153,7 @@ async def summarize_reviews(analyses):
     try:
         response = await client.chat.completions.create(
             model=settings.ark_model,
+            timeout=settings.httpx_timeout,
             messages=[
                 {"role": "system", "content": settings.ark_summary_prompt},  # 系统角色的预设提示
                 {"role": "user", "content": summary_content},  # 用户角色的汇总评论内容
@@ -154,35 +173,42 @@ async def analyze_doubao(reviews: list[dict], extra_metrics: str | None = None):
     # 打印待分析的评论数量
     log.debug(f"待分析评论数量{len(reviews)}")
 
-    analysis_results = []  # 用来存储每条评论分析的结果
     start_time = time.perf_counter()
-
+    semaphore = asyncio.Semaphore(500)
     tasks = []  # 初始化任务列表
     for review in reviews:
         # 为每条评论创建一个分析任务，并添加到任务列表
-        task = analyze_comments_batch(review, analysis_results, extra_metrics=extra_metrics)
+        review = ProductReviewSchema.model_validate(review)
+        task = analyze_single_comment(review, semaphore=semaphore, extra_metrics=extra_metrics)
         tasks.append(task)
 
     # 使用 asyncio.gather 并行执行所有任务，等待所有任务完成
-    results = await asyncio.gather(*tasks)
+    results: tuple[dict | None] = await asyncio.gather(*tasks)
 
     total_input_tokens = 0  # 输入标记的总数
     total_output_tokens = 0  # 输出标记的总数
     total_processing_time = 0  # 总处理时间
 
     # 遍历每个任务的结果，累计相关统计数据
+    analysis_results = []  # 用来存储每条评论分析的结果
+
     for res in results:
         if res:
-            print(f"{res=}")
-            total_input_tokens += res["input_tokens"]
-            total_output_tokens += res["output_tokens"]
-            total_processing_time += res["processing_time"]
+            # print(f"{res=}")
+            total_input_tokens += int(res["input_tokens"])
+            total_output_tokens += int(res["output_tokens"])
+            total_processing_time += float(res["processing_time"])
+            analysis_results.append(res)
 
     total_runtime = time.perf_counter() - start_time
 
     summary_start = time.perf_counter()
     # 生成对所有评论的整体总结
+    loop = asyncio.get_running_loop()
+    start_time = loop.time()
     summary = await summarize_reviews(analysis_results)
+    end_time = loop.time()
+    log.info(f"总结耗时: Task took {end_time - start_time:.2f} seconds")
 
     total_summary_runtime = time.perf_counter() - summary_start
 
@@ -245,7 +271,8 @@ async def main():
     sources = ["target"] * len(product_ids)
     products = list(zip(product_ids, sources))
     product_id, source = random.choice(products)  # 从列表中随机取一个
-    product_id, source = "89779562", "target"  # 一共600条评论
+    product_id, source = "89779562", "target"  # 一共600条评论, 实际有评论的235条
+    # product_id, source = "795346", "gap"  # 一共3901条评论, 实际2760 条
     # 创建数据库会话
     with Session(engine) as session:
         # 构建SQL查询语句，获取特定产品ID和来源的所有评论
@@ -259,11 +286,15 @@ async def main():
         review_dicts = [
             ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews
         ]
-        log.debug(f"当前商品{product_id=}, 共有{len(review_dicts)}跳")
+        log.debug(f"当前商品{product_id=}, 共有{len(review_dicts)}条")
 
     # 调用分析函数处理评论数据
-
+    loop = asyncio.get_running_loop()
+    start_time = loop.time()
     result = await analyze_doubao(reviews=review_dicts)
+    end_time = loop.time()
+    log.info(f"Task took {end_time - start_time:.2f} seconds")
+
     # 记录分析结果到日志
     log.info(result)
     print(result)
@@ -275,10 +306,10 @@ if __name__ == "__main__":
     #     reviews = json.load(file)
 
     result = asyncio.run(main())
-    result = asyncio.run(
-        analyze_single_comment(
-            "Love these.  They are the perfect staple pieces that will go with anything in my wardrobe.  Perfect for a capsule wardrobe."
-        )
-    )
+    # result = asyncio.run(
+    #     analyze_single_comment(
+    #         "Love these.  They are the perfect staple pieces that will go with anything in my wardrobe.  Perfect for a capsule wardrobe."
+    #     )
+    # )
     print(result)
     # pprint(result)

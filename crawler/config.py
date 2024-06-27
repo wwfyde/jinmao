@@ -55,7 +55,8 @@ class Settings(BaseSettings):
     mysql: MySQL
     molook_db: MySQLMoLook
     playwright: PlayWright
-    httpx_timeout: int = 60
+    httpx_timeout: int = 180
+    review_analysis_concurrency: int = 500
     proxy_url: AnyHttpUrl | str
     save_login_state: bool = True  # 保存登录状态
     base_dir: Path | str = Path(__file__).resolve().parent
