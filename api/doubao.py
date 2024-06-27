@@ -23,8 +23,9 @@ for library in log_libraries:
     library_logger = logging.getLogger(library)
     library_logger.setLevel(logging.WARN)
 
-settings.ark_prompt = """用途：作为电子商务和情感分析专家，全面分析客户反馈,根据评论的情感倾向和语义内容，推断并给出每个属性的评分
-功能说明：该模块不仅分析评论中直接提到的内容，还推断并评分以下属性：quality, warmth, comfort, softness, preference, repurchase_intent, appearance, fit, {{ extra_metrics }}。每个属性的最高分为10分。
+settings.ark_prompt = """
+用途：作为电子商务和情感分析专家，全面分析商品评论,根据评论的情感倾向和语义内容，推断并给出每个属性的评分,评分的分值范围是 1~10, 1 代表非常差, 10 代表非常好,评分保留1位小数
+功能说明：该模块不仅分析评论中直接提到的内容，还推断并评分以下属性：quality, warmth, comfort, softness, preference, repurchase_intent, appearance, fit, {{ extra_metrics }}
 实现方法：通过综合分析评论的整体情感和语义内容，即使某些属性没有直接提到，也能进行推断和评分。
 输入：一组电商评论文本。
 输出：针对每条评论，输出包含各属性评分的 JSON 格式结果。确保没有属性得分为零。
@@ -41,6 +42,15 @@ settings.ark_prompt = """用途：作为电子商务和情感分析专家，全�
      ...
 }"""
 
+settings.ark_summary_prompt="""
+用途：你是一名电商和情感分析专家。请总结以下用户对产品的评价，提炼出主要的情绪和关键方面，如产品质量、舒适度、功能、设计和性价比。总结应包含正面和负面的评价，并给出整体的评价。
+
+输入：一组电商商品的评论文本。
+输出：评论内容的总结
+
+将你的回应格式化为一个段落，总结一般情绪和主要收获!
+必须用英语输出结果，禁止使用中文!
+"""
 
 async def analyze_single_comment(
     review: ProductReviewSchema,
@@ -62,6 +72,7 @@ async def analyze_single_comment(
         else:
             settings.ark_prompt = Template(settings.ark_prompt).render()
         # log.info(f"模版语法渲染后的提示词{settings.ark_prompt}")
+        log.info(f"用户评论内容: {review.comment}")
         try:
             response = await client.chat.completions.create(
                 timeout=settings.httpx_timeout,
@@ -298,5 +309,5 @@ if __name__ == "__main__":
     #         "Love these.  They are the perfect staple pieces that will go with anything in my wardrobe.  Perfect for a capsule wardrobe."
     #     )
     # )
-    print(result)
+    # print(result)
     # pprint(result)
