@@ -123,7 +123,9 @@ class Settings(BaseSettings):
             "config.local.yml",
             "config.dev.local.yml",
         ],
+        yaml_file_encoding="utf-8",
         env_file=[".env", ".env.staging", ".env.prod", ".env.local"],
+        env_file_encoding="utf-8",
         extra="ignore",
     )
 
