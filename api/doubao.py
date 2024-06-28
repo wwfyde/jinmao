@@ -12,7 +12,7 @@ from sqlalchemy import select, ColumnElement
 from sqlalchemy.orm import Session
 
 from api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
-from . import log
+from api import log
 from crawler.config import settings
 from crawler.db import engine
 from crawler.models import ProductReview

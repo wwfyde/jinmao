@@ -13,7 +13,7 @@ from api.schemas import (
     ProductReviewAnalysis,
     ProductReviewAnalysisByMetricsIn,
 )
-from . import log
+from api import log
 from crawler.db import get_db
 from crawler.models import ProductReview, Product
 
