@@ -41,10 +41,23 @@ async def run(playwright: Playwright) -> None:
     # 创建一个新的浏览器上下文，设置视口大小
     # context = await browser.new_context(viewport={"width": 1920, "height": 1080})
     # 在浏览器上下文中打开一个新页面
-    base_url: str = "https://www.target.com/p/women-s-tie-waist-button-front-midi-skirt-universal-thread/-/A-89766757"
-    base_url: str = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245"
     # 关闭浏览器context
-    await open_pdp_page(context, url=base_url)
+    semaphore = asyncio.Semaphore(1)
+    # TODO  修改如下参数
+    primary_category = "women"
+    sub_category = "dresses"
+    # base_url: str = "https://www.target.com/p/women-s-tie-waist-button-front-midi-skirt-universal-thread/-/A-89766757"
+    #
+    # base_url: str = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245"
+    url = "https://www.target.com/p/women-s-strapless-midi-sweater-dress-universal-thread/-/A-90176248?preselect=90002352#lnk=sametab"
+    await open_pdp_page(
+        context,
+        url=url,
+        semaphore=semaphore,
+        source="target",
+        primary_category=primary_category,
+        sub_category=sub_category,
+    )
     # TODO 暂不关闭浏览器
     await context.close()
 

@@ -69,8 +69,9 @@ class Settings(BaseSettings):
     redis: Redis
     ark_api_key: str  # 豆包api-key
     ark_base_url: str  # 豆包api-url
-    ark_prompt: str
-    ark_summary_prompt: str
+    ark_prompt: str  # 评论分析Prompt
+    ark_summary_prompt: str  # 评论总结Prompt
+    ark_extra_metrics_prompt: str  # 额外指标分析提示词
     ark_model: str
     ark_concurrency: int = 40
 
@@ -161,3 +162,5 @@ if __name__ == "__main__":
     log.info(settings.ark_api_key)
     log.info(settings.ark_model)
     log.info(f"type:{type(settings.proxy_url)}, value:{settings.proxy_url}")
+    log.info(settings.ark_extra_metrics_prompt)
+    # log.info(settings.ark_prompt)

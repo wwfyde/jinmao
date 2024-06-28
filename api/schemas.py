@@ -4,15 +4,21 @@ from typing import Literal
 from pydantic import BaseModel, Field, ConfigDict, field_serializer, model_validator
 
 
+class ReviewMetric(BaseModel):
+    en: str | None = Field(None, description="英文名")
+    cn: str | None = Field(None, description="中文名")
+    score: float | None = Field(0, description="分数")
+
+
 class ReviewAnalysisMetrics(BaseModel):
-    quality: float | None = Field(0, description="质量")
-    warmth: float | None = Field(0, description="保暖性")
-    comfort: float | None = Field(0, description="舒适度")
-    softness: float | None = Field(0, description="柔软性")
-    preference: float | None = Field(0, description="偏好度")
-    repurchase_intent: float | None = Field(0, description="回购意向")
-    appearance: float | None = Field(0, description="外观")
-    fit: float | None = Field(0, description="合身度")
+    quality: ReviewMetric = Field(None, description="质量")
+    warmth: ReviewMetric = Field(None, description="保暖性")
+    comfort: ReviewMetric = Field(None, description="舒适度")
+    softness: ReviewMetric = Field(None, description="柔软性")
+    preference: ReviewMetric = Field(None, description="偏好")
+    repurchase_intent: ReviewMetric = Field(None, description="回购意向")
+    appearance: ReviewMetric = Field(None, description="外观")
+    fit: ReviewMetric = Field(None, description="合身度")
 
     # __pydantic_extra__: dict  # 对额外字段添加约束
     model_config = ConfigDict(
@@ -52,7 +58,25 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
     id: str | None = None
     # comment: str
     source: str | None = None
-    metrics: list[str] | str | None = Field(None, description="需要分析的指标")
+    lang: Literal["zh", "en"] = Field("en", description="语言")
+
+    from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
+    llm: Literal["ark", "claude", "azure", "bedrock", "openai"] | None = Field("ark", description="LLM模型")
+    extra_metrics: list[str] | str | None = Field(None, description="需要分析的指标")
+    threshold: float | None = Field(5.0, description="指标阈值")
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "product_id": "728681",
+                "source": "gap",
+                "lang": "en",
+                "from_api": False,
+                "llm": "ark",
+                "extra_metrics": ["cost-effectiveness", "实用性"],
+            }
+        },
+        title="评论分析输入验证",
+    )
 
     @model_validator(mode="after")
     def check_fields_after(self):
@@ -72,9 +96,9 @@ class ProductReviewIn(BaseModel):
     product_id: str = Field(..., description="商品ID")
     source: str = Field(..., description="来源")
     lang: Literal["zh", "en"] = Field("en", description="语言")
-    llm: Literal["ark", "haiku", "azure", "haiku", "openai"] | None = Field("ark", description="llm模型")
+    llm: Literal["ark", "claude", "azure", "bedrock", "openai"] | None = Field("ark", description="LLM模型")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
-    extra_metrics: list[str] | str | None = Field(False, description="额外分析指标")
+    # extra_metrics: list[str] | str | None = Field(False, description="额外分析指标")
     threshold: float | None = Field(5.0, description="指标阈值")
 
     model_config = ConfigDict(
@@ -85,7 +109,6 @@ class ProductReviewIn(BaseModel):
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",
-                "extra_metrics": ["cost-effectiveness"],
             }
         },
         title="评论分析输入验证",
@@ -144,5 +167,5 @@ class ProductReviewAnalysis(
 
 
 if __name__ == "__main__":
-    metrics = ReviewAnalysisMetrics(c="9.9").model_dump()
+    metrics = ReviewAnalysisMetrics(c="9.9", quality="7.2").model_dump()
     print(metrics)

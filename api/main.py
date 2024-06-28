@@ -7,14 +7,13 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from uvicorn import run
 
-from api import log
 from api.doubao import analyze_reviews, summarize_reviews
 from api.schemas import (
-    ReviewIn,
     ProductReviewIn,
     ProductReviewAnalysis,
     ProductReviewAnalysisByMetricsIn,
 )
+from . import log
 from crawler.db import get_db
 from crawler.models import ProductReview, Product
 
@@ -33,41 +32,8 @@ router = APIRouter()
 
 @app.get("/")
 async def root():
-    log.info("访问根目录")
+    # log.info("访问根目录")
     return RedirectResponse(url="/docs")
-
-
-@router.post(
-    "/review/analysis/haiku",
-    summary="分析",
-    deprecated=True,
-    responses={
-        200: {
-            "description": "分析结果",
-            "content": {
-                "application/json": {
-                    "example": {"product_id": "001", "source": "sourceA", "analysis_result": "分析结果示例"}
-                }
-            },
-        }
-    },
-)
-async def haiku_analysis(
-    review: ReviewIn,
-    db: Session = Depends(get_db),
-):
-    if review.id:
-        stmt = select(ProductReview).where(cast(ColumnElement, ProductReview.id == review.id))
-    elif review.review_id and review.source:
-        stmt = select(ProductReview).where(
-            cast(ColumnElement, ProductReview.review_id == review.review_id),
-            cast(ColumnElement, ProductReview.source == review.source),
-        )
-    else:
-        return {"error": "请传入id ,或review_id和source."}
-    review_obj = db.execute(stmt).scalars().one_or_none()
-    log.info(f"分析评论: {review_obj}")
-    return review_obj
 
 
 @router.post(
@@ -102,13 +68,13 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
     )
     product_db = db.execute(stmt).scalars().one_or_none()
     # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
-    if isinstance(params.extra_metrics, list):
-        params.extra_metrics = ", ".join(params.extra_metrics)
+    # if isinstance(params.extra_metrics, list):
+    #     params.extra_metrics = ", ".join(params.extra_metrics)
     if not product_db.review_analyses or params.from_api is True:
         if params.llm == "ark":
-            result = await analyze_reviews(review_dicts, params.extra_metrics)
+            result = await analyze_reviews(review_dicts)
         else:
-            result = await analyze_reviews(review_dicts, params.extra_metrics)
+            result = await analyze_reviews(review_dicts)
         # 将分析结果保存到数据库
 
         # stmt = (
@@ -123,7 +89,8 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
 
         # 获取评论统计数据
         metrics_counts = metrics_statistics(result, threshold=params.threshold) if result else {}
-        return {"analyses": result, "statistics": metrics_counts}
+        # return {"analyses": result, "statistics": metrics_counts}
+        return {"analyses": metrics_counts}
     else:
         # metrics_stmt = select(ProductReview.metrics).where(
         #     cast(ColumnElement, ProductReview.product_id == params.product_id),
@@ -136,22 +103,34 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
             else {}
         )
 
-        return {"analyses": product_db.review_analyses, "statistics": metrics_counts}
+        # return {"analyses": product_db.review_analyses, "statistics": metrics_counts}
+        return {"analyses": metrics_counts}
 
 
 def metrics_statistics(reviews: list[dict], threshold: float | int | None = None) -> dict:
     total_reviews = len(reviews)
     metrics_counts = {}
     for item in reviews:
+        # log.info(f"{item=}")
         for key, value in item.get("scores", {}).items():
-            if float(value) >= threshold or 5.0:
+            score = float(value.get("score", 0))
+            cn = value.get("cn", key)
+            en = value.get("en", key)
+            if float(value.get("score")) >= threshold or 5.0:
                 if key not in metrics_counts:
-                    metrics_counts[key] = dict(count=0)
+                    metrics_counts[key] = dict(count=0, total_score=0, cn=cn, en=en)
+
                 metrics_counts[key]["count"] += 1
+                metrics_counts[key]["total_score"] += score
 
     for key, value in metrics_counts.items():
-        metrics_counts[key]["ratio"] = f'{round(metrics_counts[key]["count"] / total_reviews * 100)}%'
+        count = metrics_counts[key]["count"]
+        metrics_counts[key]["ratio"] = f"{round(count / total_reviews * 100)}%"
         metrics_counts[key]["total"] = total_reviews
+        if count > 0:
+            metrics_counts[key]["average_score"] = round(metrics_counts[key]["total_score"] / count, 2)
+        else:
+            metrics_counts[key]["average_score"] = 0.0
     return metrics_counts
 
 
@@ -194,7 +173,7 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
         db.commit()  # 显式提交事务
 
         # 获取空间数据
-        return result
+        return {"summary": result}
     else:
         # metrics_stmt = select(ProductReview.metrics).where(
         #     cast(ColumnElement, ProductReview.product_id == params.product_id),
@@ -202,21 +181,70 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
         # )
         # metrics = db.execute(metrics_stmt).scalar().all()
 
-        return product_db.review_summary
+        return {"summary": product_db.review_summary}
 
 
-@router.post("/product/analyze_review_by_metrics")
-async def review_analyze_by_metrics(
+@router.post("/product/analyze_review_by_metrics", summary="额外指标分析")
+async def review_analysis_by_metrics(
     params: ProductReviewAnalysisByMetricsIn,
+    db: Session = Depends(get_db),
 ):
     """
     根据用指定的指标分析评论
     """
     # 将指标转换为列表
-    if isinstance(params.metrics, str):
-        params.metrics = [params.metrics]
-
+    if isinstance(params.extra_metrics, str):
+        params.extra_metrics = [params.extra_metrics]
     pass
+    stmt = select(ProductReview).where(
+        cast(ColumnElement, ProductReview.product_id == params.product_id),
+        cast(ColumnElement, ProductReview.source == params.source),
+    )
+    reviews = db.execute(stmt).scalars().all()
+
+    log.info(f"按指标分析商品评论[{len(reviews)}]")
+
+    # 将 ORM对象转换为字典
+    review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
+    log.debug(review_dicts)
+
+    # 查询商品信息
+    stmt = select(Product).where(
+        cast(ColumnElement, Product.product_id == params.product_id),
+        cast(ColumnElement, Product.source == params.source),
+    )
+    product_db = db.execute(stmt).scalars().one_or_none()
+
+    # 获取原有指标
+    # last_metrics = product_db.extra_metrics
+    # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
+    extra_metrics_str = ", ".join(params.extra_metrics)
+    if not product_db.review_analyses or params.from_api is True:
+        if params.llm == "ark":
+            result = await analyze_reviews(review_dicts, extra_metrics=extra_metrics_str)
+        else:
+            result = await analyze_reviews(review_dicts, extra_metrics=extra_metrics_str)
+        # 将分析结果保存到数据库
+
+        # product_db.review_analyses_extra = product_db.review_analyses_extra + result
+        # db.commit()  # 显式提交事务
+
+        # 获取评论统计数据
+        metrics_counts = metrics_statistics(result, threshold=params.threshold) if result else {}
+        return {"analyses": result, "statistics": metrics_counts}
+    else:
+        # metrics_stmt = select(ProductReview.metrics).where(
+        #     cast(ColumnElement, ProductReview.product_id == params.product_id),
+        #     cast(ColumnElement, ProductReview.source == params.source),
+        # )
+        # metrics = db.execute(metrics_stmt).scalar().all()
+        metrics_counts = (
+            metrics_statistics(product_db.review_analyses, threshold=params.threshold)
+            if product_db.review_analyses
+            else {}
+        )
+
+        return {"analyses": product_db.review_analyses, "statistics": metrics_counts}
 
 
 app.include_router(router, prefix="/api")

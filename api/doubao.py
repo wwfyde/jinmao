@@ -5,52 +5,25 @@ import random
 import time
 from typing import cast
 
+import tiktoken
 from jinja2 import Template
 from openai import AsyncOpenAI
 from sqlalchemy import select, ColumnElement
 from sqlalchemy.orm import Session
 
 from api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
-from crawler import log
+from . import log
 from crawler.config import settings
 from crawler.db import engine
 from crawler.models import ProductReview
 
-crawler_logger = logging.getLogger("crawler")
-crawler_logger.setLevel(logging.INFO)
+# crawler_logger = logging.getLogger("crawler")
+# crawler_logger.setLevel(logging.INFO)
 log_libraries = ["httpx", "httpcore", "openai"]
 for library in log_libraries:
     library_logger = logging.getLogger(library)
     library_logger.setLevel(logging.WARN)
 
-settings.ark_prompt = """
-用途：作为电子商务和情感分析专家，全面分析商品评论,根据评论的情感倾向和语义内容，推断并给出每个属性的评分,评分的分值范围是 1~10, 1 代表非常差, 10 代表非常好,评分保留1位小数
-功能说明：该模块不仅分析评论中直接提到的内容，还推断并评分以下属性：quality, warmth, comfort, softness, preference, repurchase_intent, appearance, fit, {{ extra_metrics }}
-实现方法：通过综合分析评论的整体情感和语义内容，即使某些属性没有直接提到，也能进行推断和评分。
-输入：一组电商评论文本。
-输出：针对每条评论，输出包含各属性评分的 JSON 格式结果。确保没有属性得分为零。
-输出格式示例：
-{
-     "quality": X,
-     "warmth": Y,
-     "comfort": Z,
-     "softness": W,
-     "preference": A,
-     "repurchase_intent": B,
-     "appearance": C,
-     "fit": E,
-     ...
-}"""
-
-settings.ark_summary_prompt="""
-用途：你是一名电商和情感分析专家。请总结以下用户对产品的评价，提炼出主要的情绪和关键方面，如产品质量、舒适度、功能、设计和性价比。总结应包含正面和负面的评价，并给出整体的评价。
-
-输入：一组电商商品的评论文本。
-输出：评论内容的总结
-
-将你的回应格式化为一个段落，总结一般情绪和主要收获!
-必须用英语输出结果，禁止使用中文!
-"""
 
 async def analyze_single_comment(
     review: ProductReviewSchema,
@@ -68,17 +41,18 @@ async def analyze_single_comment(
         # 通过jinjia2 处理settings.ark_prompt 以替换其中的 {{extra_prompt}}
         # 允许额外的指标
         if extra_metrics:
-            settings.ark_prompt = Template(settings.ark_prompt).render(extra_metrics=extra_metrics)
+            prompt = Template(settings.ark_extra_metrics_prompt).render(extra_metrics=extra_metrics)
         else:
-            settings.ark_prompt = Template(settings.ark_prompt).render()
-        # log.info(f"模版语法渲染后的提示词{settings.ark_prompt}")
+            prompt = settings.ark_prompt
+        # log.info(f"模版语法渲染后的提示词{prompt=}")
+
         log.info(f"用户评论内容: {review.comment}")
         try:
             response = await client.chat.completions.create(
                 timeout=settings.httpx_timeout,
                 model=settings.ark_model,  # 指定的模型
                 messages=[
-                    {"role": "system", "content": settings.ark_prompt},  # 系统角色的预设提示
+                    {"role": "system", "content": prompt},  # 系统角色的预设提示
                     {"role": "user", "content": review.comment},  # 用户角色的评论内容
                 ],
             )
@@ -101,10 +75,10 @@ async def analyze_single_comment(
             log.error(f"解析LLM结果失败, 错误提示: {exc}")
 
             # 解析失败时对指标分数进行置零
-            response_content = ReviewAnalysisMetrics().model_dump()
+            response_content = ReviewAnalysisMetrics().model_dump(exclude_unset=True)
 
         # 通过pydantic对象对其进行校验
-        scores = ReviewAnalysisMetrics.model_validate(response_content).model_dump()
+        scores = ReviewAnalysisMetrics.model_validate(response_content).model_dump(exclude_unset=True)
 
         # 返回解析的评分数据、使用情况和处理时间
         processing_time = end_time - start_time  # 计算处理总时间
@@ -136,19 +110,21 @@ async def summarize_reviews(reviews: list) -> str:
     start_time = loop.time()
     # 提取评论
     comments = []
+    comments_str = ""
     totoal_str = 0
     for review in reviews:
         comment = review.get("comment", "")
         if len(comment) >= 1024:
             comment = comment[:1024]
         totoal_str += len(comment)
-        if totoal_str >= 1024 * 28:
+        comments_str += comment + "\n"
+        enc = tiktoken.encoding_for_model("gpt-4")
+        tokens = enc.encode(comments_str)
+        if len(tokens) >= 1024 * 28:
             break
         comments.append(comment)
 
-    comment_str = "\n".join(comments)
-
-    summary_content = f"{comment_str}"
+    summary_content = f"{comments_str}"
 
     client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
 
@@ -168,7 +144,7 @@ async def summarize_reviews(reviews: list) -> str:
     # 从响应中提取汇总结果，并去除首尾空格
     usage = response.usage
     log.info(
-        f"【评论总结接口】用户输入token:{usage.prompt_tokens}, 输出token: {usage.completion_tokens}, 总计token: {usage.total_tokens}"
+        f"【评论总结接口】总字符串: {len(comments_str)},  用户输入token:{usage.prompt_tokens}, 输出token: {usage.completion_tokens}, 总计token: {usage.total_tokens}"
     )
     summary_result = response.choices[0].message.content.strip()
     end_time = loop.time()
@@ -266,8 +242,8 @@ async def main():
     sources = ["target"] * len(product_ids)
     products = list(zip(product_ids, sources))
     product_id, source = random.choice(products)  # 从列表中随机取一个
-    product_id, source = "89779562", "target"  # 一共600条评论, 实际有评论的235条
-    # product_id, source = "795346", "gap"  # 一共3901条评论, 实际2760 条
+    # product_id, source = "89779562", "target"  # 一共600条评论, 实际有评论的235条
+    product_id, source = "795346", "gap"  # 一共3901条评论, 实际2760 条
 
     # 创建数据库会话 并从数据库中拉取商品所有评论
     with Session(engine) as session:
@@ -283,19 +259,27 @@ async def main():
             ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews
         ]
         log.debug(f"当前商品{product_id=}, 共有{len(review_dicts)}条")
+    if not review_dicts:
+        return
 
     # 并发处理评论分析和评论总结
     async with asyncio.TaskGroup() as tg:
         # analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts))
-        summary_task = tg.create_task(summarize_reviews(reviews=review_dicts))
-        # single_summary_task = tg.create_task(
-        #     analyze_single_comment(
-        #         ProductReviewSchema.model_validate(random.choice(review_dicts)), semaphore=asyncio.Semaphore(1)
+        # summary_task = tg.create_task(
+        #     summarize_reviews(
+        #         reviews=review_dicts,
         #     )
         # )
+        single_summary_task = tg.create_task(
+            analyze_single_comment(
+                ProductReviewSchema.model_validate(random.choice(review_dicts)),
+                semaphore=asyncio.Semaphore(1),
+                extra_metrics="实用性",
+            )
+        )
         # analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
-        summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
-        # single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
+        # summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
+        single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
 
 
 if __name__ == "__main__":
