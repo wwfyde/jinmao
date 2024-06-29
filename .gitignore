@@ -84,3 +84,5 @@ browser_data/
 .browser_data/
 
 *.lock
+
+backups/

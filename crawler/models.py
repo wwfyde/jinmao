@@ -69,6 +69,8 @@ class Product(Base):
     review_analyses: Mapped[list[dict] | None] = mapped_column(JSON, comment="评论分析结果汇总")
     # review_analyses_extra: Mapped[list[dict] | None] = mapped_column(JSON, comment="评论分析结果汇总")
     # extra_metrics: Mapped[list | None] = mapped_column(JSON, comment="额外评论指标")
+    review_statistics: Mapped[dict | None] = mapped_column(JSON, comment="评论分析统计")
+    extra_review_statistics: Mapped[dict | None] = mapped_column(JSON, comment="额外评论分析统计")
 
     review_summary: Mapped[str | None] = mapped_column(String(2048), comment="评论总结")
 
@@ -193,7 +195,7 @@ class ProductSKU(Base):
     clothing_details: Mapped[str | None] = mapped_column(String(1024), comment="服装细节")
     package_quantity: Mapped[int | None] = mapped_column(Integer, comment="包装数量")
     care_instructions: Mapped[str | None] = mapped_column(String(1024), comment="护理和清洁")
-    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, comment="软删除")
+    is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, comment="软删除")
     created_at: Mapped[datetime | None] = mapped_column(
         DateTime,
         default=func.now(),
