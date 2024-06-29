@@ -4,15 +4,7 @@ version = "0.1.1"
 description = ""
 authors = ["wwfyde <wwfyde@163.com>"]
 readme = "README.md"
-
-packages = [
-    { include = "crawler" },
-    #    { include = "/api" },
-]
-
-include = [
-    { path = "crawler" },
-]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
