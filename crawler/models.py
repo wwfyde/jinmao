@@ -67,8 +67,8 @@ class Product(Base):
     tags: Mapped[list[str] | None] = mapped_column(JSON, comment="标签")  # required
     is_review_analyzed: Mapped[bool | None] = mapped_column(Boolean, default=False, comment="是否已分析")
     review_analyses: Mapped[list[dict] | None] = mapped_column(JSON, comment="评论分析结果汇总")
-    # review_analyses_extra: Mapped[list[dict] | None] = mapped_column(JSON, comment="评论分析结果汇总")
-    # extra_metrics: Mapped[list | None] = mapped_column(JSON, comment="额外评论指标")
+    extra_review_analyses: Mapped[list[dict] | None] = mapped_column(JSON, comment="额外评论分析结果汇总")
+    extra_metrics: Mapped[list | dict | None] = mapped_column(JSON, comment="额外评论指标")
     review_statistics: Mapped[dict | None] = mapped_column(JSON, comment="评论分析统计")
     extra_review_statistics: Mapped[dict | None] = mapped_column(JSON, comment="额外评论分析统计")
 

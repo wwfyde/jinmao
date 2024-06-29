@@ -94,18 +94,18 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
         title="评论分析输入验证",
     )
 
-    @model_validator(mode="after")
-    def check_fields_after(self):
-        if self.product_id and self.source:
-            print("Product ID and Source are provided.")
-        if self.id:
-            print("ID is provided.")
-
-        # if not ((self.review_id and self.source) or self.id):
-        if not (self.product_id and self.source) and not self.id:
-            raise ValueError("请传入id ,或review_id和source.")
-
-        return self
+    # @model_validator(mode="after")
+    # def check_fields_after(self):
+    #     if self.product_id and self.source:
+    #         print("Product ID and Source are provided.")
+    #     if self.id:
+    #         print("ID is provided.")
+    #
+    #     # if not ((self.review_id and self.source) or self.id):
+    #     if not (self.product_id and self.source) and not self.id:
+    #         raise ValueError("请传入id ,或review_id和source.")
+    #
+    #     return self
 
 
 class ProductReviewIn(BaseModel):

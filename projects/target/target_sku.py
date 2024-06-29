@@ -50,6 +50,8 @@ async def run(playwright: Playwright) -> None:
     #
     # base_url: str = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245"
     url = "https://www.target.com/p/women-s-strapless-midi-sweater-dress-universal-thread/-/A-90176248?preselect=90002352#lnk=sametab"
+    url = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245?preselect=90564226"
+    url = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245?preselect=90564236"
     await open_pdp_page(
         context,
         url=url,

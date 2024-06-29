@@ -2,6 +2,7 @@ import asyncio
 import random
 import re
 from datetime import datetime
+from mimetypes import guess_extension
 from pathlib import Path
 
 import httpx
@@ -75,7 +76,7 @@ async def run(playwright: Playwright) -> None:
 
             await page.wait_for_load_state(timeout=60000)
             await page.wait_for_timeout(3000)
-            scroll_pause_time = random.randrange(2500, 4500, 200)
+            scroll_pause_time = random.randrange(500, 2500, 200)
             # await page.wait_for_timeout(1000)
             await scroll_page(page, scroll_pause_time=scroll_pause_time, step=2)
             # await page.pause()
@@ -239,6 +240,7 @@ async def open_pdp_page(
                         sub_category=sub_category,
                         source=source,
                         sku_id=sku_id,
+                        product_id=product_id,
                         cookies=cookies,
                         headers=headers,
                     )
@@ -292,10 +294,11 @@ async def open_pdp_page(
             await review_event.wait()
             if product:
                 product.update(dict(attributes=attributes))
+                save_product_data(product)
+
             else:
                 log.warning(f"商品{product_id=}, {sku_id=}未获取到产品信息,")
             # 保存产品信息到数据库
-            save_product_data(product)
             # await page.pause()
 
             # fit_size 适合人群
@@ -333,9 +336,16 @@ async def fetch_images(
             async with httpx.AsyncClient(timeout=60) as client:
                 log.debug(f"下载图片: {url}")
                 response = await client.get(url + query_params, headers=headers, cookies=cookies)
+                content_type = response.headers.get("Content-Type", "")
+                if content_type.startswith("image"):
+                    # image_basename = image_basename.split(".")[0]
+                    extension = guess_extension(content_type)
+                    log.info(f"图片类型{extension=}")
+                else:
+                    log.warning("非图片类型!")
                 response.raise_for_status()  # 检查HTTP请求是否成功
                 image_bytes = response.content
-                with open(f"{str(file_path)}", "wb") as f:
+                with open(f"{str(file_path)}{extension}", "wb") as f:
                     f.write(image_bytes)
             end_time = asyncio.get_event_loop().time()
             log.debug(f"下载图片耗时: {end_time - start_time:.2f}s")
@@ -642,13 +652,13 @@ async def parse_target_product(
             sku_model_dir = sku_dir.joinpath("model")
             sku_model_dir.mkdir(parents=True, exist_ok=True)
             for index, url in enumerate(image_urls):
-                # url = url.replace("https://www.gap.com", "")
+                log.info(f"图片{url=}")
                 image_tasks.append(
                     fetch_images(
                         semaphore=semaphore,
                         url=url,
-                        headers=headers,
-                        cookies=cookies,
+                        # headers=headers,
+                        # cookies=cookies,
                         file_path=sku_model_dir.joinpath(f"model-{(index + 1):02d}-{url.split('/')[-1]}"),
                     )
                 )
