@@ -11,8 +11,8 @@ from openai import AsyncOpenAI
 from sqlalchemy import select, ColumnElement
 from sqlalchemy.orm import Session
 
-from api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
-from api import log
+from jinmao_api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
+from jinmao_api import log
 from crawler.config import settings
 from crawler.db import engine
 from crawler.models import ProductReview

@@ -7,7 +7,7 @@ from openai import OpenAI
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from api.main import ProductReviewAnalysis
+from jinmao_api.main import ProductReviewAnalysis
 from crawler import log
 from crawler.config import settings
 from crawler.db import engine
@@ -55,7 +55,6 @@ def analyze_comments_batch(reviews: list[dict]):
             try:
                 scores[key.strip()] = float(value.strip().replace("'", ""))
             except ValueError:
-
                 log.debug(f"Could not convert value to float: {value.strip()}")
 
     if not scores:
@@ -109,7 +108,7 @@ def analyze_doubao(reviews: list[dict]):
     with ThreadPoolExecutor(max_workers=200) as executor:  # 增加最大工作线程数
         futures = []
         for i in range(0, len(reviews), batch_size):
-            reviews_batch = reviews[i: i + batch_size]
+            reviews_batch = reviews[i : i + batch_size]
             futures.append(executor.submit(analyze_comments_batch, reviews_batch))
 
         for future in as_completed(futures):
@@ -145,15 +144,14 @@ if __name__ == "__main__":
     # with open("review_ana/review_test.json", "r", encoding="utf-8") as file:
     #     reviews = json.load(file)
 
-    product_id, source = '866986', 'gap'
+    product_id, source = "866986", "gap"
 
     with Session(engine) as session:
-        stmt = select(ProductReview).where(
-            ProductReview.product_id == product_id, ProductReview.source == source
-        )
+        stmt = select(ProductReview).where(ProductReview.product_id == product_id, ProductReview.source == source)
         reviews = session.execute(stmt).scalars().all()
-        review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in
-                        reviews]
+        review_dicts = [
+            ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews
+        ]
 
     result = analyze_doubao(reviews=review_dicts)
     log.info(result)

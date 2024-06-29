@@ -7,13 +7,13 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from uvicorn import run
 
-from api.doubao import analyze_reviews, summarize_reviews
-from api.schemas import (
+from jinmao_api.doubao import analyze_reviews, summarize_reviews
+from jinmao_api.schemas import (
     ProductReviewIn,
     ProductReviewAnalysis,
     ProductReviewAnalysisByMetricsIn,
 )
-from api import log
+from jinmao_api import log
 from crawler.db import get_db
 from crawler.models import ProductReview, Product
 
