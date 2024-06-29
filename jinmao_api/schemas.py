@@ -53,6 +53,22 @@ class ReviewIn(BaseModel):
         return self
 
 
+class ProductAttribute(BaseModel):
+    neckline: str | None = Field(None, description="领口")
+    origin: str | None = Field(None, description="产地")
+    material: str | None = Field(None, description="材质")
+    fabric: str | None = Field(None, description="面料")
+    sleeve: str | None = Field(None, description="袖子")
+    size: list[str] | str | None = Field(None, description="尺寸")
+    color: list[str] | str | None = Field(None, description="颜射")
+
+    # __pydantic_extra__: dict  # 对额外字段添加约束
+
+    model_config = ConfigDict(extra="allow", coerce_numbers_to_str=True)
+
+    pass
+
+
 class ProductReviewAnalysisByMetricsIn(BaseModel):
     product_id: str | None = None
     id: str | None = None

@@ -84,40 +84,39 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         # )
         # db.execute(stmt)
 
-        # 将分析结果写入数据库
-        product_db.is_review_analyzed = True
-        product_db.review_analyses = results
         for result in results:
             review_id = result.get("review_id")
             stmt = select(ProductReview).where(
                 # cast(ColumnElement, Product.product_id == params.product_id),
-                cast(ColumnElement, Product.source == params.source),
+                cast(ColumnElement, ProductReview.source == params.source),
                 cast(ColumnElement, ProductReview.review_id == review_id),
             )
             review_db = db.execute(stmt).scalars().one_or_none()
-            scores: dict = result.get("score")
+            scores: dict = result.get("scores")
             if review_db:
-                review_db.quality = scores.get("quality")
-                review_db.warmth = scores.get("warmth")
-                review_db.comfort = scores.get("comfort")
-                review_db.softness = scores.get("softness")
-                review_db.preference = scores.get("preference")
-                review_db.repurchase_intent = scores.get("repurchase_intent")
-                review_db.appearance = scores.get("appearance")
-                review_db.fit = scores.get("fit")
+                review_db.quality = scores.get("quality", {}).get("score")
+                review_db.warmth = scores.get("warmth", {}).get("score")
+                review_db.comfort = scores.get("comfort", {}).get("score")
+                review_db.softness = scores.get("softness", {}).get("score")
+                review_db.preference = scores.get("preference", {}).get("score")
+                review_db.repurchase_intent = scores.get("repurchase_intent", {}).get("score")
+                review_db.appearance = scores.get("appearance", {}).get("score")
+                review_db.fit = scores.get("fit", {}).get("score")
                 db.add(review_db)
                 db.commit()
             else:
                 log.warning(f"数据库中, 评论不存在{params.product_id=}, {review_id=}, {params.source=}")
 
         # 获取评论统计数据
-        # 将统计结果写入数据库
+        # 将统计和单一分析结果写入数据库
         metrics_counts = metrics_statistics(results, threshold=params.threshold) if results else {}
         product_db.review_statistics = metrics_counts
+        product_db.is_review_analyzed = True
+        product_db.review_analyses = results
         db.add(product_db)
         db.commit()
-        # return {"analyses": results, "statistics": metrics_counts}
-        return {"analyses": metrics_counts}
+        return {"analyses": None, "statistics": metrics_counts}
+        # return {"analyses": metrics_counts}
     else:
         # metrics_stmt = select(ProductReview.metrics).where(
         #     cast(ColumnElement, ProductReview.product_id == params.product_id),
@@ -131,8 +130,8 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         # )
         metrics_counts = product_db.review_statistics
 
-        # return {"analyses": product_db.review_analyses, "statistics": metrics_counts}
-        return {"analyses": metrics_counts}
+        return {"analyses": None, "statistics": metrics_counts}
+        # return {"analyses": metrics_counts}
 
 
 def metrics_statistics(reviews: list[dict], threshold: float | int | None = None) -> dict:
@@ -197,7 +196,8 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
         else:
             result = await summarize_reviews(review_dicts)
 
-        product_db.review_analyses = result
+        product_db.review_summary = result
+        db.add(product_db)
         db.commit()  # 显式提交事务
 
         # 获取空间数据

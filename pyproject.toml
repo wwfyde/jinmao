@@ -1,10 +1,18 @@
 [tool.poetry]
-name = "crawler"
-version = "0.1.0"
+name = "molookcrawler"
+version = "0.1.1"
 description = ""
 authors = ["wwfyde <wwfyde@163.com>"]
 readme = "README.md"
-package-mode = false
+
+packages = [
+    { include = "crawler" },
+    #    { include = "/api" },
+]
+
+include = [
+    { path = "crawler" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -20,7 +28,7 @@ python-dotenv = "^1.0.1"
 fastapi = { extras = ["all"], version = "^0.111.0" }
 pydantic = "^2.7.1"
 pydantic-settings = "^2.2.1"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.31" }
 psycopg = { extras = ["binary", "pool"], version = "^3.1.19" }
 redis = "^5.0.4"
 httpx = { extras = ["http2", "socks"], version = "^0.27.0" }
@@ -40,6 +48,10 @@ tokenizers = "^0.19.1"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"
 notebook = "^7.1.3"
+
+
+[tool.poetry.group.jinmao.dependencies]
+fastapi = { extras = ["all"], version = "^0.111.0" }
 
 [build-system]
 requires = ["poetry-core"]
