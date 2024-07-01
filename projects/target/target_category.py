@@ -21,6 +21,7 @@ domain = "https://www.target.com"
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
 PLAYWRIGHT_CONCURRENCY = 5
+settings.save_login_state = False
 
 
 async def run(playwright: Playwright) -> None:
@@ -42,7 +43,7 @@ async def run(playwright: Playwright) -> None:
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=True, devtools=True)
+        browser = await chromium.launch(headless=PLAYWRIGHT_HEADLESS, devtools=True)
         context = await browser.new_context()
 
     # 设置全局超时
@@ -54,7 +55,8 @@ async def run(playwright: Playwright) -> None:
 
     # 打开新的页面
     urls = [
-        ("women", "dresses", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcg"),
+        # ("women", "dresses", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcg"),
+        ("women", "dresses", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),
         # (
         #     "women",
         #     "dresses",
@@ -241,8 +243,8 @@ async def open_pdp_page(
                         source=source,
                         sku_id=sku_id,
                         product_id=product_id,
-                        cookies=cookies,
-                        headers=headers,
+                        # cookies=cookies,
+                        # headers=headers,
                     )
                     product_event.set()
                     log.info(f"商品详情: {product}")
@@ -699,6 +701,7 @@ async def parse_target_product(
         image_url=image_url,  # 商品图片
         outer_image_url=image_url,
         price=price,  # 价格
+        size="M",
         source=source,  # 来源
         model_image_url=alternate_image_urls[1] if len(alternate_image_urls) > 0 else None,
         outer_model_image_url=alternate_image_urls[1] if len(alternate_image_urls) > 0 else None,

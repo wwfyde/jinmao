@@ -78,6 +78,8 @@ logs/
 *.local.toml
 *.local.yml
 *.dev.yml
+.env.prod
+.env.staging
 
 # playwright
 browser_data/

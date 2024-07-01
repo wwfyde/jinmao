@@ -123,7 +123,7 @@ def metrics_statistics(reviews: list[dict], threshold: float | int | None = None
             score = float(value.get("score", 0))
             cn = value.get("cn", key)
             en = value.get("en", key)
-            if float(value.get("score")) >= threshold or 5.0:
+            if float(value.get("score")) >= (threshold or 5.0):
                 if key not in metrics_counts:
                     metrics_counts[key] = dict(count=0, total_score=0, cn=cn, en=en)
 
@@ -131,7 +131,7 @@ def metrics_statistics(reviews: list[dict], threshold: float | int | None = None
                 metrics_counts[key]["total_score"] += score
 
     for key, value in metrics_counts.items():
-        count = metrics_counts[key]["count"]
+        count = metrics_counts[key].get("count", 0)
         metrics_counts[key]["ratio"] = f"{round(count / total_reviews * 100)}%"
         metrics_counts[key]["total"] = total_reviews
         if count > 0:

@@ -1,11 +1,11 @@
 import json
 from typing import Mapping, Generator
 
-import structlog
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import Session
 
+from crawler import log
 from crawler.config import settings
 
 
@@ -37,13 +37,11 @@ if __name__ == "__main__":
     with Session(engine) as session:
         stmt = text("select version()")
         result = session.execute(stmt).scalars().one_or_none()
-        log = structlog.get_logger()
         log.info(result)
         # Base.metadata.create_all(engine)
 
     with next(get_db()) as session:
         stmt = text("select version()")
         result = session.execute(stmt).scalars().one_or_none()
-        log = structlog.get_logger()
         log.info(result)
         # Base.metadata.create_all(engine)
