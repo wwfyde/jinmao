@@ -33,6 +33,12 @@ class Aliyun(BaseModel):
     ...
 
 
+class LLM(BaseModel):
+    api_key: str
+    base_url: str
+    model: str
+
+
 class Redis(BaseModel):
     host: str
     port: int
@@ -51,6 +57,12 @@ class HTTPX(BaseModel):
     proxy_url: str | None = None
 
 
+class ProxyPool(BaseModel):
+    server: str | None = None
+    username: str | None = None
+    password: str | None = None
+
+
 class Settings(BaseSettings):
     mysql: MySQL
     molook_db: MySQLMoLook
@@ -58,6 +70,7 @@ class Settings(BaseSettings):
     httpx_timeout: int = 180
     review_analysis_concurrency: int = 500
     proxy_url: AnyHttpUrl | str
+    proxy_pool: ProxyPool
     save_login_state: bool = True  # 保存登录状态
     base_dir: Path | str = Path(__file__).resolve().parent
     project_dir: Path | str = base_dir.parent
@@ -67,12 +80,13 @@ class Settings(BaseSettings):
     user_data_dir: Path | str = project_dir.joinpath("browser_data")
     aliyun: Aliyun
     redis: Redis
-    ark_api_key: str  # 豆包api-key
-    ark_base_url: str  # 豆包api-url
+    ark_doubao: LLM
+    # ark_api_key: str  # 豆包api-key
+    # ark_base_url: str  # 豆包api-url
     ark_prompt: str  # 评论分析Prompt
     ark_summary_prompt: str  # 评论总结Prompt
     ark_extra_metrics_prompt: str  # 额外指标分析提示词
-    ark_model: str
+    # ark_model: str
     ark_concurrency: int = 40
 
     @field_serializer("proxy_url", when_used="always")
@@ -166,3 +180,4 @@ if __name__ == "__main__":
     log.info(f"type:{type(settings.proxy_url)}, value:{settings.proxy_url}")
     log.info(settings.ark_extra_metrics_prompt)
     # log.info(settings.ark_prompt)
+    log.info(settings.proxy_pool)

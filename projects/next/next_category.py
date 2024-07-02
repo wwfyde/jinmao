@@ -17,10 +17,16 @@ async def run(playwright: Playwright) -> None:
     # 启动chromium浏览器，开启开发者工具，非无头模式
     # browser = await chromium.launch(headless=False, devtools=True)
     user_data_dir = settings.user_data_dir
+    proxy = {
+        "server": settings.proxy_pool.server,
+        "username": settings.proxy_pool.username,
+        "password": settings.proxy_pool.password,
+    }
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             # headless=True,
+            proxy=proxy,
             headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             args=["--start-maximized"],  # 启动时最大化窗口
@@ -28,7 +34,7 @@ async def run(playwright: Playwright) -> None:
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=True, devtools=True)
+        browser = await chromium.launch(headless=True, devtools=True, proxy=proxy)
         context = await browser.new_context()
 
     # 设置全局超时

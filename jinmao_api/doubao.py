@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import random
+import re
 import time
 from typing import cast
 
@@ -28,7 +29,7 @@ for library in log_libraries:
 async def analyze_single_comment(
     review: ProductReviewSchema,
     semaphore: asyncio.Semaphore,
-    extra_metrics: str | None = None,
+    extra_metrics: list[str] | str | None = None,
 ) -> dict | None:
     """
     单一评论分析
@@ -36,21 +37,27 @@ async def analyze_single_comment(
     async with semaphore:
         start_time = time.time()
         # 通过async OpenAI与ark交互
-        client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
+        client = AsyncOpenAI(api_key=settings.ark_doubao.api_key, base_url=settings.ark_doubao.base_url)
 
         # 通过jinjia2 处理settings.ark_prompt 以替换其中的 {{extra_prompt}}
         # 允许额外的指标
+        if isinstance(extra_metrics, list):
+            extra_metrics_str = ", ".join(extra_metrics)
+            extra_metrics_str = re.sub("([A-Z]+)", r"_\1", extra_metrics_str)
+
+            extra_metrics_str = re.sub("([A-Z][a-z]+)", r"_\1", extra_metrics_str)
+            extra_metrics = extra_metrics_str.replace("-", "_").strip(" _")
         if extra_metrics:
             prompt = Template(settings.ark_extra_metrics_prompt).render(extra_metrics=extra_metrics)
         else:
             prompt = settings.ark_prompt
-        # log.info(f"模版语法渲染后的提示词{prompt=}")
+        log.info(f"模版语法渲染后的提示词{prompt=}")
 
         log.info(f"用户评论内容: {review.comment}")
         try:
             response = await client.chat.completions.create(
                 timeout=settings.httpx_timeout,
-                model=settings.ark_model,  # 指定的模型
+                model=settings.ark_doubao.model,  # 指定的模型
                 messages=[
                     {"role": "system", "content": prompt},  # 系统角色的预设提示
                     {"role": "user", "content": review.comment},  # 用户角色的评论内容
@@ -126,11 +133,11 @@ async def summarize_reviews(reviews: list) -> str:
 
     summary_content = f"{comments_str}"
 
-    client = AsyncOpenAI(api_key=settings.ark_api_key, base_url=settings.ark_base_url)
+    client = AsyncOpenAI(api_key=settings.ark_doubao.api_key, base_url=settings.ark_doubao.base_url)
 
     try:
         response = await client.chat.completions.create(
-            model=settings.ark_model,
+            model=settings.ark_doubao.model,
             timeout=settings.httpx_timeout,
             messages=[
                 {"role": "system", "content": settings.ark_summary_prompt},  # 系统角色的预设提示
@@ -153,7 +160,7 @@ async def summarize_reviews(reviews: list) -> str:
 
 
 # 旨在分析一组评论,通过并行处理每个评论来提高效率，并将结果汇总和记录
-async def analyze_reviews(reviews: list[dict], extra_metrics: str | None = None) -> list[dict | None]:
+async def analyze_reviews(reviews: list[dict], extra_metrics: list[str] | str | None = None) -> list[dict | None]:
     """
     分析商品所有评论
     """
@@ -274,7 +281,7 @@ async def main():
             analyze_single_comment(
                 ProductReviewSchema.model_validate(random.choice(review_dicts)),
                 semaphore=asyncio.Semaphore(1),
-                extra_metrics="实用性",
+                extra_metrics=["性价比", "soft"],
             )
         )
         # analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))

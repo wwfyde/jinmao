@@ -78,6 +78,9 @@ logs/
 *.local.toml
 *.local.yml
 *.dev.yml
+*.prod.yml
+*.staging.yml
+
 .env.prod
 .env.staging
 

@@ -17,6 +17,7 @@ COPY pyproject.toml .
 COPY .env .
 COPY .env.prod .
 COPY config.yml .
+COPY config.prod.yml .
 
 RUN mkdir logs
 #  安装依赖

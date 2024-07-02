@@ -11,7 +11,11 @@ class Base(DeclarativeBase):
 
 class Product(Base):
     __tablename__ = "product"
-    __table_args__ = (Index("ix_source_product_id", "source", "product_id", mysql_using="hash"), {"comment": "商品"})
+    __table_args__ = (
+        Index("ix_source_product_id", "source", "product_id"),
+        Index("ix_source_product_id_sku_id", "source", "product_id", "sku_id"),  # 组合索引
+        {"comment": "商品"},
+    )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")  # 内部ID
     product_id: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="源产品ID"
@@ -85,6 +89,8 @@ class Product(Base):
     source_id: Mapped[int | None] = mapped_column(BigInteger, comment="源商品ID")
     category_id: Mapped[int | None] = mapped_column(BigInteger, comment="类别ID")
     size: Mapped[str | None] = mapped_column(String(64), comment="尺码")
+    color: Mapped[str | None] = mapped_column(String(64), comment="颜色")  # required: gap, jcpenney, next, target
+
     material: Mapped[str | None] = mapped_column(String(128), comment="材质")
     fit: Mapped[str | None] = mapped_column(String(128), comment="适合")
     length: Mapped[str | None] = mapped_column(String(128), comment="服装长度")

@@ -148,11 +148,28 @@ def save_product_data(data: dict | list[dict]):
         for item in data:
             product_id = item.get("product_id")
             source = item.get("source")
-            product = (
-                session.execute(select(Product).filter(Product.product_id == product_id, Product.source == source))
-                .scalars()
-                .one_or_none()
-            )
+            sku_id = item.get("sku_id")
+            if sku_id:
+                product = (
+                    session.execute(
+                        select(Product).filter(
+                            Product.product_id == product_id, Product.source == source, Product.sku_id == sku_id
+                        )
+                    )
+                    .scalars()
+                    .one_or_none()
+                )
+            else:
+                product = (
+                    session.execute(
+                        select(Product).filter(
+                            Product.product_id == product_id,
+                            Product.source == source,
+                        )
+                    )
+                    .scalars()
+                    .one_or_none()
+                )
             if product:
                 for key, value in item.items():
                     setattr(product, key, value)

@@ -17,6 +17,9 @@ nohup uvicorn jinmao_api.main:app --host 0.0.0.0 --port 7003 --ssl-keyfile agent
 
 docker run --restart always -v $(pwd)/config.local.yml:/app/config.local.yml -p 7003:7003 --name jinmao -d jinmao:0.1.0 
 
+docker run --restart always -v $(pwd)/config.prod.yml:/app/config.prod.yml -p 7003:7003 --name jinmao -d jinmao:0.12
+
+
 ```
 
 ## 接口需求

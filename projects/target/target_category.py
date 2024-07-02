@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import random
 import re
 from datetime import datetime
@@ -10,9 +11,8 @@ import orjson
 import redis.asyncio as redis
 from playwright.async_api import Playwright, async_playwright, BrowserContext, Route, Page
 
-from crawler import log
 from crawler.config import settings
-from crawler.store import save_product_data, save_review_data, save_sku_data
+from crawler.store import save_product_data, save_review_data
 from crawler.utils import scroll_page
 from projects.gap.gap import PLAYWRIGHT_HEADLESS
 
@@ -23,6 +23,22 @@ PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
 PLAYWRIGHT_CONCURRENCY = 5
 settings.save_login_state = False
 
+from crawler.config import settings
+
+FORMAT = "%(levelname)s %(asctime)s %(module)s %(lineno)d" " %(message)s %(filename)s %(name)s"
+
+# 'format': '%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s %(pathname)s %(name)s'
+
+logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+handler = logging.FileHandler(filename=settings.log_file_path.joinpath("target.log"), encoding="utf-8")
+
+formatter = logging.Formatter(FORMAT)
+handler.setFormatter(formatter)
+log = logging.getLogger(__name__)
+log.addHandler(handler)
+# logger.addHandler(LogfireLoggingHandler())
+log.info("日志配置成功")
+
 
 async def run(playwright: Playwright) -> None:
     # 从playwright对象中获取chromium浏览器
@@ -31,11 +47,18 @@ async def run(playwright: Playwright) -> None:
     # proxy = {"server": "http://127.0.0.1:7890"}
     # 启动chromium浏览器，开启开发者工具，非无头模式
     # browser = await chromium.launch(headless=False, devtools=True)
+    proxy = {
+        "server": settings.proxy_pool.server,
+        "username": settings.proxy_pool.username,
+        "password": settings.proxy_pool.password,
+    }
+    proxy = None
     user_data_dir = settings.user_data_dir
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             headless=PLAYWRIGHT_HEADLESS,
+            proxy=proxy,
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             # args=["--start-maximized"],  # 启动时最大化窗口
@@ -43,7 +66,11 @@ async def run(playwright: Playwright) -> None:
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=PLAYWRIGHT_HEADLESS, devtools=True)
+        browser = await chromium.launch(
+            headless=PLAYWRIGHT_HEADLESS,
+            proxy=proxy,
+            # devtools=True,
+        )
         context = await browser.new_context()
 
     # 设置全局超时
@@ -56,7 +83,14 @@ async def run(playwright: Playwright) -> None:
     # 打开新的页面
     urls = [
         # ("women", "dresses", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcg"),
-        ("women", "dresses", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),
+        # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),
+        # (
+        #     "women",
+        #     "dresses",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761?Nao=24&moveTo=product-list-grid",
+        # ),
         # (
         #     "women",
         #     "dresses",
@@ -64,19 +98,31 @@ async def run(playwright: Playwright) -> None:
         # ),
         # ("women", "bottoms", "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdt"),
     ]
+    for item in range(3, 38):
+        urls.append(
+            (
+                "women",
+                "dresses",
+                "black",
+                "M",
+                f"https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761?Nao={24 * item}&moveTo=product-list-grid",
+            ),
+        )
 
     # 迭代类别urls
-    for index, (primary_category, sub_category, base_url) in enumerate(urls):
+    for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
         page = await context.new_page()
         async with page:
             # 拦截所有图片
-            # await page.route(
-            #     "**/*",
-            #     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-            # )
+            await page.route(
+                "**/*",
+                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+            )
             await page.goto(base_url)
+            log.info(f"进入类别页面: {base_url=}")
 
             await page.wait_for_load_state(timeout=60000)
+            # await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(3000)
             scroll_pause_time = random.randrange(500, 2500, 200)
             # await page.wait_for_timeout(1000)
@@ -104,9 +150,21 @@ async def run(playwright: Playwright) -> None:
                         source=source,
                         primary_category=primary_category,
                         sub_category=sub_category,
+                        color=color,
+                        size=size,
                     )
                 )
             print(f"一共获取商品数: {len(product_urls)}")
+            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+            async with r:
+                if product_urls:
+                    insert_numbers = await r.sadd(f"{source}:{primary_category}:{sub_category}:{color}", *product_urls)
+                    log.info(f"添加{insert_numbers}条数据到redis中")
+                else:
+                    log.error(f"当前页面未获取到商品, 需要尝试切换IP, {base_url=}")
+
+                log.debug(f"{product_urls}, {len(product_urls)}")
+
             result = await asyncio.gather(*pdp_tasks)
 
             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
@@ -129,12 +187,24 @@ async def open_pdp_page(
     source: str,
     primary_category: str,
     sub_category: str,
+    color: str | None = None,
+    size: str | None = None,
 ):
     """
     打开产品详情页并
     :params:url: 产品url
     """
     async with semaphore:
+        product_id = httpx.URL(url).path.split("/")[-1].split("-")[-1]
+        sku_id = httpx.URL(url).params.get("preselect")
+        log.info(f"通过PDP(产品详情页)URL获取商品id:{product_id=} SKU:{sku_id=}")
+        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+        async with r:
+            result = await r.get(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}")
+            log.info(f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {result=}")
+            if result == "done":
+                log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
+                return sku_id
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
         async with page:
@@ -145,9 +215,7 @@ async def open_pdp_page(
             # )
 
             # TODO 指定url
-            product_id = httpx.URL(url).path.split("/")[-1].split("-")[-1]
-            sku_id = httpx.URL(url).params.get("preselect")
-            log.info(f"通过PDP(产品详情页)URL获取商品id:{product_id=} SKU:{sku_id=}")
+
             review_status = None  # 评论抓取状态跟踪
             # product_id = None  # 从pdp页接口获取商品id
             product: dict | None = None
@@ -243,19 +311,21 @@ async def open_pdp_page(
                         source=source,
                         sku_id=sku_id,
                         product_id=product_id,
+                        color=color,
+                        size=size,
                         # cookies=cookies,
                         # headers=headers,
                     )
                     product_event.set()
                     log.info(f"商品详情: {product}")
 
-                if "pdp_variation_hierarchy" in request.url:
-                    log.info(f"拦截产品变体API: {route.request.url}")
-                    response = await route.fetch()
-                    json_dict = await response.json()
-                    skus = parse_target_product_variation(json_dict)
-                    skus_event.set()
-                    log.info(f"商品变体: {len(skus) if skus else 0}")
+                # if "pdp_variation_hierarchy" in request.url:
+                #     log.info(f"拦截产品变体API: {route.request.url}")
+                #     response = await route.fetch()
+                #     json_dict = await response.json()
+                #     skus = parse_target_product_variation(json_dict)
+                #     skus_event.set()
+                #     log.info(f"商品变体: {len(skus) if skus else 0}")
                 await route.continue_()
 
             await page.route("**/r2d2.target.com/**", handle_review_route)
@@ -292,13 +362,15 @@ async def open_pdp_page(
             attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
 
             await product_event.wait()
-            await skus_event.wait()
+            # await skus_event.wait()
             await review_event.wait()
             if product:
                 product.update(dict(attributes=attributes))
                 save_product_data(product)
+                product_status = "done"
 
             else:
+                product_status = "faild"
                 log.warning(f"商品{product_id=}, {sku_id=}未获取到产品信息,")
             # 保存产品信息到数据库
             # await page.pause()
@@ -309,7 +381,7 @@ async def open_pdp_page(
 
             async with r:
                 log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
-                await r.set(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", "done")
+                await r.set(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", product_status)
 
             return sku_id
 
@@ -373,7 +445,7 @@ def parse_target_review_from_api(
             title=review.get("title", None)[:128] if review.get("title") else None,
             comment=review.get("text", None)[:1024] if review.get("text") else None,
             photos=photos,
-            photos_outer=photos,
+            outer_photos=photos,
             nickname=review.get("author", {}).get("nickname") if review.get("author", {}) else None,
             product_id=review.get("Tcin", None),
             # sku_id=review.get("product_variant", None) if review.get("details") else None,
@@ -597,6 +669,8 @@ async def parse_target_product(
     source: str | None = "target",
     primary_category: str | None = None,
     sub_category: str | None = None,
+    color: str | None = None,
+    size: str | None = None,
     headers: dict | None = None,
     cookies: dict | None = None,
 ) -> dict | None:
@@ -605,6 +679,7 @@ async def parse_target_product(
     """
     product: dict | None = data.get("data").get("product") if data.get("data") else {}
     if not product:
+        log.error("未从接口中")
         return None
     product_id_from_api = product.get("tcin")
     if product_id_from_api != product_id:
@@ -630,15 +705,36 @@ async def parse_target_product(
         else None
     )
     product_url = product.get("item").get("enrichment").get("buy_url") if product.get("item") else None
-    image_url = (
-        product.get("item").get("enrichment").get("images").get("primary_image_url") if product.get("item") else None
-    )
-    alternate_image_urls = (
-        product.get("item").get("enrichment").get("images").get("alternate_image_urls", [])
-        if product.get("item")
-        else []
-    )
-    image_urls = [image_url] + alternate_image_urls if image_url else alternate_image_urls
+
+    children: list[dict] = product.get("children", [])
+    found = False
+    image_urls = []
+    for child in children:
+        if child.get("tcin") == sku_id:
+            image_url = (
+                child.get("item").get("enrichment").get("images").get("primary_image_url") if child.get("item") else []
+            )
+            alternate_image_urls = (
+                child.get("item").get("enrichment").get("images").get("alternate_image_urls", [])
+                if child.get("item")
+                else []
+            )
+            image_urls = [image_url] + alternate_image_urls if image_url else alternate_image_urls
+            found = True
+            break
+
+    if not found:
+        image_url = (
+            product.get("item").get("enrichment").get("images").get("primary_image_url")
+            if product.get("item")
+            else None
+        )
+        alternate_image_urls = (
+            product.get("item").get("enrichment").get("images").get("alternate_image_urls", [])
+            if product.get("item")
+            else []
+        )
+        image_urls = [image_url] + alternate_image_urls if image_url else alternate_image_urls
 
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
     async with r:
@@ -683,9 +779,7 @@ async def parse_target_product(
                         "failed",
                     )
                 log.warning("商品图片抓取失败")
-                return
-
-    product_name = product.get("item").get("product_description").get("title") if product.get("item") else None
+    product_name = product.get("item").get("product_description").get("title")[:128] if product.get("item") else None
     attributes = product.get("item").get("product_description").get("bullet_descriptions")
     price = product.get("price").get("formatted_current_price") if product.get("price") else None
     brand = product.get("item").get("primary_brand").get("name") if product.get("item") else None
@@ -701,10 +795,11 @@ async def parse_target_product(
         image_url=image_url,  # 商品图片
         outer_image_url=image_url,
         price=price,  # 价格
-        size="M",
+        size=size,
+        color=color,
         source=source,  # 来源
-        model_image_url=alternate_image_urls[1] if len(alternate_image_urls) > 0 else None,
-        outer_model_image_url=alternate_image_urls[1] if len(alternate_image_urls) > 0 else None,
+        model_image_url=alternate_image_urls[0] if len(alternate_image_urls) > 0 else None,
+        outer_model_image_url=alternate_image_urls[0] if len(alternate_image_urls) > 0 else None,
         model_image_urls=image_urls,
         outer_model_image_urls=image_urls,
         # attributes=attributes,  # 弃用
@@ -750,7 +845,7 @@ def parse_target_product_variation(data: dict) -> list[dict] | None:
             )
             skus.append(sku)
     # 将商品SKU保存到数据库
-    save_sku_data(skus)
+    # save_sku_data(skus)
     return skus
 
     pass

@@ -3,28 +3,35 @@ import html
 import re
 import uuid
 
+import dateutil.parser
 import httpx
 import redis.asyncio as redis
-import structlog
 from bs4 import BeautifulSoup
 from playwright.async_api import Playwright, async_playwright, BrowserContext, Response, Page
 
+from crawler import log
 from crawler.config import settings
 from crawler.store import save_sku_data, save_product_data, save_review_data
 
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
-print(f"{PLAYWRIGHT_TIMEOUT=}")
-log = structlog.get_logger()
+log.debug(f"{PLAYWRIGHT_TIMEOUT=}")
 
 
 async def run(playwright: Playwright) -> None:
     # 从playwright对象中获取chromium浏览器
     chromium = playwright.chromium
     user_data_dir = settings.user_data_dir
+    proxy = {
+        "server": settings.proxy_pool.server,
+        "username": settings.proxy_pool.username,
+        "password": settings.proxy_pool.password,
+    }
+    proxy = None
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             headless=False,
+            proxy=proxy,
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             # args=["--start-maximized"],  # 启动时最大化窗口
@@ -35,6 +42,7 @@ async def run(playwright: Playwright) -> None:
         browser = await chromium.launch(
             headless=True,
             devtools=True,
+            proxy=proxy,
         )
         context = await browser.new_context()
 
@@ -48,7 +56,7 @@ async def run(playwright: Playwright) -> None:
     # for i in range(10):
     #     tasks.append(open_pdp_page(context, semaphore))
     # pages = await asyncio.gather(*tasks)
-    # print(f"{pages=}")
+    # log.debug(f"{pages=}")
     # TODO 从redis 中获取商品列表
     # 获取商品列表
 
@@ -56,14 +64,18 @@ async def run(playwright: Playwright) -> None:
     async with r:
         source = "next"
         main_category = "women"
-        sub_category = "rashvests"
+        sub_category = "fleeces"
         product_urls = await r.smembers(f"{source}:{main_category}:{sub_category}")
-        print(product_urls, len(product_urls))
+        log.debug(product_urls, len(product_urls))
+        # product_urls = ["https://www.next.co.uk/style/su272671/q64927#q64927"]
         tasks = [
-            open_pdp_page(context, semaphore, url, main_category=main_category, source=source) for url in product_urls
+            open_pdp_page(
+                context, semaphore, url, main_category=main_category, source=source, sub_category=sub_category
+            )
+            for url in product_urls
         ]
         results = await asyncio.gather(*tasks)
-        print(f"{results=}")
+        log.debug(f"{results=}")
 
     # await context.close()
     # await asyncio.Future()
@@ -71,7 +83,13 @@ async def run(playwright: Playwright) -> None:
 
 
 async def open_pdp_page(
-    context: BrowserContext, semaphore: asyncio.Semaphore, url: str, main_category: str, source: str
+    context: BrowserContext,
+    semaphore: asyncio.Semaphore,
+    url: str,
+    *,
+    main_category: str,
+    sub_category: str,
+    source: str,
 ):
     async with semaphore:
         page = await context.new_page()
@@ -86,7 +104,7 @@ async def open_pdp_page(
             async def handle_response(response: Response):
                 if "https://api.bazaarvoice.com/data/reviews.json" in response.url and response.status == 200:
                     reviews = await response.json()
-                    print(f"{reviews=}")
+                    log.debug(f"{reviews=}")
 
             # await page.route("**/api.bazaarvoice.com/data/**", handle_route)
             page.on("response", handle_response)
@@ -102,40 +120,42 @@ async def open_pdp_page(
                 timeout=PLAYWRIGHT_TIMEOUT,
                 wait_until="load",
             )
+            # 通过url 解析 product_id 和 sku_id
+            url_paths = httpx.URL(url).path.split("/")
+            product_id = url_paths[-2].lower()
+            sku_id = url_paths[-1].lower()
             # 单击review按钮以加载评论
             log.info("等待评论按钮出现")
             # 可能没有评论
             # review_node = await page.wait_for_selector('//*[@id="LoadMoreBtn"]', timeout=5000)
             # if review_node is None:
-            #     print("该商品没有评论")
+            #     log.debug("该商品没有评论")
             await page.wait_for_load_state(timeout=30000)
             # 获取product_style 信息
             product = await parse_next_product(page)
 
-            print(f"从Page中解析 商品信息{product=}")
+            log.debug(f"从Page中解析 商品信息{product=}")
 
             sku_id_raw = product.get("sku_id_raw")
-            product.update(dict(gender=main_category, source=source))
+            product.update(dict(gender=main_category, sub_category=sub_category, source=source))
             save_product_data(product)
 
-            print(f"源sku_id: {sku_id_raw}")
+            log.debug(f"源sku_id: {sku_id_raw}")
             # 获取数据信息
             shot_data: dict = await page.evaluate("""() => {
                                 return window.shotData;
                             }""")
-            # print(type(shot_data))
-            # print(shot_data.get("Styles"))
+            # log.debug(type(shot_data))
+            # log.debug(shot_data.get("Styles"))
             sku = await parse_next_sku(
                 shot_data,
                 sku_id_raw,
-                product_id=product.get(
-                    "product_id",
-                ),
+                product_id=product_id,
                 product_name=product.get("product_name"),
                 sku_url=page.url,
                 source="next",
             )
-            print(f"商品SKU信息: {sku=}")
+            log.debug(f"商品SKU信息: {sku=}")
             # 通过点击按钮加载更多评论
             while True:
                 try:
@@ -154,17 +174,17 @@ async def open_pdp_page(
                         break
 
                     await page.locator('//*[@id="LoadMoreBtn"]').first.click()
-                    print("点击完成")
+                    log.debug("点击完成")
                     await page.wait_for_timeout(2000)
                     await page.wait_for_load_state("domcontentloaded", timeout=3000)
-                    print("等待加载完成")
+                    log.debug("等待加载完成")
                 except Exception as exc:
                     log.info(f"没有更多评论可加载: {exc}")
                     break
                 # content = await page.content()
                 # 获取评论列表
 
-            reviews = await parse_review_from_dom(page)
+            reviews = await parse_review_from_dom(page, product_id=product_id, sku_id=sku_id)
 
             log.debug(f"共获取到{len(reviews)}, {reviews=}")
             # await page.pause()
@@ -174,20 +194,20 @@ async def open_pdp_page(
             # await route_event.wait()
             log.info("等待事件被正确执行")
 
-            print("页面加载完成")
+            log.debug("页面加载完成")
             pass
             # await page.pause()
         # TODO 当任务完成后, 标记任务状态
         return url
 
 
-async def parse_review_from_dom(page: Page, product_id: str = None, source: str = None):
+async def parse_review_from_dom(page: Page, product_id: str = None, sku_id: str = None, source: str = None):
     """
     Next 只能通过DOM获取评论, 然后通过点击按钮加载更多评论
     """
     # 获取商品信息
     # 商品ID
-    sku_id = httpx.URL(page.url).path.split("/")[-1]
+    # sku_id = httpx.URL(page.url).path.split("/")[-1]
     # 商品名称
     product_name_locator = page.locator("article > section > div.StyleHeader > div.Title > h1")
     if await product_name_locator.count() > 0:
@@ -207,7 +227,7 @@ async def parse_review_from_dom(page: Page, product_id: str = None, source: str 
         review_count = 0
     log.debug(f"通过DOM获取评论数量{review_count}")
 
-    # print(f"{rating=}")
+    # log.debug(f"{rating=}")
     # 获取评论数据
     # tree = etree.HTML(content)
     review_elements = page.locator("#EmbeddedReviewsContainer > div > div.reviewContent > div.userReviews > ul > li")
@@ -220,11 +240,18 @@ async def parse_review_from_dom(page: Page, product_id: str = None, source: str 
         rating_text = await review_elements.nth(i).locator(".reviewStats > img").get_attribute("alt")
         rating_url = await review_elements.nth(i).locator(".reviewStats > img").get_attribute("src")
         rating = rating_url.split("/")[-1].split(".")[0] if rating_url else None
-        # print(f"{rating=}")
-        # print(f"{rating_text=}")
-        # print(f"{rating_url=}")
-        # print(f"{username=}")
-        # print(f"{review=}")
+        created_at_raw = await review_elements.nth(i).locator(".reviewStats > .date").inner_text()
+
+        log.debug(f"日期: {created_at_raw=}")
+        created_at_obj = dateutil.parser.parse(created_at_raw)
+        created_at = created_at_obj.strftime("%Y-%m-%d")
+        log.debug(f"日期对象: {created_at_obj}")
+        log.debug(f"格式化后的日期字符串: {created_at}")
+        # log.debug(f"{rating=}")
+        # log.debug(f"{rating_text=}")
+        # log.debug(f"{rating_url=}")
+        # log.debug(f"{username=}")
+        # log.debug(f"{review=}")
         review = dict(
             nickname=username,
             review_id=str(uuid.uuid4()),
@@ -238,6 +265,7 @@ async def parse_review_from_dom(page: Page, product_id: str = None, source: str 
             rating_url=rating_url,
             helpful_votes=None,  # 没有按顶数
             not_helpful_votes=None,  # 没有按踩数
+            created_at=created_at,
             rating=rating,
         )
 
@@ -274,7 +302,7 @@ async def parse_next_sku(
     # target = sku_id_raw or b_dict.get("Target")
 
     # Function to find the target item in the Fits list
-    print("找到商品信息")
+    log.debug("找到商品信息")
 
     def find_target_item(styles, sku_id_raw):
         for style in styles:
@@ -285,7 +313,7 @@ async def parse_next_sku(
         return None
 
     item = find_target_item(pdp_style, sku_id_raw)
-    # print(f"从数据中检查SKU信息{item}")
+    # log.debug(f"从数据中检查SKU信息{item}")
     if item is None:
         return None
     sku_id = item.get("ItemNumber").replace("-", "") if item.get("ItemNumber", "") else None
@@ -358,8 +386,8 @@ async def parse_next_product(page: Page) -> dict | None:
     product_default_color = await article_locator.get_attribute("data-defaultitemcolour")
     brand = await article_locator.get_attribute("data-brand")
     category = await article_locator.get_attribute("data-category")
-    print(f"{sku_id=}")
-    print(f"{product_id=}")
+    log.debug(f"{sku_id=}")
+    log.debug(f"{product_id=}")
     # await page.pause()
     # 商品对象
     product_obj = dict(

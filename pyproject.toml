@@ -36,6 +36,7 @@ pillow = "^10.3.0"
 jinja2 = "^3.1.4"
 tiktoken = "^0.7.0"
 tokenizers = "^0.19.1"
+python-dateutil = "^2.9.0.post0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"
@@ -51,6 +52,7 @@ mysqlclient = "^2.2.4"
 jinja2 = "^3.1.4"
 openai = "^1.35.7"
 aiomysql = "^0.2.0"
+python-dateutil = "^2.9.0.post0"
 
 [build-system]
 requires = ["poetry-core"]

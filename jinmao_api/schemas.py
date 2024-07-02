@@ -70,15 +70,14 @@ class ProductAttribute(BaseModel):
 
 
 class ProductReviewAnalysisByMetricsIn(BaseModel):
-    product_id: str | None = None
-    id: str | None = None
+    product_id: str
     # comment: str
-    source: str | None = None
+    source: str
     lang: Literal["zh", "en"] = Field("en", description="语言")
 
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
     llm: Literal["ark", "claude", "azure", "bedrock", "openai"] | None = Field("ark", description="LLM模型")
-    extra_metrics: list[str] | str | None = Field(None, description="需要分析的指标")
+    extra_metrics: list[str] | str = Field(..., description="需要分析的指标")
     threshold: float | None = Field(5.0, description="指标阈值")
     model_config = ConfigDict(
         json_schema_extra={
@@ -162,6 +161,52 @@ class ProductReviewModel(
 
 class ProductReviewSchema(ProductReviewModel):
     id: int | str | None = None
+
+
+class ProductExtraMetric(BaseModel):
+    product_id: str = Field(..., description="商品id")
+    source: str = Field(..., description="数据源")
+
+    extra_metrics: list[str] | str = Field(..., description="额外指标指标")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "product_id": "728681",
+                "source": "gap",
+                "metric": ["实用性", "cost-effectiveness"],
+            }
+        }
+    )
+
+
+class ReviewFilter(BaseModel):
+    product_id: str = Field(..., description="商品id")
+    source: str = Field(..., description="数据源")
+    page: int = 1
+    page_size: int = 10
+    include_deleted: str | None = Field(None, description="软删除选项")
+    sort_by: Literal["created_at", "id"] = Field("created_at", description="排序")
+    sort_order: Literal["desc", "asc"] = Field("desc", description="正反序")
+    metric: Literal[
+        "quality", "warmth", "comfort", "softness", "preference", "repurchase_intent", "appearance", "fit"
+    ] = Field(..., description="过滤指标名称")
+    threshold: float | None = Field(5.0, description="指标阈值")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "product_id": "728681",
+                "source": "gap",
+                "metric": "quality",
+                "page": 1,
+                "page_size": 10,
+                "sort_by": "created_at",
+                "sort_order": "desc",
+                "threshold": 5.0,
+            }
+        },
+    )
 
 
 class ProductReviewAnalysis(
