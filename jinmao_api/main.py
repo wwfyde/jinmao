@@ -69,7 +69,7 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         Product.product_id == params.product_id,
         Product.source == params.source,
     )
-    product_db = db.execute(stmt).scalars().one_or_none()
+    product_db = db.execute(stmt).scalars().first()
     # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
     # if isinstance(params.extra_metrics, list):
     #     params.extra_metrics = ", ".join(params.extra_metrics)
@@ -104,12 +104,23 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         # 获取评论统计数据
         # 将统计和单一分析结果写入数据库
         metrics_counts = metrics_statistics(results, threshold=params.threshold) if results else {}
-        product_db_new = db.execute(stmt).scalars().one_or_none()
-        product_db_new.review_statistics = metrics_counts
-        product_db_new.is_review_analyzed = True
-        product_db_new.review_analyses = results
-        db.add(product_db_new)
+        update_stmt = (
+            update(Product)
+            .where(Product.product_id == params.product_id, Product.source == params.source)
+            .values(
+                review_statistics=metrics_counts,
+                is_review_analyzed=True,
+                review_analyses=results,
+            )
+        )
+        affected_rows = db.execute(update_stmt)
         db.commit()
+        # product_db_new = db.execute(stmt).scalars().first()
+        # product_db_new.review_statistics = metrics_counts
+        # product_db_new.is_review_analyzed = True
+        # product_db_new.review_analyses = results
+        # db.add(product_db_new)
+        # db.commit()
         return {"analyses": None, "statistics": metrics_counts}
         # return {"analyses": metrics_counts}
     else:
@@ -193,7 +204,7 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
 
     # 查询商品信息 并检查总结是否存在
     stmt = select(Product).where(Product.product_id == params.product_id, Product.source == params.source)
-    product_db = db.execute(stmt).scalars().one_or_none()
+    product_db = db.execute(stmt).scalars().first()
 
     if not product_db.review_summary or params.from_api is True:
         if params.llm == "ark":
@@ -201,9 +212,18 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
         else:
             result = await summarize_reviews(review_dicts)
 
-        product_db.review_summary = result
-        db.add(product_db)
-        db.commit()  # 显式提交事务
+        update_stmt = (
+            update(Product)
+            .where(Product.product_id == params.product_id, Product.source == params.source)
+            .values(
+                review_summary=result,
+            )
+        )
+        affected_rows = db.execute(update_stmt)
+        db.commit()
+        # product_db.review_summary = result
+        # db.add(product_db)
+        # db.commit()  # 显式提交事务
 
         # 获取空间数据
         return {"summary": result}
@@ -242,7 +262,7 @@ async def analyze_review_by_metrics(
 
     # 查询商品信息
     stmt = select(Product).where(Product.product_id == params.product_id, Product.source == params.source)
-    product_db = db.execute(stmt).scalars().one_or_none()
+    product_db = db.execute(stmt).scalars().first()
 
     # 获取原有指标
 
@@ -273,12 +293,23 @@ async def analyze_review_by_metrics(
         # 获取评论统计数据
         metrics_counts = extra_metrics_statistics(results, threshold=params.threshold) if results else {}
         # return {"analyses": results, "statistics": metrics_counts}
-        product_db_new = db.execute(stmt).scalars().one_or_none()
-        product_db_new.extra_review_statistics = metrics_counts
-        product_db_new.extra_review_analyses = results
-        product_db_new.extra_metrics = params.extra_metrics
-        db.add(product_db_new)
+        update_stmt = (
+            update(Product)
+            .where(Product.product_id == params.product_id, Product.source == params.source)
+            .values(
+                extra_review_statistics=metrics_counts,
+                extra_review_analyses=results,
+                extra_metrics=params.extra_metrics,
+            )
+        )
+        affected_rows = db.execute(update_stmt)
         db.commit()
+        # product_db_new = db.execute(stmt).scalars().first()
+        # product_db_new.extra_review_statistics = metrics_counts
+        # product_db_new.extra_review_analyses = results
+        # product_db_new.extra_metrics = params.extra_metrics
+        # db.add(product_db_new)
+        # db.commit()
         log.info(f"接口执行完毕{metrics_counts}")
         return {"analyses": None, "statistics": metrics_counts}
     else:
@@ -294,7 +325,7 @@ async def extra_metrics(params: ProductReviewIn, db: Session = Depends(get_db)):
     extra_metrics_db: Product | None = (
         db.execute(select(Product).where(Product.product_id == params.product_id, Product.source == params.source))
         .scalars()
-        .one_or_none()
+        .first()
     )
     if extra_metrics_db:
         return {
