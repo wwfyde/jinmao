@@ -11,14 +11,14 @@ class ReviewMetric(BaseModel):
 
 
 class ReviewAnalysisMetrics(BaseModel):
-    quality: ReviewMetric = Field(None, description="质量")
-    warmth: ReviewMetric = Field(None, description="保暖性")
-    comfort: ReviewMetric = Field(None, description="舒适度")
-    softness: ReviewMetric = Field(None, description="柔软性")
-    preference: ReviewMetric = Field(None, description="偏好")
-    repurchase_intent: ReviewMetric = Field(None, description="回购意向")
-    appearance: ReviewMetric = Field(None, description="外观")
-    fit: ReviewMetric = Field(None, description="合身度")
+    quality: ReviewMetric | str | int | float = Field(None, description="质量")
+    warmth: ReviewMetric | str | int | float = Field(None, description="保暖性")
+    comfort: ReviewMetric | str | int | float = Field(None, description="舒适度")
+    softness: ReviewMetric | str | int | float = Field(None, description="柔软性")
+    preference: ReviewMetric | str | int | float = Field(None, description="偏好")
+    repurchase_intent: ReviewMetric | str | int | float = Field(None, description="回购意向")
+    appearance: ReviewMetric | str | int | float = Field(None, description="外观")
+    fit: ReviewMetric | str | int | float = Field(None, description="合身度")
 
     # __pydantic_extra__: dict  # 对额外字段添加约束
     model_config = ConfigDict(

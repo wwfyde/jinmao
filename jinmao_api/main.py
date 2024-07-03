@@ -267,8 +267,12 @@ async def analyze_review_by_metrics(
     # 获取原有指标
 
     last_metrics = product_db.extra_metrics
+    # 如果前端传入的
+    if last_metrics and (set(last_metrics) != set(params.extra_metrics)):
+        params.from_api = True
     # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
     if not product_db.extra_review_statistics or params.from_api is True:
+        log.debug("通过接口分析")
         if params.llm == "ark":
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
         else:
@@ -280,14 +284,14 @@ async def analyze_review_by_metrics(
                 db.execute(
                     update(ProductReview)
                     .where(
-                        ProductReview.id == result.get("review_id"), ProductReview.source == params.source
+                        ProductReview.review_id == result.get("review_id"), ProductReview.source == params.source
                     )  # 根据评论的唯一标识符更新
                     .values(extra_metrics=result.get("scores"))
                 )
             db.commit()
         except Exception as exc:
             db.rollback()
-            log.error(f"插入评论失败{exc}, 撤销")
+            log.error(f"更新评论失败{exc}, 撤销")
         log.info("插入索引指标的ProductReview成功")
 
         # 获取评论统计数据
@@ -313,6 +317,7 @@ async def analyze_review_by_metrics(
         log.info(f"接口执行完毕{metrics_counts}")
         return {"analyses": None, "statistics": metrics_counts}
     else:
+        log.debug("查数据库")
         # return {"analyses": product_db.review_analyses, "statistics": product_db.extra_review_statistics}
         return {"analyses": None, "statistics": product_db.extra_review_statistics}
 
@@ -339,7 +344,7 @@ async def extra_metrics(params: ProductReviewIn, db: Session = Depends(get_db)):
         }
 
 
-@router.patch("/product/extra_metrics", summary="额外指标同步")
+@router.patch("/product/extra_metrics", summary="删除额外指标")
 async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Session = Depends(get_db)):
     """
     从数据库获取
@@ -353,6 +358,25 @@ async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Ses
     # affected_rows = db.execute(stmt)
     # db.commit()
     # 更新指标后更新数据库
+    # if isinstance(params.extra_metrics, str):
+    #     params.extra_metrics = [params.extra_metrics]
+    log.info(f"用户传入的指标: {params.extra_metrics}")
+    if not params.extra_metrics:
+        update_stmt = (
+            update(Product)
+            .where(Product.product_id == params.product_id, Product.source == params.source)
+            .values(
+                extra_review_statistics=None,
+                extra_review_analyses=None,
+                extra_metrics=None,
+            )
+        )
+        affected_rows = db.execute(update_stmt)
+        db.commit()
+        log.info("所有额外指标成功")
+        return True
+    else:
+        log.info("指标没变化")
 
     # 总是走API重新分析一遍
     params.from_api = True
