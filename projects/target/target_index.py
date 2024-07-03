@@ -22,7 +22,6 @@ PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
 PLAYWRIGHT_CONCURRENCY = 5
 settings.save_login_state = False
-download_image = False
 
 from crawler.config import settings
 
@@ -40,7 +39,7 @@ log.addHandler(handler)
 # logger.addHandler(LogfireLoggingHandler())
 log.info("日志配置成功")
 
-ua = UserAgent(browsers=["edge", "chrome", "safari"])
+ua = UserAgent(browsers=["edge", "chrome"])
 
 
 async def run(playwright: Playwright) -> None:
@@ -102,7 +101,7 @@ async def run(playwright: Playwright) -> None:
         # ),
         # ("women", "bottoms", "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdt"),
     ]
-    for item in range(29, 38):
+    for item in range(22, 38):
         urls.append(
             (
                 "women",
@@ -115,7 +114,6 @@ async def run(playwright: Playwright) -> None:
 
     # 迭代类别urls
     for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
-        agent = False
         user_agent = ua.random
         context = await browser.new_context(user_agent=user_agent)
         log.info(f"当前UserAgent: {user_agent}")

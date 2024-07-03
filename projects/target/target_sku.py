@@ -56,6 +56,8 @@ async def run(playwright: Playwright) -> None:
     url = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245?preselect=90564226"
     # url = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245?preselect=90564228"
     url = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245?preselect=90564236"
+    url = "https://www.target.com/p/allegra-k-women-s-glitter-sequin-spaghetti-strap-v-neck-party-cocktail-sparkly-mini-dress/-/A-87419082?preselect=89041542#lnk=sametab"
+    url = "https://www.target.com/p/women-s-best-ever-maxi-a-line-dress-a-new-day/-/A-90368246?preselect=90379157#lnk=sametab"
     await open_pdp_page(
         context,
         url=url,
@@ -63,6 +65,8 @@ async def run(playwright: Playwright) -> None:
         source="target",
         primary_category=primary_category,
         sub_category=sub_category,
+        color="black",
+        size="M",
     )
     # TODO 暂不关闭浏览器
     await context.close()
