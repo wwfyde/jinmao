@@ -2,6 +2,7 @@ import asyncio
 import logging
 import random
 import re
+import time
 from datetime import datetime
 from mimetypes import guess_extension
 from pathlib import Path
@@ -850,9 +851,16 @@ def map_attribute_field(input: dict) -> dict:
 
 async def main():
     # 创建一个playwright对象并将其传递给run函数
-    async with async_playwright() as p:
-        await run(p)
-        ...
+    i = 0
+    while i < 100:
+        i += 1
+        try:
+            async with async_playwright() as p:
+                await run(p)
+                ...
+        except Exception as exc:
+            log.warning(f"重试: {exc=}")
+        time.sleep(30)
 
 
 # 这是脚本的入口点。
