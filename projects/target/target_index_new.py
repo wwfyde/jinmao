@@ -9,7 +9,7 @@ from pathlib import Path
 import httpx
 import redis.asyncio as redis
 from fake_useragent import UserAgent
-from playwright.async_api import Playwright, async_playwright, BrowserContext, Route, Page
+from playwright.async_api import Playwright, async_playwright, Route, Page, Browser
 
 from crawler.config import settings
 from crawler.store import save_product_data, save_review_data
@@ -84,37 +84,6 @@ async def run(playwright: Playwright) -> None:
     # context = await browser.new_context(viewport={"width": 1920, "height": 1080})
     # 在浏览器上下文中打开一个新页面
 
-    # 打开新的页面
-    urls = [
-        # ("women", "dresses", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcg"),
-        # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),
-        # (
-        #     "women",
-        #     "dresses",
-        #     "black",
-        #     "M",
-        #     "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761?Nao=24&moveTo=product-list-grid",
-        # ),
-        # (
-        #     "women",
-        #     "dresses",
-        #     "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcg?Nao=48&moveTo=product-list-grid",
-        # ),
-        # ("women", "bottoms", "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdt"),
-    ]
-    # for item in range(36, 38):
-    #     urls.append(
-    #         (
-    #             "women",
-    #             "dresses",
-    #             "black",
-    #             "M",
-    #             f"https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761?Nao={24 * item}&moveTo=product-list-grid",
-    #         ),
-    #     )
-    #
-    # # 迭代类别urls
-    # for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
     async with r:
         primary_category = "women"
@@ -124,81 +93,31 @@ async def run(playwright: Playwright) -> None:
         results = await r.smembers(f"target_index:{source}:{primary_category}:{sub_category}:{color}")
         log.info(f"从数据库中取回{len(results)}条数据")
 
-    # 迭代类别urls
+        # 迭代类别urls
+    pdp_tasks = []
+
+    semaphore = asyncio.Semaphore(PLAYWRIGHT_CONCURRENCY)  # 设置并发请求数限制为10
     for index, base_url in enumerate(results):
-        agent = False
-        user_agent = ua.random
-        context = await browser.new_context(user_agent=user_agent)
-        log.info(f"当前UserAgent: {user_agent}")
-        page = await context.new_page()
-        async with page:
-            # 拦截所有图片
-            await page.route(
-                "**/*",
-                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+        log.info(f"当前url:{base_url} ")
+        base_url = base_url.replace(domain, "")
+        pdp_tasks.append(
+            open_pdp_page(
+                browser,
+                url=domain + base_url,
+                semaphore=semaphore,
+                source=source,
+                primary_category=primary_category,
+                sub_category=sub_category,
+                color=color,
+                size=size,
             )
-            await page.goto(base_url)
-            log.info(f"进入类别页面: {base_url=}")
+        )
 
-            await page.wait_for_load_state(timeout=60000)
-            # await page.wait_for_load_state("networkidle")
-            await page.wait_for_timeout(3000)
-            scroll_pause_time = random.randrange(500, 2500, 200)
-            # await page.wait_for_timeout(1000)
-            await scroll_page(page, scroll_pause_time=scroll_pause_time, step=2)
-            # await page.pause()
-
-            # 获取所有商品
-            selector = '//*[@id="pageBodyContainer"]/div/div[1]/div/div[8]/div/div/div[1]/section/div/div/div/div/div[1]/div[2]/div/div/div[1]/div[1]/div[1]/a'
-            product_locators = page.locator(selector)
-            product_count = await product_locators.count()
-            product_urls = []
-            semaphore = asyncio.Semaphore(PLAYWRIGHT_CONCURRENCY)  # 设置并发请求数限制为10
-            pdp_tasks = []
-            for i in range(product_count):
-                url = await product_locators.nth(i).get_attribute("href")
-                print(url)
-                url = url.replace(domain, "")
-                url = domain + url
-                product_urls.append(url)
-                pdp_tasks.append(
-                    open_pdp_page(
-                        context,
-                        url=url,
-                        semaphore=semaphore,
-                        source=source,
-                        primary_category=primary_category,
-                        sub_category=sub_category,
-                        color=color,
-                        size=size,
-                    )
-                )
-            print(f"一共获取商品数: {len(product_urls)}")
-            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-            async with r:
-                if product_urls:
-                    insert_numbers = await r.sadd(f"{source}:{primary_category}:{sub_category}:{color}", *product_urls)
-                    log.info(f"添加{insert_numbers}条数据到redis中")
-                else:
-                    log.error(f"当前页面未获取到商品, 需要尝试切换IP, {base_url=}")
-
-                log.debug(f"{product_urls}, {len(product_urls)}")
-
-            result = await asyncio.gather(*pdp_tasks)
-
-            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-            # 将商品加入商品索引中
-            async with r:
-                print(await r.get("a"))
-                redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
-                print(redis_key)
-
-                result = await r.sadd(redis_key, *product_urls) if product_urls else None
-                print(result)
+    result = await asyncio.gather(*pdp_tasks)
 
 
 async def open_pdp_page(
-    context: BrowserContext,
+    browser: Browser,
     *,
     url: str,
     semaphore: asyncio.Semaphore,
@@ -224,14 +143,18 @@ async def open_pdp_page(
             if result == "done":
                 log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
                 return sku_id
+        user_agent = ua.random
+        context = await browser.new_context(user_agent=user_agent)
+        log.info(f"当前UserAgent: {user_agent}")
+        # page = await context.new_page()
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
         async with page:
             # 拦截所有图像
-            # await page.route(
-            #     "**/*",
-            #     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-            # )
+            await page.route(
+                "**/*",
+                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+            )
 
             # TODO 指定url
 
