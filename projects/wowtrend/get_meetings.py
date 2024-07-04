@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import sys
+import time
 from mimetypes import guess_extension
 from pathlib import Path
 import redis.asyncio as redis
@@ -17,7 +18,7 @@ source = "target"
 domain = "https://www.wow-trend.com"
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
-PLAYWRIGHT_CONCURRENCY = 5
+PLAYWRIGHT_CONCURRENCY = 6
 settings.save_login_state = False
 download_image = False
 storage_path = Path.home().joinpath("wow-trend")
@@ -121,6 +122,7 @@ async def process_meeting(browser, meeting, semaphore):
                 return
         user_agent = ua.random
         context = await browser.new_context(user_agent=user_agent)
+        # context = await browser.new_context()
         context.set_default_timeout(settings.playwright.timeout)
 
         await context.set_extra_http_headers(
@@ -233,21 +235,24 @@ async def parse_api(resp: dict, *, nav_id: str, gender_id: str, meeting_id: str)
                 download_url = image_url
             else:
                 download_url = preview_image_url
-            async with httpx.AsyncClient(timeout=60) as client:
-                response = await client.get(download_url)
-                image_bytes = response.content
-                content_type = response.headers.get("Content-Type", "")
-                if content_type.startswith("image"):
-                    # image_basename = image_basename.split(".")[0]
-                    extension = guess_extension(content_type)
-                    # log.info(f"图片类型{extension=}")
-                else:
-                    log.warning("非图片类型!")
-                    extension = ".jpg"
-                image_dir = storage_path.joinpath(f"{meeting_id}_{title}")
-                image_dir.mkdir(parents=True, exist_ok=True)
-                with open(f"{str(image_dir)}/{image_id}{extension}", "wb") as f:
-                    f.write(image_bytes)
+            try:
+                async with httpx.AsyncClient(timeout=60) as client:
+                    response = await client.get(download_url)
+                    image_bytes = response.content
+                    content_type = response.headers.get("Content-Type", "")
+                    if content_type.startswith("image"):
+                        # image_basename = image_basename.split(".")[0]
+                        extension = guess_extension(content_type)
+                        # log.info(f"图片类型{extension=}")
+                    else:
+                        log.warning("非图片类型!")
+                        extension = ".jpg"
+                    image_dir = storage_path.joinpath(f"{meeting_id}_{title}")
+                    image_dir.mkdir(parents=True, exist_ok=True)
+                    with open(f"{str(image_dir)}/{image_id}{extension}", "wb") as f:
+                        f.write(image_bytes)
+            except Exception:
+                log.info(f"下载图片失败:跳过 {meeting_id=}, {image_id=}")
 
                 # txt_lines = [f"image_id: {image_id}\n", f"title: {title}\n"]
                 #
@@ -278,9 +283,14 @@ async def fetch_images(semaphore, url, headers, nav_id, gender_id, meeting_id):
 
 async def main():
     # 创建一个playwright对象并将其传递给run函数
-    async with async_playwright() as p:
-        await run(p)
-        ...
+    while True:
+        try:
+            async with async_playwright() as p:
+                await run(p)
+                ...
+        except Exception as exc:
+            log.warning(f"中断, 60s, 错误提示: {exc}")
+        time.sleep(60)
 
 
 # 这是脚本的入口点。

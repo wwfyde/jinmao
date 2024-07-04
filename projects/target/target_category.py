@@ -102,7 +102,7 @@ async def run(playwright: Playwright) -> None:
         # ),
         # ("women", "bottoms", "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdt"),
     ]
-    for item in range(29, 38):
+    for item in range(36, 38):
         urls.append(
             (
                 "women",
@@ -179,7 +179,7 @@ async def run(playwright: Playwright) -> None:
             # 将商品加入商品索引中
             async with r:
                 print(await r.get("a"))
-                redis_key = f"target_index:{source}:{primary_category}:{sub_category}"
+                redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
                 print(redis_key)
 
                 result = await r.sadd(redis_key, *product_urls) if product_urls else None
@@ -367,13 +367,13 @@ async def open_pdp_page(
 
             # DOM中解析商品属性并下载商品图片并保存
 
-            attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
+            description, attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
 
             await product_event.wait()
             # await skus_event.wait()
             await review_event.wait()
             if product:
-                product.update(dict(attributes=attributes))
+                product.update(dict(attributes=attributes, description=description))
                 save_product_data(product)
                 product_status = "done"
 
@@ -526,6 +526,19 @@ async def parse_pdp_from_dom(
     else:
         color = None
 
+    # 通过页面获取产品描述
+    try:
+        await page.get_by_role("button", name="Description").click()
+    except Exception:
+        log.error("点击描述按钮失败")
+
+    description_locator = page.locator('[data-test="item-details-description"]')
+    if await description_locator.count() > 0:
+        description = await description_locator.inner_text()
+    else:
+        description = None
+    print(f"{description=}")
+
     # TODO 通过页面获取产品属性
     try:
         await page.locator("//main/div/div[2]/div/div/div/div[3]/button").click()
@@ -666,7 +679,7 @@ async def parse_pdp_from_dom(
         item_number=item_number,
         origin=origin,
     )
-    return attributes
+    return description, attributes
     pass
 
 

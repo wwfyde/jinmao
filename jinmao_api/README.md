@@ -17,7 +17,11 @@ nohup uvicorn jinmao_api.main:app --host 0.0.0.0 --port 7003 --ssl-keyfile agent
 
 docker run --restart always -v $(pwd)/config.local.yml:/app/config.local.yml -p 7003:7003 --name jinmao -d jinmao:0.1.0 
 
-docker run --restart always -v $(pwd)/config.prod.yml:/app/config.prod.yml -p 7003:7003 --name jinmao -d jinmao:0.12
+# 生产
+docker run --restart always -v $(pwd)/config.prod.yml:/app/config.prod.yml -p 7003:7003 --name jinmao -d jinmao:0.1.3
+
+# 本地
+docker run --restart always -v $(pwd)/config.local.yml:/app/config.local.yml  -p 7004:7003 --name jinmao -d jinmao:0.1.3
 
 
 ```
@@ -27,4 +31,8 @@ docker run --restart always -v $(pwd)/config.prod.yml:/app/config.prod.yml -p 70
 ### 额外指标分析
 
 从数据库拿取上次指标分析的列表, 最多3个, 存取指标名称
+
+## 生产数据同步方案
+
+
 

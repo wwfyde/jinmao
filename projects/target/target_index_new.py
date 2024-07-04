@@ -22,6 +22,7 @@ PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
 PLAYWRIGHT_CONCURRENCY = 5
 settings.save_login_state = False
+download_image = False
 
 from crawler.config import settings
 
@@ -39,7 +40,7 @@ log.addHandler(handler)
 # logger.addHandler(LogfireLoggingHandler())
 log.info("日志配置成功")
 
-ua = UserAgent(browsers=["edge", "chrome"])
+ua = UserAgent(browsers=["edge", "chrome", "safari"])
 
 
 async def run(playwright: Playwright) -> None:
@@ -101,19 +102,31 @@ async def run(playwright: Playwright) -> None:
         # ),
         # ("women", "bottoms", "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdt"),
     ]
-    for item in range(22, 38):
-        urls.append(
-            (
-                "women",
-                "dresses",
-                "black",
-                "M",
-                f"https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761?Nao={24 * item}&moveTo=product-list-grid",
-            ),
-        )
+    # for item in range(36, 38):
+    #     urls.append(
+    #         (
+    #             "women",
+    #             "dresses",
+    #             "black",
+    #             "M",
+    #             f"https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761?Nao={24 * item}&moveTo=product-list-grid",
+    #         ),
+    #     )
+    #
+    # # 迭代类别urls
+    # for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
+    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+    async with r:
+        primary_category = "women"
+        sub_category = "dresses"
+        color = "black"
+        size = "M"
+        results = await r.smembers(f"target_index:{source}:{primary_category}:{sub_category}:{color}")
+        log.info(f"从数据库中取回{len(results)}条数据")
 
     # 迭代类别urls
-    for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
+    for index, base_url in enumerate(results):
+        agent = False
         user_agent = ua.random
         context = await browser.new_context(user_agent=user_agent)
         log.info(f"当前UserAgent: {user_agent}")
@@ -177,7 +190,7 @@ async def run(playwright: Playwright) -> None:
             # 将商品加入商品索引中
             async with r:
                 print(await r.get("a"))
-                redis_key = f"target_index:{source}:{primary_category}:{sub_category}"
+                redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
                 print(redis_key)
 
                 result = await r.sadd(redis_key, *product_urls) if product_urls else None
@@ -365,13 +378,13 @@ async def open_pdp_page(
 
             # DOM中解析商品属性并下载商品图片并保存
 
-            attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
+            description, attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
 
             await product_event.wait()
             # await skus_event.wait()
             await review_event.wait()
             if product:
-                product.update(dict(attributes=attributes))
+                product.update(dict(attributes=attributes, description=description))
                 save_product_data(product)
                 product_status = "done"
 
@@ -524,6 +537,19 @@ async def parse_pdp_from_dom(
     else:
         color = None
 
+    # 通过页面获取产品描述
+    try:
+        await page.get_by_role("button", name="Description").click()
+    except Exception:
+        log.error("点击描述按钮失败")
+
+    description_locator = page.locator('[data-test="item-details-description"]')
+    if await description_locator.count() > 0:
+        description = await description_locator.inner_text()
+    else:
+        description = None
+    print(f"{description=}")
+
     # TODO 通过页面获取产品属性
     try:
         await page.locator("//main/div/div[2]/div/div/div/div[3]/button").click()
@@ -664,7 +690,7 @@ async def parse_pdp_from_dom(
         item_number=item_number,
         origin=origin,
     )
-    return attributes
+    return description, attributes
     pass
 
 
