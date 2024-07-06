@@ -4,7 +4,7 @@ import redis
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from api import log
+from crawler import log
 from crawler.config import settings
 from crawler.db import engine
 from crawler.models import Product
@@ -52,7 +52,7 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                             Product.product_id == product_id, Product.source == source
                                         )
 
-                                        product_sku_id = session.execute(stmt).scalar_one_or_none()
+                                        product_sku_id = session.execute(stmt).scalars().first()
 
                                     for sku_dir in product_dir.iterdir():
                                         if sku_dir.is_dir() and sku_dir.name != "raw_data":
@@ -157,6 +157,9 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
 if __name__ == "__main__":
     data_dir = settings.data_dir
     log.info(f"Processing directory: {str(data_dir)}")
-    result = process_directory(data_dir, source="gap", category_identify="men")
+    genders = ["women", "men", "girls", "boys", "baby_girls", "baby_boys"]
 
-    print(result)
+    for gender in genders:
+        result = process_directory(data_dir, source="gap", category_identify=gender)
+
+        print(result)

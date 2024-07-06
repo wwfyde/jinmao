@@ -107,7 +107,7 @@ async def scroll_page(
         # await page.evaluate(f"window.scrollTo(0, document.body.scrollHeight)")
         # await asyncio.sleep(scroll_pause_time / 1000)
         await page.wait_for_timeout(scroll_pause_time)
-        await page.wait_for_load_state()
+        await page.wait_for_load_state("domcontentloaded")
         # 重新获取页面高度
         scroll_height = await page.evaluate("document.body.scrollHeight")
         # 获取当前视口位置

@@ -14,8 +14,8 @@ from crawler.config import settings
 tunnel = "XXX.XXX.com:15818"
 
 # 用户名和密码方式
-username = "username"
-password = "password"
+username = settings.proxy_pool.username
+password = settings.proxy_pool.password
 
 
 async def get_current_ip(page):

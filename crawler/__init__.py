@@ -24,7 +24,7 @@ def initialize_logger(name: str, log_level: int = logging.INFO):
     return logger
 
 
-log = initialize_logger(__name__, logging.INFO)
+log = initialize_logger(__name__, logging.DEBUG)
 
 if __name__ == "__main__":
     log.info("hello")

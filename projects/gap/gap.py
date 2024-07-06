@@ -8,13 +8,9 @@ import httpx
 import redis.asyncio as redis
 from lxml import etree
 from playwright.async_api import async_playwright, Playwright, Page, Route, BrowserContext
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from crawler import log
 from crawler.config import settings
-from crawler.db import engine
-from crawler.models import Product
 from crawler.store import save_sku_data, save_product_data, save_review_data
 
 # urls = [
@@ -104,7 +100,7 @@ print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 8
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-# PLAYWRIGHT_HEADLESS: bool = True
+PLAYWRIGHT_HEADLESS: bool = True
 
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
@@ -645,33 +641,59 @@ async def parse_sku_from_dom_content(
         sku_url=product_url,
         source=source,
         model_image_url=model_image_url,
+        outer_model_image_url=model_image_url,
         image_url=image_url,
-        image_url_outer=image_url,
+        outer_image_url=image_url,
         model_image_urls=model_image_urls,
+        outer_model_image_urls=model_image_urls,
         attributes=attributes,
         attributes_raw=attributes,
     )
     # 将从页面提取到的信息保存的数据库
     save_sku_data(pdp_info)
-    with Session(engine) as session:
-        stmt = select(Product.sku_id).where(Product.product_id == product_id, Product.source == source)
-
-        product_sku_id = session.execute(stmt).scalar_one_or_none()
-        if sku_id == product_sku_id:
-            save_product_data(
-                dict(
-                    product_id=product_id,
-                    attributes=attributes,
-                    attributes_raw=attributes,
-                    product_url=product_url,
-                    source=source,
-                    color=color,
-                    image_url_outer=image_url,
-                    fit_size=fit_and_size,
-                    product_details=product_details,
-                    fabric_and_care=fabric_and_care,
-                )
-            )
+    save_product_data(
+        dict(
+            product_id=product_id,
+            product_name=product_name,
+            attributes=attributes,
+            attributes_raw=attributes,
+            product_url=product_url,
+            sku_id=sku_id,
+            source=source,
+            model_image_url=model_image_url,
+            outer_model_image_url=model_image_url,
+            image_url=image_url,
+            outer_image_url=image_url,
+            model_image_urls=model_image_urls,
+            outer_model_image_urls=model_image_urls,
+            color=color,
+            price=price,
+            image_url_outer=image_url,
+            fit_size=fit_and_size,
+            product_details=product_details,
+            fabric_and_care=fabric_and_care,
+        )
+    )
+    # with Session(engine) as session:
+    #     stmt = select(Product.sku_id).where(Product.product_id == product_id, Product.source == source)
+    #
+    #     product_sku_id = session.execute(stmt).scalar_one_or_none()
+    #     if sku_id == product_sku_id:
+    #         save_product_data(
+    #             dict(
+    #                 product_id=product_id,
+    #                 attributes=attributes,
+    #                 attributes_raw=attributes,
+    #                 product_url=product_url,
+    #                 sku_id=sku_id,
+    #                 source=source,
+    #                 color=color,
+    #                 image_url_outer=image_url,
+    #                 fit_size=fit_and_size,
+    #                 product_details=product_details,
+    #                 fabric_and_care=fabric_and_care,
+    #             )
+    #         )
     return pdp_info
 
 

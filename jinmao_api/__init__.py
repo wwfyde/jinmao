@@ -2,7 +2,7 @@ import logging
 
 from crawler.config import settings
 
-FORMAT = "%(levelname)s %(asctime)s %(module)s %(lineno)d" " %(message)s %(filename)s %(name)s"
+FORMAT = "%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s %(filename)s %(name)s"
 
 # 'format': '%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s %(pathname)s %(name)s'
 

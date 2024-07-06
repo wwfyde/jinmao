@@ -938,6 +938,8 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
         "564645002",
     ]
     sku_index = zip(products, sku_ids)
+
+    sku_index = [("370407", "370407002")]
     primary_category = "boys"
     sub_category = "default"
     for product_id, sku_id in sku_index:

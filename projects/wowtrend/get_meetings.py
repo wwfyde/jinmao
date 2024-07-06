@@ -283,14 +283,16 @@ async def fetch_images(semaphore, url, headers, nav_id, gender_id, meeting_id):
 
 async def main():
     # 创建一个playwright对象并将其传递给run函数
-    while True:
+    i = 0
+    while i < 50:
+        i += 1
         try:
             async with async_playwright() as p:
                 await run(p)
                 ...
         except Exception as exc:
             log.warning(f"中断, 60s, 错误提示: {exc}")
-        time.sleep(60)
+        time.sleep(15)
 
 
 # 这是脚本的入口点。

@@ -25,22 +25,25 @@ def delete_keys_by_pattern(pattern: str):
 #     delete_keys_by_pattern(pattern)
 
 if __name__ == "__main__":
-    image_pattern = "image_status:target:women*"
-    main_pattern = "status:target*"
-    image_download_pattern = "image_download_status:target:women*"
-    # image_pattern = "image_status:target:men:default*"
-    review_pattern = "review_status:target:women*"
-    # delete_keys_by_pattern(image_pattern)
-    # delete_keys_by_pattern(image_download_pattern)
-    delete_keys_by_pattern(main_pattern)
-    # delete_keys_by_pattern(review_pattern)
+    # image_pattern = "image_status:target:women*"
+    # main_pattern = "status:target*"
+    # image_download_pattern = "image_download_status:target:women*"
+    # # image_pattern = "image_status:target:men:default*"
+    # review_pattern = "review_status:target:women*"
+    # # delete_keys_by_pattern(image_pattern)
+    # # delete_keys_by_pattern(image_download_pattern)
+    # delete_keys_by_pattern(main_pattern)
+    # # delete_keys_by_pattern(review_pattern)
 
-    products = []
-    for product in products:
-        image_pattern = f"image_status:target:men:default:{product}*"
-        main_pattern = f"status:target:men:default:{product}*"
-        image_download_pattern = f"image_download_status:target:men:default:{product}*"
-        # image_pattern = "image_status:target:men:default*"
-        delete_keys_by_pattern(image_pattern)
-        delete_keys_by_pattern(image_download_pattern)
-        delete_keys_by_pattern(main_pattern)
+    brand_pattern = "image_do:target:women:dresses:*"
+    delete_keys_by_pattern(brand_pattern)
+
+    # products = []
+    # for product in products:
+    #     image_pattern = f"image_status:target:men:default:{product}*"
+    #     main_pattern = f"status:target:men:default:{product}*"
+    #     image_download_pattern = f"image_download_status:target:men:default:{product}*"
+    #     # image_pattern = "image_status:target:men:default*"
+    #     delete_keys_by_pattern(image_pattern)
+    #     delete_keys_by_pattern(image_download_pattern)
+    #     delete_keys_by_pattern(main_pattern)

@@ -3,6 +3,15 @@
 ## 问题记录
 
 - 账号注册问题
+- 商品API以product_url 为准, 请求API时可能是其他相似的API
+
+### 失败案例
+
+#### Amplified Gifting Slippers Collection
+
+- https://www.target.com/p/amplified-gifting-slippers-collection/-/A-89739486?preselect=89739486#lnk=sametab
+
+原因, 界面不一样, 商品性质不一样
 
 ## 抓取方案
 
@@ -11,6 +20,10 @@
 - 按类别抓取, 增加对颜色筛选
 
 ## 示例数据
+
+## 按品牌摘取
+
+## 按类别抓取
 
 ## 关键字段
 

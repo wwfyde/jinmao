@@ -4,10 +4,11 @@ from typing import TypeVar, Type
 
 from sqlalchemy import select, insert
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase, Session
 
 from crawler import log
-from crawler.db import engine
+from crawler.db import engine, async_engine
 from crawler.models import ProductReview, ProductSKU, Product
 
 T = TypeVar("T", bound=DeclarativeBase)
@@ -263,6 +264,64 @@ def save_review_data_bulk(data: dict | list[dict]):
         log.debug(f"保存评论[review]数据完成，耗时 {end_time - start_time:.2f} 秒")
 
         return inserted_ids or None
+
+
+async def save_review_data_async(data: dict | list[dict]):
+    """
+    保存数据为json 和数据库
+    主语
+    """
+    start_time = time.time()  # 开始计时
+
+    if isinstance(data, dict):
+        data = [data]
+
+    data: list = field_filter(ProductReview, data)
+
+    async with AsyncSession(async_engine) as session:
+        inserted_ids = []
+        for item in data:
+            review_id = item.get("review_id")
+            source = item.get("source")
+            ...
+            if review_id is None:
+                log.error("review_id is None")
+                continue
+
+            result = await session.execute(
+                select(ProductReview).filter(ProductReview.review_id == review_id, ProductReview.source == source)
+            )
+            review = result.scalars().one_or_none()
+
+            if review:
+                for key, value in item.items():
+                    setattr(review, key, value)
+                session.add(review)
+                await session.commit()
+                await session.refresh(review)
+                log.debug(
+                    f"更新评论[review]数据成功, id={review.id},review_id={review.review_id} , product_id={review.product_id}, source={review.source}"
+                )
+
+                inserted_ids.append(review.id)
+            else:
+                stmt = insert(ProductReview).values(item)
+                result = await session.execute(stmt)
+                await session.commit()
+
+                insert_id = result.inserted_primary_key[0] if result.inserted_primary_key else None
+                if insert_id:
+                    inserted_ids.append(insert_id)
+                    result = await session.execute(select(ProductReview).filter(ProductReview.id == insert_id))
+                    review = result.scalars().one_or_none()
+
+                    log.debug(
+                        f"插入评论[review]数据成功, id={review.id}, product_id={review.product_id}, source={review.source}"
+                    )
+
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存评论[review]数据完成，耗时 {end_time - start_time:.2f} 秒")
+        return inserted_ids if inserted_ids else None
 
 
 if __name__ == "__main__":

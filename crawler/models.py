@@ -60,6 +60,8 @@ class Product(Base):
     category: Mapped[Literal["women", "men", "girls", "boys", "other"] | None] = mapped_column(
         String(256), comment="商品类别"
     )  # optional: jcpenney, target
+    parent_category: Mapped[str | None] = mapped_column(String(256), comment="父商品类别")  # optional: jcpenney, target
+    category_breadcrumbs: Mapped[str | None] = mapped_column(String(1024), comment="商品类别级联")
     sub_category: Mapped[str | None] = mapped_column(String(256), comment="子类别")  # optional: jcpenney, target
     inner_category: Mapped[str | None] = mapped_column(String(256), comment="内部类别")  # optional: jcpenney, target
     gender: Mapped[Literal["F", "M", "O"]] = mapped_column(
