@@ -7,7 +7,7 @@ import dateutil.parser
 import httpx
 import redis.asyncio as redis
 from bs4 import BeautifulSoup
-from playwright.async_api import Playwright, async_playwright, BrowserContext, Page
+from playwright.async_api import Playwright, async_playwright, BrowserContext, Response, Page
 
 from crawler.config import settings
 from crawler.deps import get_logger
@@ -21,12 +21,12 @@ log.debug(f"{PLAYWRIGHT_TIMEOUT=}")
 r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 log.info("初始化Redis成功")
 
+settings.playwright.concurrency = 3
+settings.playwright.headless = False
+
 __doc__ = """
 从商品索引中获取商品链接,并开始抓取
 """
-
-settings.playwright.concurrency = 5
-settings.playwright.headless = True
 
 
 async def run(playwright: Playwright) -> None:
@@ -53,7 +53,7 @@ async def run(playwright: Playwright) -> None:
     else:
         browser = await chromium.launch(
             headless=settings.playwright.headless,
-            # devtools=True,
+            devtools=True,
             proxy=proxy,
         )
         context = await browser.new_context()
@@ -71,26 +71,27 @@ async def run(playwright: Playwright) -> None:
     # log.debug(f"{pages=}")
     # TODO 从redis 中获取商品列表
     # 获取商品列表
-    for sub_category in ("T-Shirts", "Dresses", "jackets", "Blouses", "bikinis"):
-        async with r:
-            source = "next"
-            main_category = "women"
-            sub_category = sub_category
-            product_urls = await r.smembers(f"{source}:{main_category}:{sub_category}")
-            log.debug(f"从商品中获取商品数: {len(product_urls)}")
-            # product_urls = ["https://www.next.co.uk/style/su272671/q64927#q64927"]
-            tasks = [
-                open_pdp_page(
-                    context, semaphore, url, main_category=main_category, source=source, sub_category=sub_category
-                )
-                for url in product_urls
-            ]
-            results = await asyncio.gather(*tasks)
-            log.debug(f"{results=}")
 
-        # await context.close()
-        # await asyncio.Future()
-        await asyncio.sleep(10)
+    async with r:
+        source = "next"
+        main_category = "default"
+        sub_category = "default"
+        product_urls = await r.smembers("next_customer:product_urls")
+        log.debug(f"从商品中获取商品数: {len(product_urls)}")
+        # product_urls = ["https://www.next.co.uk/style/su272671/q64927#q64927"]
+
+        tasks = [
+            open_pdp_page(
+                context, semaphore, url, main_category=main_category, source=source, sub_category=sub_category
+            )
+            for url in product_urls
+        ]
+        results = await asyncio.gather(*tasks)
+        log.debug(f"{results=}")
+
+    # await context.close()
+    # await asyncio.Future()
+    await asyncio.sleep(10)
 
 
 async def open_pdp_page(
@@ -105,21 +106,17 @@ async def open_pdp_page(
     """
     打开产品详情页PDP
     """
-
     async with semaphore:
-        # 通过url 解析 product_id 和 sku_id
         url_paths = httpx.URL(url).path.split("/")
         product_id = url_paths[-2].upper()
         sku_id = url_paths[-1].upper()
-
         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
         async with r:
-            status = await r.get(f"status:next:{product_id}:{sku_id}")
-            if status == "done" or status == "failed":
-                log.info(f"商品{product_id=}, {sku_id=}, {status=} 已经下载完成或失败, 跳过下载")
+            result = await r.get(f"status:next:{product_id}:{sku_id}")
+            if result == "done":
+                log.info(f"商品{product_id=}, {sku_id=} 已经下载完成, 跳过下载")
                 return product_id, sku_id
-        log.info(f"正在抓取商品:{product_id=}, {sku_id=}, {url=}, ")
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
         async with page:
@@ -129,14 +126,13 @@ async def open_pdp_page(
                 lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
             )
 
-            # async def handle_response(response: Response):
-            #     if "https://api.bazaarvoice.com/data/reviews.json" in response.url and response.status == 200:
-            #         reviews = await response.json()
-            #         log.debug(f"{reviews=}")
-            #
-            #
-            # # await page.route("**/api.bazaarvoice.com/data/**", handle_route)
-            # page.on("response", handle_response)
+            async def handle_response(response: Response):
+                if "https://api.bazaarvoice.com/data/reviews.json" in response.url and response.status == 200:
+                    reviews = await response.json()
+                    log.debug(f"{reviews=}")
+
+            # await page.route("**/api.bazaarvoice.com/data/**", handle_route)
+            page.on("response", handle_response)
             # url = "https://www.next.co.uk/g29253s3/709159"
             # url = "https://www.next.us/en/style/st423998/981678"
             # url = "https://www.next.co.uk/g29529s4/185342"
@@ -147,8 +143,9 @@ async def open_pdp_page(
             await page.goto(
                 url=url,
                 timeout=PLAYWRIGHT_TIMEOUT,
-                # wait_until="load",
+                wait_until="load",
             )
+            # 通过url 解析 product_id 和 sku_id
 
             # 单击review按钮以加载评论
             log.info("等待评论按钮出现")
@@ -163,7 +160,7 @@ async def open_pdp_page(
                 log.debug(f"从Page中解析 商品信息{product=}")
 
                 sku_id_raw = product.get("sku_id_raw")
-                product.update(dict(sub_category=sub_category, source=source))
+                # product.update(dict(sub_category=sub_category, source=source))
                 save_product_data(product)
 
                 log.debug(f"源sku_id: {sku_id_raw}")
@@ -222,14 +219,9 @@ async def open_pdp_page(
 
                 log.debug("页面加载完成")
                 pass
+                # await page.pause()
             else:
-                log.warning(f"商品{product_id=}, {sku_id=} 未找到商品信息")
-                async with r:
-                    log.info(f"商品{product_id=}, {sku_id=} 标记抓取为失败")
-                    await r.set(f"status:next:{product_id}:{sku_id}", "failed")
                 return product_id, sku_id
-
-            # await page.pause()
         # TODO 当任务完成后, 标记任务状态
         async with r:
             log.info(f"商品{product_id=}, {sku_id=} 标记抓取完成")
@@ -328,7 +320,6 @@ async def parse_next_sku(
 
     # 获取SKU信息
     # Convert the data to a benedict object
-    log.debug(f"开始解析SKU信息: {pdp=}")
     pdp_style: list = pdp.get("Styles") if pdp.get("Styles") else []
     if not pdp_style:
         log.warning("未找到商品信息")
@@ -490,17 +481,8 @@ async def parse_next_product(page: Page, product_id: str, sku_id: str) -> dict |
 
 
 async def main():
-    i = 0
-    while i < 15:
-        try:
-            async with async_playwright() as p:
-                await run(p)
-                i += 1
-        except Exception as exc:
-            log.error(f"出现错误: {exc}")
-            i += 1
-            await asyncio.sleep(10)
-            continue
+    async with async_playwright() as p:
+        await run(p)
 
 
 if __name__ == "__main__":
