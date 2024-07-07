@@ -504,7 +504,6 @@ async def open_pdp_page(
                 # await page.pause()
 
                 # fit_size 适合人群
-                # TODO 当商品抓取完毕
                 r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
                 async with r:
