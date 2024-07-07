@@ -2,6 +2,7 @@
 playwright:
     timeout: 300000
     concurrency: 10
+    headless: true
 mysql:
     host: 10.31.0.181
     port: 3306

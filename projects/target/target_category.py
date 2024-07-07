@@ -21,17 +21,20 @@ domain = "https://www.target.com"
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_TIMEOUT = 1000 * 60 * 5
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
-PLAYWRIGHT_CONCURRENCY = 15
+PLAYWRIGHT_CONCURRENCY = 16
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
 PLAYWRIGHT_HEADLESS: bool = True
 
-settings.save_login_state = False
+settings.save_login_state = True
 # TODO  设置是否下载图片
 should_download_image = False
-should_get_review = True
-should_get_product = False
+should_get_review = False
+should_get_product = True
+force_get_product = False
+if should_get_product:
+    PLAYWRIGHT_CONCURRENCY = 3
 
-ua = UserAgent(browsers=["edge", "chrome", "safari"])
+ua = UserAgent(browsers=["edge", "chrome"], platforms=["pc"], os=["windows"])
 
 
 async def run(playwright: Playwright) -> None:
@@ -53,7 +56,9 @@ async def run(playwright: Playwright) -> None:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             headless=PLAYWRIGHT_HEADLESS,
+            user_agent=ua.random,
             proxy=proxy,
+            # viewport={"width": 1920, "height": 1080},
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             # args=["--start-maximized"],  # 启动时最大化窗口
@@ -62,12 +67,12 @@ async def run(playwright: Playwright) -> None:
         )
     else:
         pass
-    browser = await chromium.launch(
-        headless=PLAYWRIGHT_HEADLESS,
-        proxy=proxy,
-        # devtools=True,
-    )
-    context = await browser.new_context()
+        browser = await chromium.launch(
+            headless=PLAYWRIGHT_HEADLESS,
+            proxy=proxy,
+            # devtools=True,
+        )
+        context = await browser.new_context()
 
     # 设置全局超时
     context.set_default_timeout(settings.playwright.timeout)
@@ -78,9 +83,30 @@ async def run(playwright: Playwright) -> None:
 
     # 打开新的页面
     urls = [
-        ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),
-        # ("women", "bottoms", "black", "M", "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZ5y761Zvef8a"),
-        # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa
+        # (
+        #     "women",
+        #     "t-shorts",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y761?moveTo=product-list-grid",
+        # ),  # 完成
+        # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),  # 完成
+        # (
+        #     "women",
+        #     "bottoms",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZ5y761Zvef8a",
+        # ),  # 完成
+        (
+            "women",
+            "swimsuits",
+            "black",
+            "M",
+            "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
+        ),  # 抓取中
+        # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
+        # ("women", "shorts", "black", "M", "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
     ]
 
     # 迭代类别urls
@@ -97,7 +123,7 @@ async def run(playwright: Playwright) -> None:
             else:
                 agent = False
                 user_agent = ua.random
-                context = await browser.new_context(user_agent=user_agent)
+                # context = await browser.new_context(user_agent=user_agent)
                 # context = await browser.new_context()
                 log.info(f"当前UserAgent: {user_agent}")
                 page = await context.new_page()
@@ -240,19 +266,37 @@ async def open_pdp_page(
         product_id = httpx.URL(url).path.split("/")[-1].split("-")[-1]
         sku_id = httpx.URL(url).params.get("preselect")
         log.info(f"通过PDP(产品详情页)URL获取商品id:{product_id=} SKU:{sku_id=}")
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-        async with r:
-            category_status_flag = await r.get(
-                f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}"
-            )
-            brand_status_flag = await r.get(f"status_brand:{source}:{brand}:{product_id}:{sku_id}")
-            log.info(
-                f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {category_status_flag=}, {brand_status_flag=}"
-            )
+        if not force_get_product:
+            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+            async with r:
+                category_status_flag = await r.get(
+                    f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}"
+                )
+                brand_status_flag = await r.get(f"status_brand:{source}:{brand}:{product_id}:{sku_id}")
+                log.info(
+                    f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {category_status_flag=}, {brand_status_flag=}"
+                )
+                category_key = f"review_status:{source}:{primary_category}:{sub_category}:{product_id}"
+                brand_key = f"review_status_brand:{source}:{brand}:{product_id}"
+                category_review_status_flag = await r.get(category_key)
+                brand_review_status_flag = await r.get(brand_key)
+                log.info(
+                    f"{category_status_flag=}, {brand_status_flag=}, {category_review_status_flag=}, {brand_review_status_flag=}"
+                )
 
-            if category_status_flag == "done" or brand_status_flag == "done":
-                log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
-                return product_id, sku_id
+                if (category_status_flag == "done" or brand_status_flag == "done") and should_get_review is False:
+                    log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
+                    return product_id, sku_id
+                if (
+                    (category_status_flag == "done" or brand_status_flag == "done")
+                    and should_get_review
+                    and (category_review_status_flag == "done" or brand_review_status_flag == "done")
+                ):
+                    log.warning(f"商品和评论:{product_id=}, {sku_id}均已抓取过, 跳过")
+
+                    return product_id, sku_id
+                log.info(f"商品:{product_id=}, {sku_id}, 开始抓取")
+
         user_agent = ua.random
         log.info(f"当前UserAgent: {user_agent}")
         # context = await browser.new_context(user_agent=user_agent)
@@ -261,10 +305,10 @@ async def open_pdp_page(
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
         async with page:
             # 拦截所有图像
-            # await page.route(
-            #     "**/*",
-            #     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-            # )
+            await page.route(
+                "**/*",
+                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+            )
 
             # TODO 指定url
 
@@ -304,6 +348,7 @@ async def open_pdp_page(
                         # log.info(f"预期评论数{total_count}, reviews: , {len(reviews)}")
                         page_size = 50
                         total_pages = (total_count + page_size - 1) // page_size
+                        total_pages = total_pages if total_pages <= 50 else 50
                         log.info(f"总页数{total_pages}")
 
                         semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
@@ -443,31 +488,38 @@ async def open_pdp_page(
                 await review_event.wait()
                 log.info("Review(评论)接口执行完毕")
 
-            if product:
-                # product.update(dict(attributes=attributes, description=description))
-                log.info(f"商品{product_id=}, {sku_id=}获取到产品信息, 保存到数据库")
-                save_product_data(product)
-                product_status = "done"
-
-            else:
-                product_status = "faild"
-                log.warning(f"商品{product_id=}, {sku_id=}未获取到产品信息,")
-            # 保存产品信息到数据库
             # await page.pause()
+            if should_get_product or force_get_product:
+                if product:
+                    # product.update(dict(attributes=attributes, description=description))
+                    log.info(f"商品{product_id=}, {sku_id=}获取到产品信息, 保存到数据库")
+                    save_product_data(product)
+                    product_status = "done"
 
-            # fit_size 适合人群
-            # TODO 当商品抓取完毕
-            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                else:
+                    product_status = "faild"
+                    log.warning(f"商品{product_id=}, {sku_id=}未获取到产品信息,")
 
-            async with r:
-                log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
-                if task_type == "category":
-                    await r.set(
-                        f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", product_status
-                    )
-                elif task_type == "brand":
-                    await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
+                # 保存产品信息到数据库
+                # await page.pause()
 
+                # fit_size 适合人群
+                # TODO 当商品抓取完毕
+                r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+
+                async with r:
+                    log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
+                    if task_type == "category":
+                        await r.set(
+                            f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", product_status
+                        )
+                    elif task_type == "brand":
+                        await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
+                if should_get_product:
+                    log.warning("等待随机时间")
+                    await asyncio.sleep(random.randint(5, 30))
+            else:
+                log.warning("跳过商品状态检查")
             return product_id, sku_id
 
 
@@ -1060,7 +1112,7 @@ def map_attribute_field(input: dict) -> dict:
 async def main():
     # 创建一个playwright对象并将其传递给run函数
     retry_times = 0
-    while retry_times < 3:
+    while retry_times < 1:
         try:
             async with async_playwright() as p:
                 await run(p)

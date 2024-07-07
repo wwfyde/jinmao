@@ -30,7 +30,7 @@ async def run(playwright: Playwright) -> None:
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
-            headless=False,
+            headless=settings.playwright.headless,
             proxy=proxy,
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
@@ -40,7 +40,7 @@ async def run(playwright: Playwright) -> None:
         )
     else:
         browser = await chromium.launch(
-            headless=True,
+            headless=settings.playwright.headless,
             devtools=True,
             proxy=proxy,
         )
@@ -64,7 +64,7 @@ async def run(playwright: Playwright) -> None:
     async with r:
         source = "next"
         main_category = "women"
-        sub_category = "fleeces"
+        sub_category = "joggers"
         product_urls = await r.smembers(f"{source}:{main_category}:{sub_category}")
         log.debug(product_urls, len(product_urls))
         # product_urls = ["https://www.next.co.uk/style/su272671/q64927#q64927"]
@@ -91,6 +91,9 @@ async def open_pdp_page(
     sub_category: str,
     source: str,
 ):
+    """
+    打开产品详情页PDP
+    """
     async with semaphore:
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)

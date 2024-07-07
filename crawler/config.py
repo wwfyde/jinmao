@@ -58,6 +58,7 @@ class HTTPX(BaseModel):
 
 
 class ProxyPool(BaseModel):
+    status: bool = False
     server: str | None = None
     username: str | None = None
     password: str | None = None
