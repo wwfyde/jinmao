@@ -360,7 +360,7 @@ async def parse_next_sku(
     image_url = item.get("ShotImage", None)
     price = item.get("SalePlainPrice", None)
     original_price = item.get("FullPrice", None)
-    material = item.get("Composition", None)
+    material = item.get("Composition", None)[:128] if item.get("Composition", None) else None
     pdp_url = None
     washing_instructions = item.get("WashingInstructions", None)  # 是否可清洗
     care_instructions = item.get("CareInformation", None)  # 护理指导
