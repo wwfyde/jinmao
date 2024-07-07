@@ -12,9 +12,11 @@ from fake_useragent import UserAgent
 from playwright.async_api import Playwright, async_playwright, Route, Page, BrowserContext
 
 from crawler.config import settings
+from crawler.deps import get_logger
 from crawler.store import save_product_data, save_review_data_async
 from crawler.utils import scroll_page
-from projects.target import log
+
+log = get_logger("target")
 
 source = "target"
 domain = "https://www.target.com"
@@ -91,6 +93,41 @@ async def run(playwright: Playwright) -> None:
         #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y761?moveTo=product-list-grid",
         # ),  # 完成
         # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),  # 完成
+        (
+            "women",
+            "pajama-sets",
+            "default",
+            "default",
+            "https://www.target.com/c/pajama-sets-pajamas-loungewear-women-s-clothing/-/N-5xtbz",
+        ),  # 抓取中 采用三级类别
+        (
+            "women",
+            "pajama-tops",
+            "default",
+            "default",
+            "https://www.target.com/c/pajama-tops-pajamas-loungewear-women-s-clothing/-/N-5xtby",
+        ),  # 抓取中 采用三级类别
+        (
+            "women",
+            "pajama-bottoms",
+            "default",
+            "default",
+            "https://www.target.com/c/pajama-bottoms-pajamas-loungewear-women-s-clothing/-/N-5xtc2",
+        ),  # 抓取中 采用三级类别
+        (
+            "women",
+            "coats-jackets",
+            "default",
+            "default",
+            "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZ66rho?moveTo=product-list-grid",
+        ),  # TODO
+        (
+            "women",
+            "coats-jackets",
+            "default",
+            "extra",
+            "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZech2s2krbvfZech2s25o21uZech2s2c5qdaZech2s25tn8bZech2s2bgfyq?moveTo=product-list-grid",
+        ),  # win
         # (
         #     "women",
         #     "bottoms",
@@ -98,20 +135,20 @@ async def run(playwright: Playwright) -> None:
         #     "M",
         #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZ5y761Zvef8a",
         # ),  # 完成
-        (
-            "women",
-            "activewear",
-            "default",
-            "default",
-            "https://www.target.com/c/activewear-women-s-clothing/-/N-5xtcl",
-        ),  # win
+        # (
+        #     "women",
+        #     "activewear",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/activewear-women-s-clothing/-/N-5xtcl",
+        # ),  # win 抓取完毕
         # (
         #     "women",
         #     "swimsuits",
         #     "black",
         #     "M",
         #     "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
-        # ),  # 抓取中
+        # ),  # 抓取完毕
         # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
         # ("women", "shorts", "black", "M", "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
     ]
@@ -157,7 +194,7 @@ async def run(playwright: Playwright) -> None:
                             count = metadata.get("count", 0)
                             total_pages = metadata.get("total_pages", 0)
                             tasks = []
-                            semaphore = asyncio.Semaphore(5)  # 设置并发请求数限制为5
+                            semaphore = asyncio.Semaphore(1)  # 设置并发请求数限制为5
                             nonlocal product_status
                             product_status = "done"
                             if total_pages > 1:
@@ -211,8 +248,11 @@ async def run(playwright: Playwright) -> None:
                     # await page.wait_for_timeout(1000)
                     # await scroll_page(page, scroll_pause_time=scroll_pause_time, step=2)
                     # await page.pause()
-
-                    await plp_event.wait()
+                    try:
+                        # 设置超时时间为5秒
+                        await asyncio.wait_for(plp_event.wait(), timeout=60 * 10)
+                    except asyncio.TimeoutError:
+                        print("等待超时")
 
                     # 获取所有商品
                     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
@@ -486,11 +526,19 @@ async def open_pdp_page(
             #  优化商品属性 获取方案, 通过API 完成 deprecated
             # description, attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
             if should_get_product:
-                await product_event.wait()
+                try:
+                    # 设置超时时间为5秒
+                    await asyncio.wait_for(product_event.wait(), timeout=60 * 5)
+                except asyncio.TimeoutError:
+                    log.warning("等待超时")
                 log.info("PDP(产品详情页)接口执行完毕")
             # await skus_event.wait()
             if should_get_review:
-                await review_event.wait()
+                try:
+                    # 设置超时时间为5秒
+                    await asyncio.wait_for(review_event.wait(), timeout=60 * 5)
+                except asyncio.TimeoutError:
+                    log.warning("等待超时")
                 log.info("Review(评论)接口执行完毕")
 
             # await page.pause()
