@@ -100,11 +100,18 @@ async def run(playwright: Playwright) -> None:
         # ),  # 完成
         (
             "women",
-            "swimsuits",
-            "black",
-            "M",
-            "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
-        ),  # 抓取中
+            "activewear",
+            "default",
+            "default",
+            "https://www.target.com/c/activewear-women-s-clothing/-/N-5xtcl",
+        ),  # win
+        # (
+        #     "women",
+        #     "swimsuits",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
+        # ),  # 抓取中
         # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
         # ("women", "shorts", "black", "M", "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
     ]
@@ -181,7 +188,15 @@ async def run(playwright: Playwright) -> None:
                             async with r:
                                 await r.set(key, product_status)
                                 log.info(f"当前商品列表{primary_category=}, {key}, 标记redis状态为: {product_status}")
+                            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                            # 将商品加入商品索引中
+                            async with r:
+                                print(await r.get("a"))
+                                redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
+                                print(redis_key)
 
+                                result = await r.sadd(redis_key, *product_urls) if product_urls else None
+                                print(result)
                             plp_event.set()
                         await route.continue_()
 
@@ -232,16 +247,6 @@ async def run(playwright: Playwright) -> None:
         print(f"一共获取商品数: {len(product_urls)}")
 
         results = await asyncio.gather(*pdp_tasks)
-
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-        # 将商品加入商品索引中
-        async with r:
-            print(await r.get("a"))
-            redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
-            print(redis_key)
-
-            result = await r.sadd(redis_key, *product_urls) if product_urls else None
-            print(result)
 
 
 async def open_pdp_page(
