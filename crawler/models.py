@@ -138,6 +138,10 @@ class Product(Base):
         comment="内部更新时间",
     )
     resource_url: Mapped[str | None] = mapped_column(String(1024), comment="外部资源链接")  # deprecated 同 商品url
+    lot_id: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, comment="产品批次 ID"
+    )  # required: jcpenney
+    category_breadcrumbs: Mapped[str | None] = mapped_column(String(1024), comment="商品类别级联")
 
 
 class ProductSKU(Base):
