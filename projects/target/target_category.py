@@ -23,15 +23,15 @@ domain = "https://www.target.com"
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_TIMEOUT = 1000 * 60 * 5
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
-PLAYWRIGHT_CONCURRENCY = 16
+PLAYWRIGHT_CONCURRENCY = 9
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-PLAYWRIGHT_HEADLESS: bool = True
+PLAYWRIGHT_HEADLESS: bool = False
 
 settings.save_login_state = True
 # TODO  设置是否下载图片
 should_download_image = False
-should_get_review = False
-should_get_product = True
+should_get_review = True
+should_get_product = False
 force_get_product = False
 if should_get_product:
     PLAYWRIGHT_CONCURRENCY = 3
@@ -85,49 +85,56 @@ async def run(playwright: Playwright) -> None:
 
     # 打开新的页面
     urls = [
+        (
+            "women",
+            "intimates",
+            "default",
+            "default",
+            "https://www.target.com/c/intimates-women-s-clothing/-/N-5xtcfZ5y34t",
+        ),  # win
         # (
         #     "women",
-        #     "t-shorts",
+        #     "t-shirts",
         #     "black",
         #     "M",
         #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y761?moveTo=product-list-grid",
         # ),  # 完成
         # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),  # 完成
-        (
-            "women",
-            "pajama-sets",
-            "default",
-            "default",
-            "https://www.target.com/c/pajama-sets-pajamas-loungewear-women-s-clothing/-/N-5xtbz",
-        ),  # 抓取中 采用三级类别
-        (
-            "women",
-            "pajama-tops",
-            "default",
-            "default",
-            "https://www.target.com/c/pajama-tops-pajamas-loungewear-women-s-clothing/-/N-5xtby",
-        ),  # 抓取中 采用三级类别
-        (
-            "women",
-            "pajama-bottoms",
-            "default",
-            "default",
-            "https://www.target.com/c/pajama-bottoms-pajamas-loungewear-women-s-clothing/-/N-5xtc2",
-        ),  # 抓取中 采用三级类别
-        (
-            "women",
-            "coats-jackets",
-            "default",
-            "default",
-            "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZ66rho?moveTo=product-list-grid",
-        ),  # TODO
-        (
-            "women",
-            "coats-jackets",
-            "default",
-            "extra",
-            "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZech2s2krbvfZech2s25o21uZech2s2c5qdaZech2s25tn8bZech2s2bgfyq?moveTo=product-list-grid",
-        ),  # win
+        # (
+        #     "women",
+        #     "pajama-sets",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pajama-sets-pajamas-loungewear-women-s-clothing/-/N-5xtbz",
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "pajama-tops",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pajama-tops-pajamas-loungewear-women-s-clothing/-/N-5xtby",
+        # ),  # 抓取中 采用三级类别
+        # (
+        #     "women",
+        #     "pajama-bottoms",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pajama-bottoms-pajamas-loungewear-women-s-clothing/-/N-5xtc2",
+        # ),  # 抓取中 采用三级类别
+        # (
+        #     "women",
+        #     "coats-jackets",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZ66rho?moveTo=product-list-grid",
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "coats-jackets",
+        #     "default",
+        #     "extra",
+        #     "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZech2s2krbvfZech2s25o21uZech2s2c5qdaZech2s25tn8bZech2s2bgfyq?moveTo=product-list-grid",
+        # ),  # win
         # (
         #     "women",
         #     "bottoms",
@@ -150,7 +157,10 @@ async def run(playwright: Playwright) -> None:
         #     "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
         # ),  # 抓取完毕
         # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
-        # ("women", "shorts", "black", "M", "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
+        # ("women", "jeans", "default", "default", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8",),  # 已完成
+        # noqa # 已完成
+        # ("women", "shorts", "black", "M",
+        #  "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
     ]
 
     # 迭代类别urls
@@ -290,18 +300,18 @@ async def run(playwright: Playwright) -> None:
 
 
 async def open_pdp_page(
-    context: BrowserContext,
-    # browser: Browser,
-    *,
-    url: str,
-    semaphore: asyncio.Semaphore,
-    source: str,
-    primary_category: str | None = None,
-    sub_category: str | None = None,
-    color: str | None = None,
-    size: str | None = None,
-    brand: str | None = None,
-    task_type: Literal["brand", "category"] = "category",
+        context: BrowserContext,
+        # browser: Browser,
+        *,
+        url: str,
+        semaphore: asyncio.Semaphore,
+        source: str,
+        primary_category: str | None = None,
+        sub_category: str | None = None,
+        color: str | None = None,
+        size: str | None = None,
+        brand: str | None = None,
+        task_type: Literal["brand", "category"] = "category",
 ) -> tuple[str, str]:
     """
     打开产品详情页并
@@ -315,32 +325,37 @@ async def open_pdp_page(
             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
             async with r:
                 category_status_flag = await r.get(
-                    f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}"
+                    f"status:{source}:{product_id}:{sku_id}"
                 )
                 brand_status_flag = await r.get(f"status_brand:{source}:{brand}:{product_id}:{sku_id}")
-                log.info(
-                    f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {category_status_flag=}, {brand_status_flag=}"
-                )
-                category_key = f"review_status:{source}:{primary_category}:{sub_category}:{product_id}"
-                brand_key = f"review_status_brand:{source}:{brand}:{product_id}"
-                category_review_status_flag = await r.get(category_key)
-                brand_review_status_flag = await r.get(brand_key)
-                log.info(
-                    f"{category_status_flag=}, {brand_status_flag=}, {category_review_status_flag=}, {brand_review_status_flag=}"
-                )
+                # log.info(
+                #     f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {category_status_flag=}, {brand_status_flag=}"
+                # )
+                category_review_status_key = f"review_status:{source}:{product_id}"
+                brand_review_status_key = f"review_status_brand:{source}:{brand}:{product_id}"
+                category_review_status_flag = await r.get(category_review_status_key)
+                brand_review_status_flag = await r.get(brand_review_status_key)
+                # log.info(
+                #     f"{category_status_flag=}, {brand_status_flag=}, {category_review_status_flag=}, {brand_review_status_flag=}"
+                # )
 
-                if (category_status_flag == "done" or brand_status_flag == "done") and should_get_review is False:
-                    log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
+                # 处理跳过情形
+                if (category_status_flag == "done" or brand_status_flag == "done") and not should_get_review:
+                    log.warning(f"商品:{product_id=}, {sku_id},商品已抓取, 但不需要抓取评论, 跳过")
                     return product_id, sku_id
-                if (
-                    (category_status_flag == "done" or brand_status_flag == "done")
-                    and should_get_review
-                    and (category_review_status_flag == "done" or brand_review_status_flag == "done")
-                ):
-                    log.warning(f"商品和评论:{product_id=}, {sku_id}均已抓取过, 跳过")
-
+                if (category_status_flag == "done" or brand_status_flag == "done") and (
+                        category_review_status_flag == "done" or brand_review_status_flag == "done"):
+                    log.warning(f"商品:{product_id=}, {sku_id}, 商品和评论均已抓取过, 跳过")
                     return product_id, sku_id
-                log.info(f"商品:{product_id=}, {sku_id}, 开始抓取")
+                if (category_review_status_flag == "done" or brand_review_status_flag == "done") and not (
+                        should_get_product or force_get_product):
+                    log.warning(f"商品:{product_id=}, {sku_id},评论已抓取, 但不需要抓取商品, 跳过")
+                    return product_id, sku_id
+                if not should_get_product and not should_get_review:
+                    log.warning(f"商品:{product_id=}, {sku_id},不需要抓取商品和评论, 跳过")
+                    return product_id, sku_id
+                log.info(
+                    f"抓取商品或评论:{product_id=}, {sku_id},{category_status_flag=}, {category_review_status_flag=}, {brand_status_flag=}, {brand_review_status_flag=} 开始抓取")
 
         user_agent = ua.random
         log.info(f"当前UserAgent: {user_agent}")
@@ -360,7 +375,7 @@ async def open_pdp_page(
             review_status = None  # 评论抓取状态跟踪
             # product_id = None  # 从pdp页接口获取商品id
             product: dict | None = None
-            if should_get_product:
+            if should_get_product or force_get_product:
                 product_event = asyncio.Event()
             if should_get_review:
                 review_event = asyncio.Event()
@@ -375,7 +390,7 @@ async def open_pdp_page(
                 if "summary" in request.url:
                     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                     async with r:
-                        category_key = f"review_status:{source}:{primary_category}:{sub_category}:{product_id}"
+                        category_key = f"review_status:{source}:{product_id}"
                         result1 = await r.get(category_key)
                         log.info(f"商品评论: {product_id} 评论, redis状态标记: {result1=}")
                         log.info(f"拦截评论请求API:{route.request.url}")
@@ -443,7 +458,8 @@ async def open_pdp_page(
                         #     # 使用orjson以支持datetime格式
                         #     f.write(orjson.dumps(reviews, option=orjson.OPT_NAIVE_UTC).decode("utf-8"))
                     else:
-                        log.warning(f"商品[{product_id=}]的评论已抓取过, 跳过")
+                        log.warning(
+                            f"商品[{product_id=}]的评论已抓取过, 类别状态: {result1}, 品牌状态: {result2}, 跳过")
                         review_event.set()
                         # log.info("获取评论信息")
                         # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
@@ -493,7 +509,7 @@ async def open_pdp_page(
             if should_get_review:
                 await page.route("**/r2d2.target.com/**", handle_review_route)
 
-            if should_get_product:
+            if should_get_product or force_get_product:
                 await page.route("**/redsky.target.com/**", handle_pdp_route)
             # 导航到指定的URL
             # 其他操作...
@@ -525,7 +541,7 @@ async def open_pdp_page(
 
             #  优化商品属性 获取方案, 通过API 完成 deprecated
             # description, attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
-            if should_get_product:
+            if should_get_product or force_get_product:
                 try:
                     # 设置超时时间为5秒
                     await asyncio.wait_for(product_event.wait(), timeout=60 * 5)
@@ -563,11 +579,11 @@ async def open_pdp_page(
                     log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
                     if task_type == "category":
                         await r.set(
-                            f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", product_status
+                            f"status:{source}:{product_id}:{sku_id}", product_status
                         )
                     elif task_type == "brand":
                         await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
-                if should_get_product:
+                if should_get_product or force_get_product:
                     log.warning("等待随机时间")
                     await asyncio.sleep(random.randint(5, 30))
             else:
@@ -585,13 +601,13 @@ async def fetch_reviews(semaphore, url, headers):
 
 
 async def fetch_images(
-    *,
-    semaphore: asyncio.Semaphore,
-    url: str,
-    headers: dict | None = None,
-    cookies: dict | None = None,
-    file_path: Path | str,
-    query_params: str = "?wid=2400&hei=2400&qlt=100",
+        *,
+        semaphore: asyncio.Semaphore,
+        url: str,
+        headers: dict | None = None,
+        cookies: dict | None = None,
+        file_path: Path | str,
+        query_params: str = "?wid=2400&hei=2400&qlt=100",
 ) -> bool:
     async with semaphore:
         try:
@@ -619,7 +635,7 @@ async def fetch_images(
 
 
 def parse_target_review_from_api(
-    data: dict, product_name: str | None = None, sku_id: str | None = None
+        data: dict, product_name: str | None = None, sku_id: str | None = None
 ) -> tuple[list, int]:
     reviews = data.get("reviews").get("results", []) if data.get("reviews") else []
     total_count = data.get("reviews").get("total_results", 0) if data.get("reviews") else []
@@ -669,11 +685,11 @@ def parse_target_review_from_api(
 
 
 async def parse_pdp_from_dom(
-    page: Page,
-    *,
-    cookies: dict | None = None,
-    headers: dict | None = None,
-    sku_id: str | None = None,
+        page: Page,
+        *,
+        cookies: dict | None = None,
+        headers: dict | None = None,
+        sku_id: str | None = None,
 ):
     # content = await page.content()
     # tree = etree.HTML(content)
@@ -865,18 +881,18 @@ async def parse_pdp_from_dom(
 
 
 async def parse_target_product(
-    data: dict,
-    sku_id: str | None = None,
-    product_id: str | None = None,
-    source: str | None = "target",
-    primary_category: str | None = None,
-    sub_category: str | None = None,
-    color: str | None = None,
-    size: str | None = None,
-    headers: dict | None = None,
-    cookies: dict | None = None,
-    brand: str | None = None,
-    task_type: Literal["brand", "category"] = "category",
+        data: dict,
+        sku_id: str | None = None,
+        product_id: str | None = None,
+        source: str | None = "target",
+        primary_category: str | None = None,
+        sub_category: str | None = None,
+        color: str | None = None,
+        size: str | None = None,
+        headers: dict | None = None,
+        cookies: dict | None = None,
+        brand: str | None = None,
+        task_type: Literal["brand", "category"] = "category",
 ) -> dict | None:
     """
     解析target商品信息
@@ -930,7 +946,7 @@ async def parse_target_product(
         async with r:
             if task_type == "category":
                 image_status1 = await r.get(
-                    f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}"
+                    f"image_download_status:{source}:{product_id}:{sku_id}"
                 )
             elif task_type == "brand":
                 image_status2 = await r.get(f"image_download_status_brand:{source}:{brand}:{product_id}:{sku_id}")
@@ -966,7 +982,7 @@ async def parse_target_product(
                     async with r:
                         if task_type == "category":
                             await r.set(
-                                f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}",
+                                f"image_download_status:{source}:{product_id}:{sku_id}",
                                 "done",
                             )
                         elif task_type == "brand":
@@ -981,7 +997,7 @@ async def parse_target_product(
                     async with r:
                         if task_type == "category":
                             await r.set(
-                                f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}",
+                                f"image_download_status:{source}:{product_id}:{sku_id}",
                                 "failed",
                             )
                         elif task_type == "brand":
