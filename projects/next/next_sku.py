@@ -71,7 +71,24 @@ async def run(playwright: Playwright) -> None:
     # log.debug(f"{pages=}")
     # TODO 从redis 中获取商品列表
     # 获取商品列表
-    for sub_category in ("T-Shirts", "Dresses", "jackets", "Blouses", "bikinis"):
+    sub_categories = ['jumpsuit',
+                      # 'Blouses', 
+                      'suitskirts', 'sweattops', 'jumpers',
+                      # 'Dresses', 
+                      'hoodies', 'waistcoats',
+                      'socks', 'bodies', 'tankinis', 'tights', 'tunics',
+                      # 'jackets',
+                      'shorts', 'ponchos', 'topshortsets',
+                      'suittrousers', 'vests', 'playsuits', 'tanktops', 'croptops', 'fleeces', 'rashvests', 'dungarees',
+                      # 'bikinis', 
+                      'loungewearsets', 'gilets', 'coats', 'Hoodies', 'joggers', 'camisoles', 'rompersuits',
+                      'leggings',
+                      # 'T-Shirts', 
+                      'topleggingset', 'blazers', 'coverups', 'suitjackets', 'bodysuits',
+                      'jeans', 'tracksuits', 'poloshirts', 'Jackets', 'cardigans', 'trousers', 'shirts', 'skirts',
+                      'boobtube']
+
+    for sub_category in sub_categories:
         async with r:
             source = "next"
             main_category = "women"
@@ -94,13 +111,13 @@ async def run(playwright: Playwright) -> None:
 
 
 async def open_pdp_page(
-    context: BrowserContext,
-    semaphore: asyncio.Semaphore,
-    url: str,
-    *,
-    main_category: str,
-    sub_category: str,
-    source: str,
+        context: BrowserContext,
+        semaphore: asyncio.Semaphore,
+        url: str,
+        *,
+        main_category: str,
+        sub_category: str,
+        source: str,
 ):
     """
     打开产品详情页PDP
@@ -314,12 +331,12 @@ async def parse_review_from_dom(page: Page, product_id: str = None, sku_id: str 
 
 
 async def parse_next_sku(
-    pdp: dict,
-    sku_id_raw: str | None = None,
-    product_id: str | None = None,
-    product_name: str | None = None,
-    source: str | None = None,
-    sku_url: str | None = None,
+        pdp: dict,
+        sku_id_raw: str | None = None,
+        product_id: str | None = None,
+        product_name: str | None = None,
+        source: str | None = None,
+        sku_url: str | None = None,
 ) -> dict | None:
     """
     从API中解析SKU信息
