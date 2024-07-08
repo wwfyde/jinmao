@@ -93,3 +93,6 @@ browser_data/
 backups/
 
 dist/
+reviews/
+clean_data/
+products/
