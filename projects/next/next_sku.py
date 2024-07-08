@@ -103,11 +103,12 @@ async def run(playwright: Playwright) -> None:
                 for url in product_urls
             ]
             results = await asyncio.gather(*tasks)
-            log.debug(f"{results=}")
+            # log.debug(f"{results=}")
+            log.debug(f"完成{sub_category=}的抓取")
 
         # await context.close()
         # await asyncio.Future()
-        await asyncio.sleep(10)
+        # await asyncio.sleep(10)
 
 
 async def open_pdp_page(
