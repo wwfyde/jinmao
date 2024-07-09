@@ -66,7 +66,8 @@ def save_review_data(data: dict | list[dict]):
                 log.debug(
                     f"更新评论[review]数据成功, id={review.id},review_id={review.review_id} , product_id={review.product_id}, source={review.source}"
                 )
-
+                if review.product_id != item.get("product_id"):
+                    log.error(f"product_id 不一致, {review.product_id} != {item.get('product_id')}")
                 inserted_ids.append(review.id)
             else:
                 stmt = insert(ProductReview).values(item)
@@ -302,6 +303,8 @@ async def save_review_data_async(data: dict | list[dict]):
                 log.debug(
                     f"更新评论[review]数据成功, id={review.id},review_id={review.review_id} , product_id={review.product_id}, source={review.source}"
                 )
+                if review.product_id != item.get("product_id"):
+                    log.error(f"product_id 不一致, {review.product_id} != {item.get('product_id')}")
 
                 inserted_ids.append(review.id)
             else:
