@@ -4,9 +4,16 @@ import random
 import redis.asyncio as redis
 from playwright.async_api import Playwright, async_playwright
 
-from crawler import log
 from crawler.config import settings
+from crawler.deps import get_logger
 from crawler.utils import scroll_page
+
+log = get_logger("next")
+log.info(f"日志配置成功, 日志器: {log.name}")
+
+# log.debug(f"{PLAYWRIGHT_TIMEOUT=}")
+settings.save_login_state = False
+settings.playwright.headless = False
 
 
 async def run(playwright: Playwright) -> None:
@@ -22,19 +29,23 @@ async def run(playwright: Playwright) -> None:
         "username": settings.proxy_pool.username,
         "password": settings.proxy_pool.password,
     }
+    proxy = None
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             # headless=True,
             proxy=proxy,
-            headless=False,
+            headless=settings.playwright.headless,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             args=["--start-maximized"],  # 启动时最大化窗口
             # ignore_https_errors=True,  # 忽略HTTPS错误
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=True, devtools=True, proxy=proxy)
+        browser = await chromium.launch(
+            headless=settings.playwright.headless,
+            # devtools=True, 
+            proxy=proxy)
         context = await browser.new_context()
 
     # 设置全局超时
@@ -209,43 +220,44 @@ async def run(playwright: Playwright) -> None:
 
     # men
     categories = [
-        ("tshirts", "4911"),
-        ("shirts", "3559"),
-        ("shorts", "2187"),
-        ("jackets", "2183"),
-        ("poloshirts", "2182"),
-        ("hoodies", "1483"),
-        ("trousers", "1443"),
-        ("sweattops", "983"),
-        ("joggers", "860"),
-        ("socks", "817"),
-        ("jeans", "757"),
-        ("jumpers", "710"),
-        ("swimshorts", "580"),
-        ("suittrousers", "517"),
-        ("suitjackets", "513"),
-        ("footballshirts", "428"),
-        ("waistcoats", "298"),
-        ("fleeces", "296"),
-        ("coats", "267"),
-        ("gilets", "228"),
-        ("vests", "168"),
-        ("tracksuits", "94"),
-        ("cardigans", "50"),
-        ("rashvests", "39"),
-        ("rugbyshirts", "32"),
-        ("topshortsets", "20"),
-        ("leggings", "16"),
-        ("ponchos", "5"),
-        ("allinone", "3"),
+        # ("tshirts", "3658"),
+        # ("shirts", "2579"),
+        # ("shorts", "1888"),
+        # ("jackets", "1604"),
+        # ("poloshirts", "1603"),
+        # ("trousers", "1117"),
+        # ("hoodies", "1070"),
+        # ("sweattops", "654"),
+        # ("socks", "652"),
+        # ("joggers", "605"),
+        # ("jeans", "576"),
+        # ("jumpers", "512"),
+        # ("footballshirts", "463"),
+        # ("swimshorts", "421"),
+        # ("suittrousers", "392"),
+        # ("suitjackets", "386"),
+        # ("fleeces", "248"),
+        # ("waistcoats", "238"),
+        # ("coats", "205"),
+        # ("gilets", "181"),
+        # ("vests", "142"),
+        # ("tracksuits", "67"),
+        # ("cardigans", "39"),
+        # ("rashvests", "32"),
+        # ("topshortsets", "23"),
+        # ("rugbyshirts", "20"),
+        # ("leggings", "14"),
+        # ("ponchos", "6"),
+        ("allinone", "4"),
         ("loungewearsets", "3"),
         ("sweattopjoggersets", "3"),
         ("tights", "3"),
-        ("hoodiejoggerset", "1"),
-        ("jumpsuit", "1"),
-        ("suits", "1"),
+        ("tanktops", "2"),
+        # ("jumpsuit", "1"),
+        # ("suits", "1"),
     ]
-
+    gender = "men"
+    # categories = [("bedding", 143)]
     for category, count in categories:
         print(category, count)
         total = int(count)
@@ -255,17 +267,19 @@ async def run(playwright: Playwright) -> None:
         base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
         base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-jumpers"
         base_url = f"https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-{category}"
+        base_url = "https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/"
+        base_url = f"https://www.next.co.uk/shop/gender-men-productaffiliation-clothing/category-{category}"
         # 分段 当页数太多时可能导致chrome内存爆裂
         segment = 40
         times = (page_count + segment - 1) // segment
         dresses_not = ["549_600", "825_900"]
+        log.debug(f"分页{segment=}, {times=}")
         for j in range(0, times):
             next_base_url = base_url + f"?p={j * segment + 1}"
 
             page = await context.new_page()
             async with page:
                 # base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
-                gender = "women"
                 # base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-dresses"
                 a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
                 b = ["1-50", "51-100", "101-200", "200, .."]
@@ -277,6 +291,7 @@ async def run(playwright: Playwright) -> None:
                     "**/*",
                     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
                 )
+                log.debug(f"打开页面: {next_base_url}")
                 await page.goto(next_base_url)
                 b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
                 selector = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
@@ -287,16 +302,17 @@ async def run(playwright: Playwright) -> None:
                 await page.wait_for_timeout(5000)
                 scroll_pause_time = random.randrange(1000, 1800, 200)
                 # await page.wait_for_timeout(1000)
+                log.debug("开始滚动页面")
                 await scroll_page(page, scroll_pause_time=scroll_pause_time, source="next", page_size=segment)
                 # await page.pause()
                 product_locators = page.locator(li_selector)
                 product_count = await product_locators.count()
-                print(f"locators数量: {product_count}")
+                log.info(f"locators数量: {product_count}")
                 product_urls = []
                 for i in range(product_count):
                     try:
                         url = await product_locators.nth(i).get_attribute("href", timeout=5000)
-                        print(url)
+                        log.debug(f"抓取到商品数量{url}")
                         product_urls.append(url)
                     # TODO 将 所有url 存入redis, 以持久化
                     except Exception as exc:
@@ -307,10 +323,11 @@ async def run(playwright: Playwright) -> None:
                 r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                 async with r:
                     # print(await r.get("a"))
-
-                    gender = "women"
-                    result = await r.sadd(f"next:{gender}:{category}", *product_urls)
-                    print(result)
+                    if product_urls:
+                        result = await r.sadd(f"next:{gender}:{category}", *product_urls)
+                        print(result)
+                    else:
+                        log.warning(f"没有获取到商品url: {next_base_url}")
                 # print(products_urls)
                 # 将数据持久化到本地
                 with open(settings.project_dir.joinpath("data", f"{gender}-{category}-next_urls.txt"), "w") as f:
