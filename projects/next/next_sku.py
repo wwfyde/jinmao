@@ -71,28 +71,43 @@ async def run(playwright: Playwright) -> None:
     # log.debug(f"{pages=}")
     # TODO 从redis 中获取商品列表
     # 获取商品列表
-    sub_categories = ['jumpsuit',
-                      # 'Blouses', 
+    sub_categories = {'jumpsuit',
+                      'Blouses',
                       'suitskirts', 'sweattops', 'jumpers',
-                      # 'Dresses', 
+                      'Dresses',
                       'hoodies', 'waistcoats',
                       'socks', 'bodies', 'tankinis', 'tights', 'tunics',
-                      # 'jackets',
+                      'jackets',
                       'shorts', 'ponchos', 'topshortsets',
                       'suittrousers', 'vests', 'playsuits', 'tanktops', 'croptops', 'fleeces', 'rashvests', 'dungarees',
-                      # 'bikinis', 
+                      'bikinis',
                       'loungewearsets', 'gilets', 'coats', 'Hoodies', 'joggers', 'camisoles', 'rompersuits',
                       'leggings',
-                      # 'T-Shirts', 
-                      'topleggingset', 'blazers', 'coverups', 'suitjackets', 'bodysuits',
-                      'jeans', 'tracksuits', 'poloshirts', 'Jackets', 'cardigans', 'trousers', 'shirts', 'skirts',
-                      'boobtube']
+                      'T-Shirts',
+                      'topleggingset',
+                      'blazers',
+                      'coverups',
+                      'suitjackets', 'bodysuits',
+                      'jeans',
+                      'tracksuits', 'poloshirts',
+                      'Jackets',
+                      'cardigans',
+                      'trousers',
+                      'shirts',
+                      'skirts',
+                      'boobtube'}
 
     for sub_category in sub_categories:
         async with r:
             source = "next"
             main_category = "women"
             sub_category = sub_category
+
+            status = await r.get(f"category_task_status:next:{main_category}:{sub_category}")
+            if status == "done":
+                log.warning(f"该类别{main_category=},{sub_category=}已抓取完毕, 跳过")
+                continue
+
             product_urls = await r.smembers(f"{source}:{main_category}:{sub_category}")
             log.debug(f"从商品中获取商品数: {len(product_urls)}")
             # product_urls = ["https://www.next.co.uk/style/su272671/q64927#q64927"]
@@ -105,6 +120,10 @@ async def run(playwright: Playwright) -> None:
             results = await asyncio.gather(*tasks)
             # log.debug(f"{results=}")
             log.debug(f"完成{sub_category=}的抓取")
+            async with r:
+                # 将子类别的抓取状态存入redis
+
+                await r.set(f"category_task_status:next:{main_category}:{sub_category}", "done")
 
         # await context.close()
         # await asyncio.Future()
