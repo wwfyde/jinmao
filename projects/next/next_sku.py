@@ -467,7 +467,7 @@ async def parse_next_product(page: Page, product_id: str, sku_id: str) -> dict |
     """
     article_locator = page.locator("article")
     try:
-        product_id_from_data = await article_locator.get_attribute("data-stylenumber", timeout=30 * 1000)
+        product_id_from_data = await article_locator.get_attribute("data-stylenumber", timeout=180 * 1000)
         if product_id_from_data.upper() != product_id:
             log.warning(f"商品ID不匹配! {product_id=}, {product_id_from_data=}")
     except Exception as exc:
