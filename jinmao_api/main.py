@@ -56,6 +56,12 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         ProductReview.product_id == params.product_id,
         ProductReview.source == params.source,
     )
+    log.debug(f"{params.date_start=}, {params.date_end}")
+    if params.date_start:
+        stmt = stmt.where(ProductReview.created_at >= params.date_start)
+    if params.date_end:
+        stmt = stmt.where(ProductReview.created_at <= params.date_end)
+    log.debug(f"{params.date_start=}, {params.date_end=}")
     reviews = db.execute(stmt).scalars().all()
 
     log.info(f"分析商品评论[{len(reviews)}]")
@@ -63,6 +69,8 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
     # 将 ORM对象转换为字典
     review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
     log.debug(review_dicts)
+    if not reviews:
+        return {"analyses": None, "statistics": None}
 
     # 查询商品信息
     stmt = select(Product).where(
@@ -73,48 +81,59 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
     # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
     # if isinstance(params.extra_metrics, list):
     #     params.extra_metrics = ", ".join(params.extra_metrics)
+    if params.date_start or params.date_end:
+        params.from_api = True
     if not product_db.review_analyses or params.from_api is True:
         if params.llm == "ark":
             results = await analyze_reviews(review_dicts)
         else:
             results = await analyze_reviews(review_dicts)
-        # 将分析结果保存到数据库
-        try:
-            for result in results:
-                review_id = result.get("review_id")
-                scores: dict = result.get("scores")
-                db.execute(
-                    update(ProductReview)
-                    .where(ProductReview.review_id == review_id, ProductReview.source == params.source)
-                    .values(
-                        quality=scores.get("quality", {}).get("score"),
-                        warmth=scores.get("warmth", {}).get("score"),
-                        comfort=scores.get("comfort", {}).get("score"),
-                        softness=scores.get("softness", {}).get("score"),
-                        preference=scores.get("preference", {}).get("score"),
-                        repurchase_intent=scores.get("repurchase_intent", {}).get("score"),
-                        appearance=scores.get("appearance", {}).get("score"),
-                        fit=scores.get("fit", {}).get("score"),
-                    )
-                )
-            db.commit()
-        except Exception as exc:
-            log.error(f"插入评论指标失败{exc}")
-            db.rollback()
-        # 获取评论统计数据
-        # 将统计和单一分析结果写入数据库
+
+        # 分析指标统计
         metrics_counts = metrics_statistics(results, threshold=params.threshold) if results else {}
-        update_stmt = (
-            update(Product)
-            .where(Product.product_id == params.product_id, Product.source == params.source)
-            .values(
-                review_statistics=metrics_counts,
-                is_review_analyzed=True,
-                review_analyses=results,
+
+        # 将分析结果保存到数据库
+        if not params.date_start and not params.date_end:
+            try:
+                for result in results:
+                    review_id = result.get("review_id")
+                    scores: dict = result.get("scores")
+                    db.execute(
+                        update(ProductReview)
+                        .where(ProductReview.review_id == review_id, ProductReview.source == params.source)
+                        .values(
+                            quality=scores.get("quality", {}).get("score"),
+                            warmth=scores.get("warmth", {}).get("score"),
+                            comfort=scores.get("comfort", {}).get("score"),
+                            softness=scores.get("softness", {}).get("score"),
+                            preference=scores.get("preference", {}).get("score"),
+                            repurchase_intent=scores.get("repurchase_intent", {}).get("score"),
+                            appearance=scores.get("appearance", {}).get("score"),
+                            fit=scores.get("fit", {}).get("score"),
+                        )
+                    )
+                db.commit()
+            except Exception as exc:
+                log.error(f"插入评论指标失败{exc}")
+                db.rollback()
+
+            # 将统计和单一分析结果写入数据库
+
+            update_stmt = (
+                update(Product)
+                .where(Product.product_id == params.product_id, Product.source == params.source)
+                .values(
+                    review_statistics=metrics_counts,
+                    is_review_analyzed=True,
+                    review_analyses=results,
+                )
             )
-        )
-        affected_rows = db.execute(update_stmt)
-        db.commit()
+            affected_rows = db.execute(update_stmt)
+            log.debug(f"更新{affected_rows}条记录")
+            db.commit()
+        else:
+            log.info("当前使用了日期过滤, 将不会保存结果")
+            # 获取评论统计数据
         # product_db_new = db.execute(stmt).scalars().first()
         # product_db_new.review_statistics = metrics_counts
         # product_db_new.is_review_analyzed = True
@@ -193,6 +212,11 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
     stmt = select(ProductReview).where(
         ProductReview.product_id == params.product_id, ProductReview.source == params.source
     )
+    if params.date_start:
+        stmt = stmt.where(ProductReview.created_at >= params.date_start)
+    if params.date_end:
+        stmt = stmt.where(ProductReview.created_at <= params.date_end)
+    log.debug(f"{params.date_start=}, {params.date_end=}")
     # 从数据库中获取商品下的所有评论
     reviews = db.execute(stmt).scalars().all()
 
@@ -201,29 +225,36 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
     # 将 ORM对象转换为字典
     review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
     # log.debug(review_dicts)
+    if not reviews:
+        return {"summary": None}
 
     # 查询商品信息 并检查总结是否存在
     stmt = select(Product).where(Product.product_id == params.product_id, Product.source == params.source)
     product_db = db.execute(stmt).scalars().first()
+    if params.date_start or params.date_end:
+        params.from_api = True
 
     if not product_db.review_summary or params.from_api is True:
         if params.llm == "ark":
             result = await summarize_reviews(review_dicts)
         else:
             result = await summarize_reviews(review_dicts)
+        if not params.date_start and not params.date_end:
 
-        update_stmt = (
-            update(Product)
-            .where(Product.product_id == params.product_id, Product.source == params.source)
-            .values(
-                review_summary=result,
+            update_stmt = (
+                update(Product)
+                .where(Product.product_id == params.product_id, Product.source == params.source)
+                .values(
+                    review_summary=result,
+                )
             )
-        )
-        affected_rows = db.execute(update_stmt)
-        db.commit()
-        # product_db.review_summary = result
-        # db.add(product_db)
-        # db.commit()  # 显式提交事务
+            affected_rows = db.execute(update_stmt)
+            db.commit()
+            # product_db.review_summary = result
+            # db.add(product_db)
+            # db.commit()  # 显式提交事务
+        else:
+            log.info("当前使用了日期过滤, 将不会保存结果")
 
         # 获取空间数据
         return {"summary": result}
@@ -233,8 +264,8 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
 
 @router.post("/product/analyze_review_by_metrics", summary="额外指标分析")
 async def review_analysis_with_extra_metrics(
-    params: ProductReviewAnalysisByMetricsIn,
-    db: Session = Depends(get_db),
+        params: ProductReviewAnalysisByMetricsIn,
+        db: Session = Depends(get_db),
 ):
     """
     根据用指定的指标分析评论
@@ -243,8 +274,8 @@ async def review_analysis_with_extra_metrics(
 
 
 async def analyze_review_by_metrics(
-    params: ProductReviewAnalysisByMetricsIn,
-    db: Session,
+        params: ProductReviewAnalysisByMetricsIn,
+        db: Session,
 ):
     # 将指标转换为列表
     if isinstance(params.extra_metrics, str):
@@ -252,6 +283,10 @@ async def analyze_review_by_metrics(
     stmt = select(ProductReview).where(
         ProductReview.product_id == params.product_id, ProductReview.source == params.source
     )
+    if params.date_start:
+        stmt = stmt.where(ProductReview.created_at >= params.date_start)
+    if params.date_end:
+        stmt = stmt.where(ProductReview.created_at <= params.date_end)
     reviews = db.execute(stmt).scalars().all()
 
     log.info(f"按指标分析商品评论, 共[{len(reviews)}]条")
@@ -260,11 +295,15 @@ async def analyze_review_by_metrics(
     review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
     log.debug(review_dicts)
 
+    if not reviews:
+        return {"analyses": None, "statistics": None}
     # 查询商品信息
     stmt = select(Product).where(Product.product_id == params.product_id, Product.source == params.source)
     product_db = db.execute(stmt).scalars().first()
 
     # 获取原有指标
+    if params.date_start or params.date_end:
+        params.from_api = True
 
     last_metrics = product_db.extra_metrics
     # 如果前端传入的
@@ -278,42 +317,44 @@ async def analyze_review_by_metrics(
         else:
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
 
-        # 将分析结果保存到数据库
-        try:
-            for result in results:
-                db.execute(
-                    update(ProductReview)
-                    .where(
-                        ProductReview.review_id == result.get("review_id"), ProductReview.source == params.source
-                    )  # 根据评论的唯一标识符更新
-                    .values(extra_metrics=result.get("scores"))
-                )
-            db.commit()
-        except Exception as exc:
-            db.rollback()
-            log.error(f"更新评论失败{exc}, 撤销")
-        log.info("插入索引指标的ProductReview成功")
-
         # 获取评论统计数据
         metrics_counts = extra_metrics_statistics(results, threshold=params.threshold) if results else {}
-        # return {"analyses": results, "statistics": metrics_counts}
-        update_stmt = (
-            update(Product)
-            .where(Product.product_id == params.product_id, Product.source == params.source)
-            .values(
-                extra_review_statistics=metrics_counts,
-                extra_review_analyses=results,
-                extra_metrics=params.extra_metrics,
+        # 将分析结果保存到数据库
+        if not params.date_start and not params.date_end:
+            try:
+                for result in results:
+                    db.execute(
+                        update(ProductReview)
+                        .where(
+                            ProductReview.review_id == result.get("review_id"), ProductReview.source == params.source
+                        )  # 根据评论的唯一标识符更新
+                        .values(extra_metrics=result.get("scores"))
+                    )
+                db.commit()
+            except Exception as exc:
+                db.rollback()
+                log.error(f"更新评论失败{exc}, 撤销")
+            log.info("插入索引指标的ProductReview成功")
+
+            update_stmt = (
+                update(Product)
+                .where(Product.product_id == params.product_id, Product.source == params.source)
+                .values(
+                    extra_review_statistics=metrics_counts,
+                    extra_review_analyses=results,
+                    extra_metrics=params.extra_metrics,
+                )
             )
-        )
-        affected_rows = db.execute(update_stmt)
-        db.commit()
-        # product_db_new = db.execute(stmt).scalars().first()
-        # product_db_new.extra_review_statistics = metrics_counts
-        # product_db_new.extra_review_analyses = results
-        # product_db_new.extra_metrics = params.extra_metrics
-        # db.add(product_db_new)
-        # db.commit()
+            affected_rows = db.execute(update_stmt)
+            db.commit()
+            # product_db_new = db.execute(stmt).scalars().first()
+            # product_db_new.extra_review_statistics = metrics_counts
+            # product_db_new.extra_review_analyses = results
+            # product_db_new.extra_metrics = params.extra_metrics
+            # db.add(product_db_new)
+            # db.commit()
+        else:
+            log.info("当前使用了日期过滤, 将不会保存结果")
         log.info(f"接口执行完毕{metrics_counts}")
         return {"analyses": None, "statistics": metrics_counts}
     else:

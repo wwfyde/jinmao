@@ -74,7 +74,8 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
     # comment: str
     source: str
     lang: Literal["zh", "en"] = Field("en", description="语言")
-
+    date_start: datetime | None = Field(None, description="时间范围起始")
+    date_end: datetime | None = Field(None, description="时间范围截止")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
     llm: Literal["ark", "claude", "azure", "bedrock", "openai"] | None = Field("ark", description="LLM模型")
     extra_metrics: list[str] | str = Field(..., description="需要分析的指标")
@@ -84,6 +85,8 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
             "example": {
                 "product_id": "728681",
                 "source": "gap",
+                "date_start": "2024-07-09",
+                "date_end": "2024-07-10",
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",
@@ -114,6 +117,8 @@ class ProductReviewIn(BaseModel):
     llm: Literal["ark", "claude", "azure", "bedrock", "openai"] | None = Field("ark", description="LLM模型")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
     # extra_metrics: list[str] | str | None = Field(False, description="额外分析指标")
+    date_start: datetime | None = Field(None, description="时间范围起始")
+    date_end: datetime | None = Field(None, description="时间范围截止")
     threshold: float | None = Field(5.0, description="指标阈值")
 
     model_config = ConfigDict(
@@ -121,6 +126,8 @@ class ProductReviewIn(BaseModel):
             "example": {
                 "product_id": "728681",
                 "source": "gap",
+                "date_start": "2024-07-09",
+                "date_end": "2024-07-10",
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",
