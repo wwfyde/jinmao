@@ -182,7 +182,7 @@ def extra_metrics_statistics(reviews: list[dict], threshold: float | int | None 
     for item in reviews:
         # log.info(f"{item=}")
         for key, value in item.get("scores", {}).items():
-            if float(value) >= (threshold or 5.0):
+            if value and float(value) >= (threshold or 5.0):
                 if key not in metrics_counts:
                     metrics_counts[key] = dict(count=0, total_score=0)
 
@@ -316,6 +316,16 @@ async def analyze_review_by_metrics(
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
         else:
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
+
+        # 提示词过滤, 仅保留params.extra_extra_metrics中的数据, 去除额外的字段
+        new_results = []
+        for result in results:
+            new_result = result
+            new_result["scores"] = {extra_metric: result.get("scores", {}).get(extra_metric) for extra_metric in
+                                    params.extra_metrics}
+            new_results.append(new_result)
+
+        log.debug(new_results)
 
         # 获取评论统计数据
         metrics_counts = extra_metrics_statistics(results, threshold=params.threshold) if results else {}

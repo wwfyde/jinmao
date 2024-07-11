@@ -12,11 +12,11 @@ from openai import AsyncOpenAI
 from sqlalchemy import select, ColumnElement
 from sqlalchemy.orm import Session
 
-from jinmao_api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
-from jinmao_api import log
 from crawler.config import settings
 from crawler.db import engine
 from crawler.models import ProductReview
+from jinmao_api import log
+from jinmao_api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
 
 # crawler_logger = logging.getLogger("crawler")
 # crawler_logger.setLevel(logging.INFO)
@@ -27,9 +27,9 @@ for library in log_libraries:
 
 
 async def analyze_single_comment(
-    review: ProductReviewSchema,
-    semaphore: asyncio.Semaphore,
-    extra_metrics: list[str] | str | None = None,
+        review: ProductReviewSchema,
+        semaphore: asyncio.Semaphore,
+        extra_metrics: list[str] | str | None = None,
 ) -> dict | None:
     """
     单一评论分析
@@ -46,14 +46,17 @@ async def analyze_single_comment(
             extra_metrics_str = re.sub("([A-Z]+)", r"_\1", extra_metrics_str)
 
             extra_metrics_str = re.sub("([A-Z][a-z]+)", r"_\1", extra_metrics_str)
-            extra_metrics = extra_metrics_str.replace("-", "_").strip(" _")
+            extra_metrics_str = extra_metrics_str.replace("-", "_").strip(" _")
         if extra_metrics:
-            prompt = Template(settings.ark_extra_metrics_prompt).render(extra_metrics=extra_metrics)
+            prompt = Template(settings.ark_extra_metrics_prompt).render(extra_metrics=extra_metrics,
+                                                                        extra_metrics_str=extra_metrics_str,
+                                                                        random=random
+                                                                        )
         else:
             prompt = settings.ark_prompt
-        log.info(f"模版语法渲染后的提示词{prompt=}")
+        # log.info(f"模版语法渲染后的提示词{prompt=}")
 
-        log.info(f"用户评论内容: {review.comment}")
+        # log.info(f"用户评论内容: {review.comment}")
         try:
             response = await client.chat.completions.create(
                 timeout=settings.httpx_timeout,
@@ -250,7 +253,7 @@ async def main():
     products = list(zip(product_ids, sources))
     product_id, source = random.choice(products)  # 从列表中随机取一个
     # product_id, source = "89779562", "target"  # 一共600条评论, 实际有评论的235条
-    product_id, source = "795346", "gap"  # 一共3901条评论, 实际2760 条
+    # product_id, source = "795346", "gap"  # 一共3901条评论, 实际2760 条
 
     # 创建数据库会话 并从数据库中拉取商品所有评论
     with Session(engine) as session:
@@ -271,22 +274,23 @@ async def main():
 
     # 并发处理评论分析和评论总结
     async with asyncio.TaskGroup() as tg:
-        # analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts))
+        analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts, extra_metrics=["性价比", "soft"],
+                                                       ))
         # summary_task = tg.create_task(
         #     summarize_reviews(
         #         reviews=review_dicts,
         #     )
         # )
-        single_summary_task = tg.create_task(
-            analyze_single_comment(
-                ProductReviewSchema.model_validate(random.choice(review_dicts)),
-                semaphore=asyncio.Semaphore(1),
-                extra_metrics=["性价比", "soft"],
-            )
-        )
-        # analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
+        # single_summary_task = tg.create_task(
+        #     analyze_single_comment(
+        #         ProductReviewSchema.model_validate(random.choice(review_dicts)),
+        #         semaphore=asyncio.Semaphore(1),
+        #         extra_metrics=["性价比", "soft"],
+        #     )
+        # )
+        analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
         # summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
-        single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
+        # single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
 
 
 if __name__ == "__main__":
