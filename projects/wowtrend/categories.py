@@ -63,8 +63,12 @@ async def run(playwright: Playwright) -> None:
 
     async with page:
         # 打开新的页面
-        "https://apps01.wow-trend.com/api/trend/article/get-list?nav_id=16&gender_id=72105"
-        url = "https://www.wow-trend.com/column/?nav_id=16&gender_id=72105"
+        # "https://apps01.wow-trend.com/api/trend/article/get-list?nav_id=16&gender_id=72105"
+        # url = "https://www.wow-trend.com/column/?nav_id=16&gender_id=72105"
+
+        url = "https://www.wow-trend.com/column/?nav_id=111&gender_id=72105&keywords=miu%20miu&mode1=成册"
+        url = "https://www.wow-trend.com/column/?nav_id=111&gender_id=72105&keywords=chanel&mode1=%E6%88%90%E5%86%8C"
+        url = "https://www.wow-trend.com/column/?nav_id=111&gender_id=72105&keywords=Celine&mode1=%E6%88%90%E5%86%8C"
         nav_id = httpx.URL(url).params.get("nav_id")
         gender_id = httpx.URL(url).params.get("gender_id")
         api_event = asyncio.Event()
@@ -103,7 +107,7 @@ async def run(playwright: Playwright) -> None:
                     meetings.extend(extra_meeting)
                 nonlocal all_meetings
                 all_meetings = meetings
-                with open("meetings.json", "w") as f:
+                with open("meetings_celine.json", "w") as f:
                     f.write(json.dumps(meetings, ensure_ascii=False, indent=4))
                 api_event.set()
                 await route.continue_()

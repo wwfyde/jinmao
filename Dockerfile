@@ -22,7 +22,7 @@ COPY config.prod.yml .
 RUN mkdir logs
 #  安装依赖
 ARG INSTALL_DEV=false
-RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-cache; else poetry install --no-cache --only jinmao ; fi"
+RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-cache; else poetry install --no-cache --only jinmao -vv ; fi"
 
 
 

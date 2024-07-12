@@ -35,7 +35,8 @@ if __name__ == "__main__":
     # delete_keys_by_pattern(main_pattern)
     # # delete_keys_by_pattern(review_pattern)
 
-    brand_pattern = "image_do:target:women:dresses:*"
+    # brand_pattern = "image_do:target:women:dresses:*"
+    brand_pattern = "wowtrend-collections:*"
     delete_keys_by_pattern(brand_pattern)
 
     # products = []

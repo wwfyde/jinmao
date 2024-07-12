@@ -25,16 +25,18 @@ PLAYWRIGHT_TIMEOUT = 1000 * 60 * 5
 PLAYWRIGHT_CONCURRENCY = settings.playwright.concurrency
 PLAYWRIGHT_CONCURRENCY = 9
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-PLAYWRIGHT_HEADLESS: bool = False
+PLAYWRIGHT_HEADLESS: bool = True
 
 settings.save_login_state = True
 # TODO  设置是否下载图片
 should_download_image = False
 should_get_review = True
-should_get_product = False
+should_get_product = True
 force_get_product = False
 if should_get_product:
     PLAYWRIGHT_CONCURRENCY = 3
+if not should_download_image:
+    log.warning("当前图片未设置为允许下载")
 
 ua = UserAgent(browsers=["edge", "chrome"], platforms=["pc"], os=["windows"])
 
@@ -85,13 +87,36 @@ async def run(playwright: Playwright) -> None:
 
     # 打开新的页面
     urls = [
-        (
-            "women",
-            "intimates",
-            "default",
-            "default",
-            "https://www.target.com/c/intimates-women-s-clothing/-/N-5xtcfZ5y34t",
-        ),  # win
+        # ("women", "maternity", "default", "default",
+        #  "https://www.target.com/c/maternity-clothing-women/-/N-5ouvi"),  # 
+        # ("women", "graphic-tees", "default", "batch1",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ4u9pjZqama8Z4u9goZ5xeljZcv1blcqhq3mZ5y70kZfo87bqov5agZrg0dh?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "default", "batch2",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ5xeljZvef8a?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "default", "batch3",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZcv1blcs3gscZvef8a?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "default", "batch4",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ4u9ldZ5y24gZ5y1h6Z5y2kw?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "pop-culture", "black",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZvef8aZcv1blczeafkZ5y761?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "pop-culture", "gray",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZvef8aZcv1blczeafkZ5y759?type=products&moveTo=product-list-grid"),
+
+        # 
+        # ("women", "jumpsuits-rompers", "default", "default",
+        #  "https://www.target.com/c/jumpsuits-rompers-women-s-clothing/-/N-4y52e"),  # 抓取完成
+
+        # ("women","socks-hosiery","default","default","https://www.target.com/c/socks-hosiery-women-s-clothing/-/N-5xtbdZ600jqZgfdyb?moveTo=product-list-grid"),  # win
+        # ("women","socks-hosiery","default","extra", "https://www.target.com/c/socks-hosiery-women-s-clothing/-/N-5xtbdZq8ldyZ1ktcxZ68721?moveTo=product-list-grid"),  # win
+
+        # (
+        #     "women",
+        #     "intimates",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/intimates-women-s-clothing/-/N-5xtcfZ5y34t",
+        # ),  # 已完成
+
         # (
         #     "women",
         #     "t-shirts",
@@ -99,6 +124,42 @@ async def run(playwright: Playwright) -> None:
         #     "M",
         #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y761?moveTo=product-list-grid",
         # ),  # 完成
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "batch1",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y6q6Z5y746Z5y70hZ5y67t?moveTo=product-list-grid"
+        # ),  # 完成
+        (
+            "women",
+            "t-shirts",
+            "batch2",
+            "M",
+            "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y73rZ5xr7iZ5y759?moveTo=product-list-grid"
+        ),  # 完成
+        (
+            "women",
+            "t-shirts",
+            "batch3",
+            "M",
+            "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ55iviZ5xrh3Z5y76nZ5y6hb?moveTo=product-list-grid"
+        ),  # 完成
+        (
+            "women",
+            "t-shirts",
+            "batch4",
+            "M",
+            "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ55iviZ5xrh3Z5y76nZ5y6hb?moveTo=product-list-grid"
+        ),  # 完成(
+        (
+            "women",
+            "t-shirts",
+            "batch5",
+            "M",
+            "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y76dZ5y713Z5y750Z5y72c?moveTo=product-list-grid"
+        ),  # 完成
+
         # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),  # 完成
         # (
         #     "women",
@@ -142,6 +203,14 @@ async def run(playwright: Playwright) -> None:
         #     "M",
         #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZ5y761Zvef8a",
         # ),  # 完成
+        (
+            "women",
+            "bottoms",
+            "multi",
+            "M",
+            "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZvef8aZ5y6q6Z5y70hZ5y746Z5y67tZ5y759Z5y73rZ5xr7iZ5xrh3Z55iviZ5y76nZ5y6hbZ5y76dZ5y713Z5y750Z5y72c?moveTo=product-list-grid",
+        ),  # 完成
+
         # (
         #     "women",
         #     "activewear",
@@ -165,6 +234,7 @@ async def run(playwright: Playwright) -> None:
 
     # 迭代类别urls
     for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
+        log.info(f"正在抓取{primary_category=}, {sub_category=}")
         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
         key = f"product_status:{source}:{primary_category}:{sub_category}:{color}:{size}"
         async with r:
@@ -176,10 +246,10 @@ async def run(playwright: Playwright) -> None:
                 log.info(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品数量: {len(product_urls)}")
             else:
                 agent = False
-                user_agent = ua.random
+                # user_agent = ua.random
                 # context = await browser.new_context(user_agent=user_agent)
                 # context = await browser.new_context()
-                log.info(f"当前UserAgent: {user_agent}")
+                # log.info(f"当前UserAgent: {user_agent}")
                 page = await context.new_page()
                 async with page:
                     # 拦截所有图片
@@ -357,8 +427,8 @@ async def open_pdp_page(
                 log.info(
                     f"抓取商品或评论:{product_id=}, {sku_id},{category_status_flag=}, {category_review_status_flag=}, {brand_status_flag=}, {brand_review_status_flag=} 开始抓取")
 
-        user_agent = ua.random
-        log.info(f"当前UserAgent: {user_agent}")
+        # user_agent = ua.random
+        # log.info(f"当前UserAgent: {user_agent}")
         # context = await browser.new_context(user_agent=user_agent)
         # context = await browser.new_context()
         page = await context.new_page()
@@ -391,15 +461,15 @@ async def open_pdp_page(
                     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                     async with r:
                         category_key = f"review_status:{source}:{product_id}"
-                        result1 = await r.get(category_key)
-                        log.info(f"商品评论: {product_id} 评论, redis状态标记: {result1=}")
+                        category_review_status = await r.get(category_key)
                         log.info(f"拦截评论请求API:{route.request.url}")
                         brand_key = f"review_status_brand:{source}:{brand}:{product_id}"
-                        result2 = await r.get(brand_key)
-                        log.info(f"商品评论: {product_id} 评论, redis状态标记: {result2=}")
+                        brand_review_status = await r.get(brand_key)
+                        log.info(
+                            f"商品评论: {product_id} 评论, redis状态标记:{category_review_status=}, {brand_review_status=}")
                         log.info(f"拦截评论请求API:{route.request.url}")
 
-                    if result1 != "done" and result2 != "done":
+                    if category_review_status != "done" and brand_review_status != "done":
                         response = await route.fetch()
                         json_dict = await response.json()
                         # TODO  获取评论信息
@@ -459,7 +529,7 @@ async def open_pdp_page(
                         #     f.write(orjson.dumps(reviews, option=orjson.OPT_NAIVE_UTC).decode("utf-8"))
                     else:
                         log.warning(
-                            f"商品[{product_id=}]的评论已抓取过, 类别状态: {result1}, 品牌状态: {result2}, 跳过")
+                            f"商品[{product_id=}]的评论已抓取过, 类别状态: {category_review_status}, 品牌状态: {brand_review_status}, 跳过")
                         review_event.set()
                         # log.info("获取评论信息")
                         # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
@@ -1006,9 +1076,6 @@ async def parse_target_product(
                                 "done",
                             )
                     log.warning("商品图片抓取失败")
-
-    else:
-        log.warning("当前图片未设置为允许下载")
     product_name = product.get("item").get("product_description").get("title")[:128] if product.get("item") else None
     raw_attributes = product.get("item").get("product_description").get("bullet_descriptions", [])
     try:
@@ -1197,4 +1264,4 @@ async def main():
 # 它开始执行main函数。
 if __name__ == "__main__":
     # 指定本地代理
-    asyncio.run(main())
+    asyncio.run(main(), debug=True)

@@ -6,18 +6,18 @@ from crawler.config import settings
 
 async def main():
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-
+    sub_categories = []
     async with r:
-        keys = r.scan_iter(match="image_download_status:target:*:*:*:*")
+        keys = r.scan_iter(match="next:women:*")
         async for key in keys:
             print(key)
-            value = await r.get(key)
-            new_key_spliter = key.split(":")
-            new_key = f"{new_key_spliter[0]}:{new_key_spliter[1]}:{new_key_spliter[-2]}:{new_key_spliter[-1]}"
-            print(f"{new_key}:{value}")
-            await r.set(new_key, value)
-            await r.delete(key)
+            sub_categories.append(key.split(":")[-1])
+        print(sub_categories)
+        # value = await r.get(key)
+        # print(value)
 
+
+redis_client = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
 if __name__ == '__main__':
     asyncio.run(main())
