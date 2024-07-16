@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from sqlalchemy import String, Integer, DateTime, JSON, func, Boolean, BigInteger, Numeric, Text, Index, TIMESTAMP, \
+from sqlalchemy import String, Integer, JSON, func, Boolean, BigInteger, Numeric, Text, Index, TIMESTAMP, \
     ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -56,9 +56,11 @@ class Product(Base):
         String(16), nullable=True, comment="性别"
     )  # required gap, jcpeney
     released_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=func.now(), server_default=func.now(), nullable=True, index=True, comment="上新时间"
+        TIMESTAMP(timezone=True), nullable=True, index=True,
+        comment="上新时间"
     )  # required: gap(none), jcpenney
     tags: Mapped[list[str] | None] = mapped_column(JSON, comment="标签")  # required
+    current_version: Mapped[str | None] = mapped_column(String(32), default="0", comment="当前版本")
     is_review_analyzed: Mapped[bool | None] = mapped_column(Boolean, default=False, comment="是否已分析")
     review_analyses: Mapped[list[dict] | None] = mapped_column(JSON, comment="评论分析结果汇总")
     extra_review_analyses: Mapped[list[dict] | None] = mapped_column(JSON, comment="额外评论分析结果汇总")
@@ -106,7 +108,7 @@ class ProductTranslation(Base):
         {"comment": "商品翻译"},
     )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")
-    language_code: Mapped[Literal['zh', 'en']] = mapped_column(String(16), nullable=False, comment="语言")
+    language_code: Mapped[Literal['zh', 'en']] = mapped_column(String(16), nullable=False, default="zh", comment="语言")
     product_id: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="商品ID"
     )  # required: gap, jcpenney, target
@@ -291,7 +293,8 @@ class ProductSKUTranslation(Base):
     product_id: Mapped[str | None] = mapped_column(
         String(128), comment="商品ID"
     )  # required: gap, jcpenney, next, target
-    language_code: Mapped[Literal['zh', 'en']] = mapped_column(String(16), nullable=False, comment="语言代码")
+    language_code: Mapped[Literal['zh', 'en']] = mapped_column(String(16), nullable=False, default="zh",
+                                                               comment="语言代码")
     size: Mapped[str | None] = mapped_column(String(64), comment="尺码")  # required: gap, jcpenney, next, target
     color: Mapped[str | None] = mapped_column(String(64), comment="颜色")  # required: gap, jcpenney, next, target
     material: Mapped[str | None] = mapped_column(String(128), comment="材质")
@@ -328,6 +331,7 @@ class ProductReview(Base):
     product_id: Mapped[str | None] = mapped_column(
         String(64), nullable=True, comment="商品ID"
     )  # required: gap, jcpenney, next
+    current_version: Mapped[str | None] = mapped_column(String(32), default="0", comment="当前版本")
     sku_id: Mapped[str | None] = mapped_column(String(64), comment="SKU ID")  # optional: gap, next
     rating: Mapped[float | None] = mapped_column(
         Numeric(2, 1), comment="评分"
@@ -390,7 +394,8 @@ class ProductReviewTranslation(Base):
     )  # required: gap, jcpenney, next, target
     sku_id: Mapped[str | None] = mapped_column(String(64),
                                                comment="SKU ID, 部分系统支持sku_id区分")  # optional: gap, next
-    language_code: Mapped[Literal['zh', 'en']] = mapped_column(String(16), nullable=False, comment="语言代码")
+    language_code: Mapped[Literal['zh', 'en']] = mapped_column(String(16), nullable=False, default='zh',
+                                                               comment="语言代码")
     title: Mapped[str | None] = mapped_column(String(1024), comment="评论标题")  # required: gap, jcpenney, next
     comment: Mapped[str | None] = mapped_column(Text, comment="评论内容")  # required: gap, jcpenney, next
     is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")
@@ -412,10 +417,13 @@ class ProductReviewTranslation(Base):
 
 class ProductReviewAnalysis(Base):
     __tablename__ = "product_review_analysis"
-    __table_args__ = {"comment": "商品评论分析, 支持版本号管理"}
+    __table_args__ = (
+        Index("ix_source_review_id", "source", "review_id"),
+        Index("ix_source_review_id_version_id", "source", "review_id", "version_id"),
+        {"comment": "商品评论分析, 支持版本号管理"})
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     review_id: Mapped[str | None] = mapped_column(String(64), comment="源评论ID")  # required: gap, jcpenney, next
-    version_id: Mapped[int] = mapped_column(Integer, default=0, comment="版本ID")
+    version_id: Mapped[str | None] = mapped_column(String(32), default="0", comment="版本ID")
     source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
         String(64), default="other", nullable=True, comment="数据来源"
     )  # required: gap, jcpenney, next
@@ -438,6 +446,41 @@ class ProductReviewAnalysis(Base):
         JSON, comment="LLM token 消耗"
     )  # required: gap, jcpenney, next, target
     is_deleted: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True, comment="软删除")
+    created_at: Mapped[datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True),
+        default=func.now(),
+        server_default=func.now(),
+        nullable=True,
+        comment="创建时间",
+    )
+    updated_at: Mapped[datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True),
+        default=func.now(),
+        onupdate=func.now(),
+        server_default=func.now(),
+        nullable=True,
+        comment="更新时间",
+    )
+
+
+class ReviewAnalysisExtraMetric(Base):
+    __tablename__ = "review_analysis_extra_metric"
+    __table_args__ = (
+        Index("ix_source_review_id", "source", "review_id"),
+        Index("ix_source_review_id_version_id", "source", "review_id", "version_id"),
+        {"comment": "商品评论额外指标, 支持版本管理"}
+    )
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="ID")
+    review_id: Mapped[str | None] = mapped_column(String(64), comment="源评论ID")  # required: gap, jcpenney, next
+    source: Mapped[Literal["gap", "target", "next", "jcpenney", "other"]] = mapped_column(
+        String(64), default="other", nullable=True, comment="数据来源"
+    )
+    product_id: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, comment="商品ID"
+    )  # required: gap, jcpenney, next
+    version_id: Mapped[str | None] = mapped_column(String(32), default="0", comment="版本ID")
+    name: Mapped[str | None] = mapped_column(String(64), comment="指标名称")
+    value: Mapped[float | None] = mapped_column(Numeric(3, 1), default=0, comment="指标得分")
     created_at: Mapped[datetime | None] = mapped_column(
         TIMESTAMP(timezone=True),
         default=func.now(),
