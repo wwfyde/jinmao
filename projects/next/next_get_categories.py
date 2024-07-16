@@ -14,10 +14,13 @@ async def run(playwright):
     men = "https://www.next.co.uk/shop/gender-men-productaffiliation-clothing-0"
     boys = "https://www.next.co.uk/shop/gender-newbornboys-gender-newbornunisex-gender-olderboys-gender-youngerboys-productaffiliation-boysclothing-0"
     girls = "https://www.next.co.uk/shop/gender-newborngirls-gender-newbornunisex-gender-oldergirls-gender-youngergirls-productaffiliation-girlsclothing-0"
-    await page.goto(girls)
+    pets = "https://www.next.co.uk/shop/productaffiliation-gifts/category-pets"
+    bed = "https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding-0"
+    await page.goto(bed)
 
     # 点击 "Category" 以渲染类别中的子类别
     # await page.locator("//main/div/div/div[2]/header/nav/div/div[2]/div/div[1]/button").click()
+    print("点击类别按钮")
     await page.locator('[data-testid="plp-filter-label-button-category"]').click()
 
     # 等待类别内容加载
@@ -25,7 +28,8 @@ async def run(playwright):
 
     # 获取类别和数量
     categories = await page.locator(
-        "//main/div/div/div[2]/header/nav/div/div[2]/div/div[2]/div/div[2]/div"
+        # "//main/div/div/div[2]/header/nav/div/div[2]/div/div[2]/div/div[2]/div"
+        '//*[@id="plp-horizontal-filter-bar"]/nav/div/div[3]/div/div[2]/div/div[2]/div'
     ).element_handles()
     categories_list = []
     # 遍历每个类别获取名称和数量
@@ -42,6 +46,7 @@ async def run(playwright):
             categories_list.append((name, count))
             print(f"Category: {category_name}, Count: {count}")
     print(categories_list)
+    print([category[0] for category in categories_list])
 
     await browser.close()
 

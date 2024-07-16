@@ -66,6 +66,7 @@ class ProxyPool(BaseModel):
 
 class Settings(BaseSettings):
     mysql: MySQL
+    mysql_test: MySQL  # 测试数据库
     molook_db: MySQLMoLook
     playwright: PlayWright
     httpx_timeout: int = 180
@@ -82,6 +83,8 @@ class Settings(BaseSettings):
     aliyun: Aliyun
     redis: Redis
     ark_doubao: LLM
+    glm4_air: LLM
+    claude_haiku: LLM
     # ark_api_key: str  # 豆包api-key
     # ark_base_url: str  # 豆包api-url
     ark_prompt: str  # 评论分析Prompt
@@ -89,6 +92,7 @@ class Settings(BaseSettings):
     ark_extra_metrics_prompt: str  # 额外指标分析提示词
     # ark_model: str
     ark_concurrency: int = 40
+    translate_prompt: str  # 翻译Prompt
 
     @field_serializer("proxy_url", when_used="always")
     def proxy_url_serializer(self, proxy_url: AnyHttpUrl) -> str:
@@ -118,6 +122,16 @@ class Settings(BaseSettings):
         return f"mysql+aiomysql://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
 
     @computed_field
+    def mysql_test_async_dsn(self) -> MySQLDsn:
+        ...
+        return f"mysql+aiomysql://{self.mysql_test.user}:{self.mysql_test.password}@{self.mysql_test.host}:{self.mysql_test.port}/{self.mysql_test.db}"
+
+    @computed_field
+    def mysql_test_dsn(self) -> MySQLDsn:
+        ...
+        return f"mysql+mysqldb://{self.mysql_test.user}:{self.mysql_test.password}@{self.mysql_test.host}:{self.mysql_test.port}/{self.mysql_test.db}"
+
+    @computed_field
     def redis_dsn(self) -> str:
         return f"redis://:{self.redis.password}@{self.redis.host}:{self.redis.port}/{self.redis.db}"
 
@@ -137,21 +151,26 @@ class Settings(BaseSettings):
             "config.prod.yml",
             "config.local.yml",
             "config.dev.local.yml",
+            "config.staging.local.yml",
+            "config.prod.local.yml",
         ],
         yaml_file_encoding="utf-8",
-        env_file=[".env", ".env.staging", ".env.prod", ".env.local"],
+        env_file=[
+            ".env", ".env.dev", ".env.staging", ".env.prod", ".env.local", ".env.dev.local", ".env.staging.local",
+            ".env.prod.local"
+        ],
         env_file_encoding="utf-8",
         extra="ignore",
     )
 
     @classmethod
     def settings_customise_sources(
-        cls,
-        settings_cls: Type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
+            cls,
+            settings_cls: Type[BaseSettings],
+            init_settings: PydanticBaseSettingsSource,
+            env_settings: PydanticBaseSettingsSource,
+            dotenv_settings: PydanticBaseSettingsSource,
+            file_secret_settings: PydanticBaseSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
@@ -169,6 +188,7 @@ settings = Settings()
 if __name__ == "__main__":
     log.info(settings)
     log.info(settings.mysql_dsn)
+    log.info(settings.mysql_test_async_dsn)
     log.info(settings.base_dir)
     log.info(settings.project_dir)
     # log.info(settings.log_file_path)
@@ -177,8 +197,7 @@ if __name__ == "__main__":
     log.info(settings.redis)
     log.info(settings.redis_dsn)
     # log.info(settings.ark_api_key)
-    log.info(settings.ark_model)
-    log.info(f"type:{type(settings.proxy_url)}, value:{settings.proxy_url}")
-    log.info(settings.ark_extra_metrics_prompt)
+    # log.info(f"type:{type(settings.proxy_url)}, value:{settings.proxy_url}")
+    # log.info(settings.ark_extra_metrics_prompt)
     # log.info(settings.ark_prompt)
-    log.info(settings.proxy_pool)
+    # log.info(settings.proxy_pool)

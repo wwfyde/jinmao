@@ -101,11 +101,12 @@ async def run(playwright: Playwright) -> None:
                       'vests', 'swimshorts', 'suitjackets', 'tracksuits', 'footballshirts', 'rashvests', 'fleeces',
                       'gilets', 'sweattops', 'sweattopjoggersets', 'joggers', 'rugbyshirts', 'jackets', 'socks',
                       'tshirts'}
+    sub_categories = {'pets'}
 
     for sub_category in sub_categories:
         async with r:
             source = "next"
-            main_category = "men"
+            main_category = "bed"
             sub_category = sub_category
 
             status = await r.get(f"category_task_status:next:{main_category}:{sub_category}")

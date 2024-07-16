@@ -60,6 +60,7 @@ def run_migrations_offline() -> None:
 
     """
     # url = config.get_main_option("sqlalchemy.url")
+    print(f"{settings.mysql_dsn=}")
     print("run offline")
     context.configure(
         url=settings.mysql_dsn,
@@ -81,6 +82,7 @@ def run_migrations_online() -> None:
 
     """
     print("run online")
+    print(f"{settings.mysql_dsn=}")
     configuration = config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = settings.mysql_dsn
     connectable = engine_from_config(

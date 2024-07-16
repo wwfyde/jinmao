@@ -256,8 +256,15 @@ async def run(playwright: Playwright) -> None:
         # ("jumpsuit", "1"),
         # ("suits", "1"),
     ]
-    gender = "men"
+    gender = "unknown"
     # categories = [("bedding", 143)]
+    categories = [('pets', 677)]
+
+    # 床上用品
+    categories = [('bedsets', '1263'), ('throws', '577'), ('bedsheets', '435'), ('pillowcases', '399'),
+                  ('duvets', '238'), ('pillows', '161'), ('duvetcover', '100'), ('protectors', '66'), ('toppers', '39'),
+                  ('blankets', '10'), ('valances', '7')]
+
     for category, count in categories:
         print(category, count)
         total = int(count)
@@ -270,6 +277,10 @@ async def run(playwright: Playwright) -> None:
         base_url = "https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/"
         base_url = f"https://www.next.co.uk/shop/gender-men-productaffiliation-clothing/category-{category}"
         # 分段 当页数太多时可能导致chrome内存爆裂
+
+        base_url = 'https://www.next.co.uk/shop/productaffiliation-gifts/category-pets'
+        base_url = f'https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/category-{category}'
+        category = base_url.split("/")[-1].split("-")[-1]
         segment = 40
         times = (page_count + segment - 1) // segment
         dresses_not = ["549_600", "825_900"]
@@ -284,7 +295,7 @@ async def run(playwright: Playwright) -> None:
                 a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
                 b = ["1-50", "51-100", "101-200", "200, .."]
                 c = [""]
-                category = base_url.split("/")[-1].split("-")[-1]
+                # category = base_url.split("/")[-1].split("-")[-1]
                 print(category)
                 # 拦截所有图片
                 await page.route(

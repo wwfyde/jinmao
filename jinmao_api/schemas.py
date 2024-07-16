@@ -146,20 +146,20 @@ class ProductReviewModel(
     review_id: str
     product_id: str
     source: str
-    product_name: str | None = None
     sku_id: str | None = None
     rating: float | None = None
     title: str | None = None
     comment: str | None = None
+    photos: list[str] | None = None
+    outer_photos: list[str] | None = None
     nickname: str | None = None
     helpful_votes: int | None = None
     not_helpful_votes: int | None = None
-    helpful_score: int | None = None
     is_deleted: bool | None = None
+    gathered_at: datetime | None = None
+    last_gathered_at: datetime | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
-    created_at_inner: datetime | None = None
-    updated_at_inner: datetime | None = None
 
     @field_serializer("id", when_used="always")
     def transform_id_to_str(id: int) -> str:
@@ -168,6 +168,40 @@ class ProductReviewModel(
 
 class ProductReviewSchema(ProductReviewModel):
     id: int | str | None = None
+
+
+class ProductReviewTranslationSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    review_id: str
+    product_id: str
+    source: str
+    rating: float | None = None
+    title: str | None = None
+    comment: str | None = None
+
+
+class ProductTranslationSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    product_id: str
+    source: str
+    product_name: str | None = None
+    description: str | None = None
+    attributes: ProductAttribute | None = None
+    gender: str | None = None
+
+
+class ProductSKUTranslationSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    product_id: str
+    sku_id: str
+    source: str
+    sku_name: str | None = None
+    size: str | None = None
+    color: str | None = None
+    material: str | None = None
 
 
 class ProductExtraMetric(BaseModel):

@@ -41,8 +41,9 @@ fake-useragent = "^1.5.1"
 loguru = "^0.7.2"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.4.4"
+ruff = "^0.5.1"
 notebook = "^7.1.3"
+ruff-lsp = "^0.0.54"
 
 
 [tool.poetry.group.jinmao.dependencies]

@@ -1,6 +1,8 @@
 import asyncio
+import os
 import random
 import re
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from mimetypes import guess_extension
 from pathlib import Path
@@ -285,7 +287,7 @@ async def run(playwright: Playwright) -> None:
                                             semaphore=semaphore, url=product_page_url, headers=request.headers
                                         )
                                     )
-                                extra_product_urls_tuple = await asyncio.gather(*tasks)
+                                extra_product_urls_tuple = await asyncio.gather(*tasks, return_exceptions=True)
                                 product_status = "done"
                                 if len(extra_product_urls_tuple) == 0:
                                     log.error("未获取到商品列表, 请尝试更换IP")
@@ -1244,7 +1246,7 @@ def map_attribute_field(input: dict) -> dict:
 #         # previous_height = new_height
 
 
-async def main():
+async def run_playwright_instance():
     # 创建一个playwright对象并将其传递给run函数
     retry_times = 0
     while retry_times < 1:
@@ -1260,8 +1262,27 @@ async def main():
         await asyncio.sleep(15)
 
 
+async def main():
+    loop = asyncio.get_running_loop()
+    num_processes = os.cpu_count()
+    urls = []
+    with ProcessPoolExecutor(max_workers=num_processes) as executor:
+        tasks = [loop.run_in_executor(executor, run_playwright_instance) for _ in urls]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for result in results:
+            if isinstance(result, Exception):
+                log.error(f"Task resulted in an exception: {result}")
+            else:
+                log.info(result)
+
+
 # 这是脚本的入口点。
 # 它开始执行main函数。
-if __name__ == "__main__":
+def async_runner():
     # 指定本地代理
-    asyncio.run(main(), debug=True)
+    asyncio.run(run_playwright_instance(), debug=True)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

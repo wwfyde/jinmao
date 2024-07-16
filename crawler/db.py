@@ -27,6 +27,19 @@ async_engine = create_async_engine(
     # json_serializer=dumps,
 )
 
+engine_test = create_engine(
+    str(settings.mysql_test_dsn),
+    connect_args={},
+    # echo=True,
+    # json_serializer=dumps,
+)
+async_engine_test = create_async_engine(
+    str(settings.mysql_test_async_dsn),
+    connect_args={},
+    # echo=True,
+    # json_serializer=dumps,
+)
+
 
 def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
