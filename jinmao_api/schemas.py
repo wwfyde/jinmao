@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, ConfigDict, field_serializer, model_valid
 
 class ReviewMetric(BaseModel):
     en: str | None = Field(None, description="英文名")
-    cn: str | None = Field(None, description="中文名")
+    zh: str | None = Field(None, description="中文名")
     score: float | None = Field(0, description="分数")
 
 
@@ -85,12 +85,12 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
             "example": {
                 "product_id": "728681",
                 "source": "gap",
-                "date_start": "2024-07-09",
+                "date_start": "2023-01-09",
                 "date_end": "2024-07-10",
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",
-                "extra_metrics": ["cost-effectiveness", "实用性"],
+                "extra_metrics": ["cost_effectiveness", "实用性"],
             }
         },
         title="评论分析输入验证",

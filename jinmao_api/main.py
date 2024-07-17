@@ -287,7 +287,7 @@ async def analyze_review_by_metrics(
         params.extra_metrics = [params.extra_metrics]
 
     # 将指标键名风格替换为下划线
-    params.extra_metrics = [metric.replace("-", "_").replace(" ", "_") for metric in params.extra_metrics]
+    params.extra_metrics = [metric.replace("-", "_").replace(" ", "_").lower() for metric in params.extra_metrics]
     stmt = select(ProductReview).where(
         ProductReview.product_id == params.product_id, ProductReview.source == params.source
     )
@@ -443,7 +443,7 @@ async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Ses
     # if isinstance(params.extra_metrics, str):
     #     params.extra_metrics = [params.extra_metrics]
     log.info(f"用户传入的指标: {params.extra_metrics}")
-    params.extra_metrics = [metric.replace("-", "_").replace(" ", "_") for metric in params.extra_metrics]
+    params.extra_metrics = [metric.replace("-", "_").replace(" ", "_").lower() for metric in params.extra_metrics]
 
     if not params.extra_metrics:
         update_stmt = (

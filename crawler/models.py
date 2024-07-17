@@ -68,7 +68,7 @@ class Product(Base):
     extra_metrics: Mapped[list | dict | None] = mapped_column(JSON, comment="额外评论指标")
     review_statistics: Mapped[dict | None] = mapped_column(JSON, comment="评论分析统计")
     extra_review_statistics: Mapped[dict | None] = mapped_column(JSON, comment="额外评论分析统计")
-    review_summary: Mapped[str | None] = mapped_column(String(2048), comment="评论总结")
+    review_summary: Mapped[dict | list | None] = mapped_column(JSON, comment="评论总结")
 
     remark: Mapped[str | None] = mapped_column(String(1024), comment="备注")
     category_id: Mapped[int | None] = mapped_column(BigInteger, comment="类别ID")
