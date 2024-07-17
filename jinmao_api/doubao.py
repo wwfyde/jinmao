@@ -16,7 +16,7 @@ from crawler.config import settings
 from crawler.db import engine
 from crawler.models import ProductReview
 from jinmao_api import log
-from jinmao_api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
+from jinmao_api.schemas import ProductReviewAnalysisValidator, ReviewAnalysisMetrics, ProductReviewSchema
 
 # crawler_logger = logging.getLogger("crawler")
 # crawler_logger.setLevel(logging.INFO)
@@ -266,7 +266,7 @@ async def main():
         reviews = session.execute(stmt).scalars().all()
         # 将查询结果中的每个评论对象转换为字典格式，方便后续处理
         review_dicts = [
-            ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews
+            ProductReviewAnalysisValidator.model_validate(review).model_dump(exclude_unset=True) for review in reviews
         ]
         log.debug(f"当前商品{product_id=}, 共有{len(review_dicts)}条")
     if not review_dicts:
@@ -274,23 +274,23 @@ async def main():
 
     # 并发处理评论分析和评论总结
     async with asyncio.TaskGroup() as tg:
-        analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts, extra_metrics=["性价比", "soft"],
+        analysis_task = tg.create_task(analyze_reviews(reviews=review_dicts,
                                                        ))
-        # summary_task = tg.create_task(
-        #     summarize_reviews(
-        #         reviews=review_dicts,
-        #     )
-        # )
-        # single_summary_task = tg.create_task(
-        #     analyze_single_comment(
-        #         ProductReviewSchema.model_validate(random.choice(review_dicts)),
-        #         semaphore=asyncio.Semaphore(1),
-        #         extra_metrics=["性价比", "soft"],
-        #     )
-        # )
+        summary_task = tg.create_task(
+            summarize_reviews(
+                reviews=review_dicts,
+            )
+        )
+        single_analysis_task = tg.create_task(
+            analyze_single_comment(
+                ProductReviewSchema.model_validate(random.choice(review_dicts)),
+                semaphore=asyncio.Semaphore(1),
+                extra_metrics=["性价比", "soft"],
+            )
+        )
         analysis_task.add_done_callback(lambda fut: print(f"评论分析完成: {fut.result()}"))
-        # summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
-        # single_summary_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
+        summary_task.add_done_callback(lambda fut: print(f"评论总结完成: {fut.result()}"))
+        single_analysis_task.add_done_callback(lambda fut: print(f"单一评论分析完成: {fut.result()}"))
 
 
 if __name__ == "__main__":

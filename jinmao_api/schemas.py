@@ -250,7 +250,7 @@ class ReviewFilter(BaseModel):
     )
 
 
-class ProductReviewAnalysis(
+class ProductReviewAnalysisValidator(
     BaseModel,
 ):
     model_config = ConfigDict(from_attributes=True)
@@ -258,14 +258,12 @@ class ProductReviewAnalysis(
     review_id: str
     product_id: str
     source: str
-    product_name: str | None = None
     rating: float | None = None
     title: str | None = None
     comment: str | None = None
     nickname: str | None = None
     helpful_votes: int | None = None
     not_helpful_votes: int | None = None
-    helpful_score: int | None = None
 
 
 if __name__ == "__main__":

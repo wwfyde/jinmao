@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import FastAPI, Depends, APIRouter
-from sqlalchemy import select, update, and_, func, desc, text, asc
+from sqlalchemy import select, update, and_, func, desc, text, asc, insert
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
@@ -10,13 +10,13 @@ from uvicorn import run
 from jinmao_api.doubao import analyze_reviews, summarize_reviews
 from jinmao_api.schemas import (
     ProductReviewIn,
-    ProductReviewAnalysis,
+    ProductReviewAnalysisValidator,
     ProductReviewAnalysisByMetricsIn,
     ReviewFilter,
 )
 from jinmao_api import log
 from crawler.db import get_db
-from crawler.models import ProductReview, Product
+from crawler.models import ProductReview, Product, ProductReviewAnalysis, ReviewAnalysisExtraMetric
 
 log.setLevel(logging.DEBUG)
 
@@ -67,7 +67,8 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
     log.info(f"分析商品评论[{len(reviews)}]")
 
     # 将 ORM对象转换为字典
-    review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
+    review_dicts = [ProductReviewAnalysisValidator.model_validate(review).model_dump(exclude_unset=True) for review in
+                    reviews]
     log.debug(review_dicts)
     if not reviews:
         return {"analyses": None, "statistics": None}
@@ -77,7 +78,7 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
         Product.product_id == params.product_id,
         Product.source == params.source,
     )
-    product_db = db.execute(stmt).scalars().first()
+    product_db = db.execute(stmt).scalars().one_or_none()
     # 通过redis 设置商品分析结果缓存, 超过7天自动重新分析
     # if isinstance(params.extra_metrics, list):
     #     params.extra_metrics = ", ".join(params.extra_metrics)
@@ -98,10 +99,13 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
                 for result in results:
                     review_id = result.get("review_id")
                     scores: dict = result.get("scores")
+
                     db.execute(
-                        update(ProductReview)
-                        .where(ProductReview.review_id == review_id, ProductReview.source == params.source)
+                        insert(ProductReviewAnalysis)
                         .values(
+                            review_id=review_id,
+                            product_id=params.product_id,
+                            source=params.source,
                             quality=scores.get("quality", {}).get("score"),
                             warmth=scores.get("warmth", {}).get("score"),
                             comfort=scores.get("comfort", {}).get("score"),
@@ -128,7 +132,7 @@ async def review_analysis(params: ProductReviewIn, db: Session = Depends(get_db)
                     review_analyses=results,
                 )
             )
-            affected_rows = db.execute(update_stmt)
+            affected_rows = db.execute(update_stmt).rowcount
             log.debug(f"更新{affected_rows}条记录")
             db.commit()
         else:
@@ -223,14 +227,15 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
     log.info(f"总结商品{params.product_id=}, {params.source=}评论[{len(reviews)}]")
 
     # 将 ORM对象转换为字典
-    review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
+    review_dicts = [ProductReviewAnalysisValidator.model_validate(review).model_dump(exclude_unset=True) for review in
+                    reviews]
     # log.debug(review_dicts)
     if not reviews:
         return {"summary": None}
 
     # 查询商品信息 并检查总结是否存在
     stmt = select(Product).where(Product.product_id == params.product_id, Product.source == params.source)
-    product_db = db.execute(stmt).scalars().first()
+    product_db = db.execute(stmt).scalars().one_or_none()
     if params.date_start or params.date_end:
         params.from_api = True
 
@@ -280,6 +285,9 @@ async def analyze_review_by_metrics(
     # 将指标转换为列表
     if isinstance(params.extra_metrics, str):
         params.extra_metrics = [params.extra_metrics]
+
+    # 将指标键名风格替换为下划线
+    params.extra_metrics = [metric.replace("-", "_").replace(" ", "_") for metric in params.extra_metrics]
     stmt = select(ProductReview).where(
         ProductReview.product_id == params.product_id, ProductReview.source == params.source
     )
@@ -292,14 +300,15 @@ async def analyze_review_by_metrics(
     log.info(f"按指标分析商品评论, 共[{len(reviews)}]条")
 
     # 将 ORM对象转换为字典
-    review_dicts = [ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews]
+    review_dicts = [ProductReviewAnalysisValidator.model_validate(review).model_dump(exclude_unset=True) for review in
+                    reviews]
     log.debug(review_dicts)
 
     if not reviews:
         return {"analyses": None, "statistics": None}
     # 查询商品信息
     stmt = select(Product).where(Product.product_id == params.product_id, Product.source == params.source)
-    product_db = db.execute(stmt).scalars().first()
+    product_db = db.execute(stmt).scalars().one_or_none()
 
     # 获取原有指标
     if params.date_start or params.date_end:
@@ -316,7 +325,7 @@ async def analyze_review_by_metrics(
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
         else:
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
-
+        log.debug(results)
         # 提示词过滤, 仅保留params.extra_extra_metrics中的数据, 去除额外的字段
         new_results = []
         for result in results:
@@ -332,18 +341,40 @@ async def analyze_review_by_metrics(
         # 将分析结果保存到数据库
         if not params.date_start and not params.date_end:
             try:
-                for result in results:
+                for result in new_results:
                     db.execute(
-                        update(ProductReview)
+                        update(ProductReviewAnalysis)
                         .where(
-                            ProductReview.review_id == result.get("review_id"), ProductReview.source == params.source
+                            ProductReviewAnalysis.review_id == result.get("review_id"),
+                            ProductReviewAnalysis.source == params.source
                         )  # 根据评论的唯一标识符更新
                         .values(extra_metrics=result.get("scores"))
                     )
-                db.commit()
+                    db.commit()
+                    extra_metrics_to_insert = []
+                    for name, value in result.get("scores").items():
+                        extra_metrics_to_insert.append(
+                            ReviewAnalysisExtraMetric(
+                                review_id=result.get("review_id"),
+                                product_id=params.product_id,
+                                source=params.source,
+                                name=name,
+                                value=value,
+
+                            )
+                        )
+                    # stmt = insert(ReviewAnalysisExtraMetric).values(
+                    #     review_id=result.get("review_id"),
+                    #     product_id=params.product_id,
+                    #     source=params.source,
+                    #     name='name',
+                    #     value='value',
+                    # )
+                    db.add_all(extra_metrics_to_insert)
+                    db.commit()
             except Exception as exc:
                 db.rollback()
-                log.error(f"更新评论失败{exc}, 撤销")
+                log.error(f"插入额外指标失败{exc}, 撤销")
             log.info("插入索引指标的ProductReview成功")
 
             update_stmt = (
@@ -381,7 +412,7 @@ async def extra_metrics(params: ProductReviewIn, db: Session = Depends(get_db)):
     extra_metrics_db: Product | None = (
         db.execute(select(Product).where(Product.product_id == params.product_id, Product.source == params.source))
         .scalars()
-        .first()
+        .one_or_none()
     )
     if extra_metrics_db:
         return {
@@ -412,6 +443,8 @@ async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Ses
     # if isinstance(params.extra_metrics, str):
     #     params.extra_metrics = [params.extra_metrics]
     log.info(f"用户传入的指标: {params.extra_metrics}")
+    params.extra_metrics = [metric.replace("-", "_").replace(" ", "_") for metric in params.extra_metrics]
+
     if not params.extra_metrics:
         update_stmt = (
             update(Product)
@@ -439,12 +472,12 @@ async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Ses
 
 @router.post("/product/review/metrics_filter", summary="评论指标过滤")
 async def review_metrics_filter(params: ReviewFilter, db: Session = Depends(get_db)):
-    metric_field = getattr(ProductReview, params.metric)
+    metric_field = getattr(ProductReviewAnalysis, params.metric)
     log.debug(metric_field)
-    stmt = select(ProductReview).where(
+    stmt = select(ProductReviewAnalysis).where(
         and_(
-            ProductReview.product_id == params.product_id,
-            ProductReview.source == params.source,
+            ProductReviewAnalysis.product_id == params.product_id,
+            ProductReviewAnalysis.source == params.source,
             metric_field >= params.threshold,
         )
     )
@@ -455,7 +488,7 @@ async def review_metrics_filter(params: ReviewFilter, db: Session = Depends(get_
         stmt = stmt.order_by(order)
 
     total_count = db.execute(
-        select(func.count(ProductReview.id)).select_from(ProductReview).where(stmt.whereclause)
+        select(func.count(ProductReviewAnalysis.id)).select_from(ProductReviewAnalysis).where(stmt.whereclause)
     ).scalar()
     total_pages = (total_count + params.page_size - 1) // params.page_size
     stmt = stmt.limit(params.page_size).offset((params.page - 1) * params.page_size)

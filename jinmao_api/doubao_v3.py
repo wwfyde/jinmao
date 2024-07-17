@@ -10,7 +10,7 @@ from openai import AsyncOpenAI
 from sqlalchemy import select, ColumnElement
 from sqlalchemy.orm import Session
 
-from jinmao_api.schemas import ProductReviewAnalysis, ReviewAnalysisMetrics, ProductReviewSchema
+from jinmao_api.schemas import ProductReviewAnalysisValidator, ReviewAnalysisMetrics, ProductReviewSchema
 from jinmao_api import log
 from crawler.config import settings
 from crawler.db import engine
@@ -43,9 +43,9 @@ settings.ark_prompt = """用途：作为电子商务和情感分析专家，全�
 
 
 async def analyze_single_comment(
-    review: ProductReviewSchema,
-    semaphore: asyncio.Semaphore,
-    extra_metrics: str | None = None,
+        review: ProductReviewSchema,
+        semaphore: asyncio.Semaphore,
+        extra_metrics: str | None = None,
 ) -> dict | None:
     """
     单一评论分析
@@ -284,7 +284,7 @@ async def main():
         reviews = session.execute(stmt).scalars().all()
         # 将查询结果中的每个评论对象转换为字典格式，方便后续处理
         review_dicts = [
-            ProductReviewAnalysis.model_validate(review).model_dump(exclude_unset=True) for review in reviews
+            ProductReviewAnalysisValidator.model_validate(review).model_dump(exclude_unset=True) for review in reviews
         ]
         log.debug(f"当前商品{product_id=}, 共有{len(review_dicts)}条")
 
