@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal
 
 from sqlalchemy import String, Integer, JSON, func, Boolean, BigInteger, Numeric, Text, Index, TIMESTAMP, \
-    ForeignKey
+    ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -15,6 +15,7 @@ class Product(Base):
     __table_args__ = (
         Index("ix_source_product_id", "source", "product_id"),
         # Index("ix_source_product_id_sku_id", "source", "product_id", "sku_id"),  # 组合索引
+        UniqueConstraint("product_id", "source", name="uq_product_id_source"),
         {"comment": "商品"},
     )
 
@@ -160,6 +161,7 @@ class ProductDetail(Base):
     __tablename__ = "product_detail"
     __table_args__ = (
         Index("ix_source_product_id", "source", "product_id"),
+        UniqueConstraint("product_id", "source", name="uq_product_id_source"),
         {"comment": "商品"},
     )
     id: Mapped[int] = mapped_column(ForeignKey('product.id'), primary_key=True, comment="内部ID")
@@ -201,6 +203,7 @@ class ProductSKU(Base):
     __table_args__ = (
         Index("ix_source_sku_id", "source", "sku_id", mysql_using="hash"),
         Index("ix_source_product_id", "source", "product_id", mysql_using="hash"),
+        UniqueConstraint("product_id", "sku_id", "source", name="uq_product_id_sku_id_source"),
         {"comment": "商品SKU"},
     )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="内部ID")
@@ -305,6 +308,8 @@ class ProductSKUDetail(Base):
     __tablename__ = "product_sku_detail"
     __table_args__ = (
         Index("ix_source_sku_id", "source", "sku_id"),
+        UniqueConstraint("product_id", "sku_id", "source", name="uq_product_id_sku_id_source"),
+
         {"comment": "商品SKU详情"},
     )
     id: Mapped[int] = mapped_column(ForeignKey('product_sku.id'), primary_key=True, comment="内部ID")
@@ -321,6 +326,7 @@ class ProductReview(Base):
     __tablename__ = "product_review"
     __table_args__ = (
         Index("ix_source_product_id", "source", "product_id", mysql_using="hash"),
+        UniqueConstraint("review_id", "source", name="uq_review_id_source"),
         {"comment": "商品评论"},
     )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
