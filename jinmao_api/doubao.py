@@ -108,7 +108,7 @@ async def analyze_single_comment(
 
 
 # 汇总评论summarize分析结果
-async def summarize_reviews(reviews: list) -> str:
+async def summarize_reviews(reviews: list) -> dict:
     """
     使用空格将所有分析结果中的评分信息连接成一个长字符串
     combined_analyses = " ".join([str(analysis["scores"]) for analysis in reviews])
@@ -159,6 +159,15 @@ async def summarize_reviews(reviews: list) -> str:
     summary_result = response.choices[0].message.content.strip()
     end_time = loop.time()
     log.info(f"评论总结耗时: Task took {end_time - start_time:.2f} seconds")
+    try:
+        summary_result = json.loads(summary_result)
+    except Exception as e:
+        log.warning(f"解析LLM结果失败, 错误提示: {e}")
+        summary_result = {
+            "zh": "评论总结失败, 请重试",
+            "en": "Summary generation failed, please try again",
+        }
+
     return summary_result
 
 

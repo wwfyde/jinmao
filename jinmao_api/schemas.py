@@ -3,6 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, ConfigDict, field_serializer, model_validator
 
+from jinmao_api.utils import generate_version_string
+
 
 class ReviewMetric(BaseModel):
     en: str | None = Field(None, description="英文名")
@@ -76,6 +78,7 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
     lang: Literal["zh", "en"] = Field("en", description="语言")
     date_start: datetime | None = Field(None, description="时间范围起始")
     date_end: datetime | None = Field(None, description="时间范围截止")
+    version_id: str | None = Field(default_factory=generate_version_string, description="版本号")
     from_api: bool | None = Field(False, description="是否从api分析")  # 是否走API
     llm: Literal["ark", "claude", "azure", "bedrock", "openai"] | None = Field("ark", description="LLM模型")
     extra_metrics: list[str] | str = Field(..., description="需要分析的指标")
@@ -85,11 +88,12 @@ class ProductReviewAnalysisByMetricsIn(BaseModel):
             "example": {
                 "product_id": "728681",
                 "source": "gap",
-                "date_start": "2023-01-09",
-                "date_end": "2024-07-10",
+                # "date_start": "2023-01-09",
+                # "date_end": "2024-07-10",
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",
+                "version_id": "0",
                 "extra_metrics": ["cost_effectiveness", "实用性"],
             }
         },
@@ -215,7 +219,7 @@ class ProductExtraMetric(BaseModel):
             "example": {
                 "product_id": "728681",
                 "source": "gap",
-                "metric": ["实用性", "cost-effectiveness"],
+                "metric": ["实用性", "cost_effectiveness"],
             }
         }
     )
@@ -269,3 +273,6 @@ class ProductReviewAnalysisValidator(
 if __name__ == "__main__":
     metrics = ReviewAnalysisMetrics(c="9.9", quality="7.2").model_dump()
     print(metrics)
+    metrics_in = ProductReviewAnalysisByMetricsIn(product_id="728681", source="gap",
+                                                  extra_metrics=["cost_effectiveness"])
+    print(metrics_in)

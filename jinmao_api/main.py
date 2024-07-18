@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import FastAPI, Depends, APIRouter
-from sqlalchemy import select, update, and_, func, desc, text, asc, insert
+from sqlalchemy import select, update, and_, func, desc, text, asc, insert, delete
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
@@ -160,11 +160,11 @@ def metrics_statistics(reviews: list[dict], threshold: float | int | None = None
         # log.info(f"{item=}")
         for key, value in item.get("scores", {}).items():
             score = float(value.get("score", 0))
-            cn = value.get("cn", key)
+            zh = value.get("zh", key)
             en = value.get("en", key)
             if float(value.get("score")) >= (threshold or 5.0):
                 if key not in metrics_counts:
-                    metrics_counts[key] = dict(count=0, total_score=0, cn=cn, en=en)
+                    metrics_counts[key] = dict(count=0, total_score=0, zh=zh, en=en)
 
                 metrics_counts[key]["count"] += 1
                 metrics_counts[key]["total_score"] += score
@@ -253,7 +253,8 @@ async def review_summary(params: ProductReviewIn, db: Session = Depends(get_db))
                     review_summary=result,
                 )
             )
-            affected_rows = db.execute(update_stmt)
+            affected_rows = db.execute(update_stmt).rowcount
+            log.debug(f"更新{affected_rows}条记录")
             db.commit()
             # product_db.review_summary = result
             # db.add(product_db)
@@ -326,6 +327,7 @@ async def analyze_review_by_metrics(
         else:
             results = await analyze_reviews(review_dicts, extra_metrics=params.extra_metrics)
         log.debug(results)
+
         # 提示词过滤, 仅保留params.extra_extra_metrics中的数据, 去除额外的字段
         new_results = []
         for result in results:
@@ -337,10 +339,10 @@ async def analyze_review_by_metrics(
         log.debug(new_results)
 
         # 获取评论统计数据
-        metrics_counts = extra_metrics_statistics(results, threshold=params.threshold) if results else {}
+        metrics_counts = extra_metrics_statistics(new_results, threshold=params.threshold) if results else {}
         # 将分析结果保存到数据库
         if not params.date_start and not params.date_end:
-            try:
+            with db.begin_nested():
                 for result in new_results:
                     db.execute(
                         update(ProductReviewAnalysis)
@@ -348,52 +350,57 @@ async def analyze_review_by_metrics(
                             ProductReviewAnalysis.review_id == result.get("review_id"),
                             ProductReviewAnalysis.source == params.source
                         )  # 根据评论的唯一标识符更新
-                        .values(extra_metrics=result.get("scores"))
+                        .values(extra_metrics=result.get("scores"), version_id=params.version_id)
                     )
-                    db.commit()
-                    extra_metrics_to_insert = []
                     for name, value in result.get("scores").items():
-                        extra_metrics_to_insert.append(
-                            ReviewAnalysisExtraMetric(
+                        # 查询是否存在, 不存在则插入
+                        stmt = select(ReviewAnalysisExtraMetric).where(
+                            ReviewAnalysisExtraMetric.review_id == result.get("review_id"),
+                            ReviewAnalysisExtraMetric.source == params.source,
+                            ReviewAnalysisExtraMetric.version_id == params.version_id,
+                            ReviewAnalysisExtraMetric.name == name,
+                        )
+                        metric_name_result = db.execute(stmt).scalars().one_or_none()
+                        if metric_name_result:
+                            # update
+                            db.execute(
+                                update(ReviewAnalysisExtraMetric).where(stmt.whereclause).values(
+                                    value=value,
+
+                                )
+                            )
+                            log.debug("更新额外指标成功")
+
+                        else:
+                            # insert
+                            stmt = insert(ReviewAnalysisExtraMetric).values(
                                 review_id=result.get("review_id"),
                                 product_id=params.product_id,
                                 source=params.source,
+                                version_id=params.version_id,
                                 name=name,
                                 value=value,
-
                             )
-                        )
-                    # stmt = insert(ReviewAnalysisExtraMetric).values(
-                    #     review_id=result.get("review_id"),
-                    #     product_id=params.product_id,
-                    #     source=params.source,
-                    #     name='name',
-                    #     value='value',
-                    # )
-                    db.add_all(extra_metrics_to_insert)
-                    db.commit()
-            except Exception as exc:
-                db.rollback()
-                log.error(f"插入额外指标失败{exc}, 撤销")
+                            db.execute(stmt)
+                            log.debug("插入额外指标成功")
+
             log.info("插入索引指标的ProductReview成功")
 
+            # 将额外指标分析结果保存到数据库
             update_stmt = (
                 update(Product)
                 .where(Product.product_id == params.product_id, Product.source == params.source)
                 .values(
                     extra_review_statistics=metrics_counts,
-                    extra_review_analyses=results,
+                    extra_review_analyses=new_results,
                     extra_metrics=params.extra_metrics,
+                    current_version=params.version_id,
                 )
             )
-            affected_rows = db.execute(update_stmt)
+            affected_rows = db.execute(update_stmt).rowcount
             db.commit()
-            # product_db_new = db.execute(stmt).scalars().first()
-            # product_db_new.extra_review_statistics = metrics_counts
-            # product_db_new.extra_review_analyses = results
-            # product_db_new.extra_metrics = params.extra_metrics
-            # db.add(product_db_new)
-            # db.commit()
+            log.debug(f"更新{affected_rows}条记录")
+
         else:
             log.info("当前使用了日期过滤, 将不会保存结果")
         log.info(f"接口执行完毕{metrics_counts}")
@@ -445,6 +452,7 @@ async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Ses
     log.info(f"用户传入的指标: {params.extra_metrics}")
     params.extra_metrics = [metric.replace("-", "_").replace(" ", "_").lower() for metric in params.extra_metrics]
 
+    # 删除所有额外指标
     if not params.extra_metrics:
         update_stmt = (
             update(Product)
@@ -455,19 +463,69 @@ async def update_extra_metrics(params: ProductReviewAnalysisByMetricsIn, db: Ses
                 extra_metrics=None,
             )
         )
-        affected_rows = db.execute(update_stmt)
-        db.commit()
-        log.info("所有额外指标成功")
-        return True
-    else:
-        log.info("指标没变化")
+        affected_rows = db.execute(update_stmt).rowcount
 
-    # 总是走API重新分析一遍
-    params.from_api = True
-    try:
-        return await analyze_review_by_metrics(params, db)
-    except Exception as exc:
-        log.error(f"更新额外指标失败{exc}")
+        # 删除额外指标
+        delete_stmt = delete(ReviewAnalysisExtraMetric).where(
+            ReviewAnalysisExtraMetric.product_id == params.product_id,
+            ReviewAnalysisExtraMetric.source == params.source,
+            ReviewAnalysisExtraMetric.version_id == params.version_id,
+
+        )
+        db.execute(delete_stmt)
+        log.debug(f"更新{affected_rows}条记录")
+        db.commit()
+        log.info("删除所有额外指标成功")
+        return {"analyses": None, "statistics": None}
+    else:
+        log.info("不分删除")
+
+    # 部分指标删除 逻辑优化, 仅删除指定的指标
+
+    # 获取已有指标
+    product_db: Product = db.execute(select(Product).where(Product.product_id == params.product_id,
+                                                           Product.source == params.source)).scalars().one()
+    last_metrics = product_db.extra_metrics
+    log.debug(f"上次指标: {last_metrics}")
+    # 需要删除的指标
+    to_delete_metrics = list(set(last_metrics) - set(params.extra_metrics))
+    if not to_delete_metrics:
+        log.info("没有需要删除的指标")
+        return {"analyses": None, "statistics": product_db.extra_review_statistics}
+    log.debug(f"待删除指标: {to_delete_metrics}")
+    delete_stmt = delete(ReviewAnalysisExtraMetric).where(
+        ReviewAnalysisExtraMetric.product_id == params.product_id,
+        ReviewAnalysisExtraMetric.source == params.source,
+        ReviewAnalysisExtraMetric.version_id == params.version_id,
+        ReviewAnalysisExtraMetric.name.in_(to_delete_metrics),
+    )
+    db.execute(delete_stmt)
+
+    # 操作product数据库
+    # 过滤
+    last_extra_review_statistics: dict = product_db.extra_review_statistics
+    last_extra_review_analyses: list = product_db.extra_review_analyses
+    new_extra_review_analyses = []
+    for metric in to_delete_metrics:
+        last_extra_review_statistics.pop(metric, None)
+        for analysis in last_extra_review_analyses:
+            analysis.get("scores", {}).pop(metric, None)
+            new_extra_review_analyses.append(analysis)
+
+    update_stmt = (
+        update(Product)
+        .where(Product.product_id == params.product_id, Product.source == params.source)
+        .values(
+            extra_review_statistics=last_extra_review_statistics,
+            extra_review_analyses=new_extra_review_analyses,
+            extra_metrics=params.extra_metrics,
+            current_version=params.version_id,
+        )
+    )
+    affected_rows = db.execute(update_stmt).rowcount
+    db.commit()
+    log.debug(f"更新{affected_rows}条记录")
+    return {"analyses": None, "statistics": last_extra_review_statistics}
 
 
 @router.post("/product/review/metrics_filter", summary="评论指标过滤")

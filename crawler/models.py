@@ -100,6 +100,9 @@ class Product(Base):
         onupdate=func.now(),
         comment="更新时间",
     )
+    # skus = relationship("ProductSKU",
+    #                     primaryjoin="Product.product_id == ProductSKU.product_id and Product.source == ProductSKU.source",
+    #                     back_populates="product")
 
 
 class ProductTranslation(Base):
@@ -280,6 +283,9 @@ class ProductSKU(Base):
         nullable=True,
         comment="更新时间",
     )
+    # product: Mapped[list["Product"]] = relationship("Product",
+    #                                                 primaryjoin="ProductSKU.product_id == Product.product_id and ProductSKU.source == Product.source",
+    #                                                 back_populates="skus")
 
 
 class ProductSKUTranslation(Base):
@@ -473,7 +479,9 @@ class ReviewAnalysisExtraMetric(Base):
     __tablename__ = "review_analysis_extra_metric"
     __table_args__ = (
         Index("ix_source_review_id", "source", "review_id"),
+        # Index("ix_source_product_id_version_id", "source", "product_id", "version_id"),
         Index("ix_source_review_id_version_id", "source", "review_id", "version_id"),
+        Index("ix_source_review_id_version_id_name", "source", "review_id", "version_id", "name"),
         {"comment": "商品评论额外指标, 支持版本管理"}
     )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True, comment="ID")
