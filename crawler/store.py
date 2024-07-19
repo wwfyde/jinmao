@@ -1,3 +1,4 @@
+import asyncio
 import time
 from datetime import datetime
 from typing import TypeVar, Type
@@ -9,14 +10,14 @@ from sqlalchemy.orm import DeclarativeBase, Session
 
 from crawler import log
 from crawler.db import engine, async_engine
-from crawler.models import ProductReview, ProductSKU, Product
+from crawler.models import ProductReview, ProductSKU, Product, ProductDetail
 
 T = TypeVar("T", bound=DeclarativeBase)
 
 
 def field_filter(model: Type[T], data: dict | list[dict]) -> list[dict]:
     """
-    过滤字段
+    过滤字段, 仅当字段存在于表中才会保存
     """
     if isinstance(data, dict):
         data = [data]
@@ -105,9 +106,11 @@ def save_sku_data(data: dict | list[dict]) -> list | None:
         for item in data:
             sku_id = item.get("sku_id")
             source = item.get("source")
+            product_id = item.get("product_id")
 
             sku = (
-                session.execute(select(ProductSKU).filter(ProductSKU.sku_id == sku_id, ProductSKU.source == source))
+                session.execute(select(ProductSKU).filter(ProductSKU.sku_id == sku_id, ProductSKU.source == source,
+                                                          ProductSKU.product_id == product_id))
                 .scalars()
                 .one_or_none()
             )
@@ -150,28 +153,16 @@ def save_product_data(data: dict | list[dict]):
         for item in data:
             product_id = item.get("product_id")
             source = item.get("source")
-            sku_id = item.get("sku_id")
-            if sku_id:
-                product = (
-                    session.execute(
-                        select(Product).filter(
-                            Product.product_id == product_id, Product.source == source, Product.sku_id == sku_id
-                        )
+            product = (
+                session.execute(
+                    select(Product).filter(
+                        Product.product_id == product_id,
+                        Product.source == source,
                     )
-                    .scalars()
-                    .one_or_none()
                 )
-            else:
-                product = (
-                    session.execute(
-                        select(Product).filter(
-                            Product.product_id == product_id,
-                            Product.source == source,
-                        )
-                    )
-                    .scalars()
-                    .one_or_none()
-                )
+                .scalars()
+                .one_or_none()
+            )
             if product:
                 for key, value in item.items():
                     setattr(product, key, value)
@@ -195,7 +186,75 @@ def save_product_data(data: dict | list[dict]):
                         f"插入商品[product]数据成功, id={product.id}, product_id={product.product_id}, source={product.source}"
                     )
         end_time = time.time()  # 结束计时
-        log.debug(f"保存商品[product]数据完成，耗时 {end_time - start_time:.2f} 秒")
+        log.debug(f"保存商品[product]数据: {product_id=}, {source=}，耗时 {end_time - start_time:.2f} 秒")
+        return inserted_ids if inserted_ids else None
+
+
+def save_product_detail_data(data: dict | list[dict]):
+    """
+    保存数据为json 和数据库
+    """
+    start_time = time.time()
+    if isinstance(data, dict):
+        data = [data]
+    data: list = field_filter(ProductDetail, data)
+    inserted_ids = []
+    with Session(engine) as session:
+        for item in data:
+            product_id = item.get("product_id")
+            source = item.get("source")
+
+            # 获取外键Product.id
+            result = session.execute(
+                select(Product.id).filter(
+                    Product.product_id == product_id,
+                    Product.source == source,
+                )
+            )
+            product_inner_id = result.scalar_one_or_none()
+
+            if not product_inner_id:
+                log.error(f"未找到对应的Product, product_id={product_id}, source={source}")
+                continue
+
+            # 将数据的id 
+            item["id"] = product_inner_id
+
+            product_detail = (
+                session.execute(
+                    select(ProductDetail).filter(
+                        ProductDetail.product_id == product_id,
+                        ProductDetail.source == source,
+                    )
+                )
+                .scalars()
+                .one_or_none()
+            )
+            if product_detail:
+                for key, value in item.items():
+                    setattr(product_detail, key, value)
+                session.add(product_detail)
+                session.commit()
+                session.refresh(product_detail)
+                inserted_ids.append(product_detail.id)
+                log.debug(
+                    f"更新商品详情[product_detail]数据成功, id={product_detail.id}, product_id={product_detail.product_id}, source={product_detail.source}"
+                )
+            else:
+                log.info(f"insert product_detail data: {item}")
+                stmt = insert(ProductDetail).values(item)
+                result = session.execute(stmt)
+                session.commit()
+                insert_id = result.inserted_primary_key[0] if result.inserted_primary_key else None
+                if insert_id:
+                    inserted_ids.append(insert_id)
+                    product_detail = session.execute(
+                        select(ProductDetail).filter(ProductDetail.id == insert_id)).scalars().one_or_none()
+                    log.debug(
+                        f"插入商品详情[product_detail]数据成功, id={product_detail.id}, product_id={product_detail.product_id}, source={product_detail.source}"
+                    )
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存商品详情[product_detail]数据: {product_id=}, {source=}，耗时 {end_time - start_time:.2f} 秒")
         return inserted_ids if inserted_ids else None
 
 
@@ -327,6 +386,168 @@ async def save_review_data_async(data: dict | list[dict]):
         return inserted_ids if inserted_ids else None
 
 
+async def save_product_data_async(data: dict | list[dict]) -> str | None:
+    """
+    保存数据为json 和数据库
+    """
+    start_time = time.time()
+    if isinstance(data, dict):
+        data = [data]
+    data: list = field_filter(Product, data)
+    inserted_ids = []
+    async with AsyncSession(async_engine) as session:
+        for item in data:
+            product_id = item.get("product_id")
+            source = item.get("source")
+
+            result = await session.execute(
+                select(Product).filter(
+                    Product.product_id == product_id,
+                    Product.source == source,
+                )
+            )
+            product = result.scalars().one_or_none()
+
+            if product:
+                for key, value in item.items():
+                    setattr(product, key, value)
+                session.add(product)
+                await session.commit()
+                await session.refresh(product)
+                inserted_ids.append(product.id)
+                log.debug(
+                    f"更新商品[product]数据成功, id={product.id}, product_id={product.product_id}, source={product.source}"
+                )
+            else:
+                log.info(f"insert product data: {item}")
+                stmt = insert(Product).values(item)
+                result = await session.execute(stmt)
+                await session.commit()
+                insert_id = result.inserted_primary_key[0] if result.inserted_primary_key else None
+                if insert_id:
+                    inserted_ids.append(insert_id)
+                    result = await session.execute(select(Product).filter(Product.id == insert_id))
+                    product = result.scalars().one_or_none()
+                    log.debug(
+                        f"插入商品[product]数据成功, id={product.id}, product_id={product.product_id}, source={product.source}"
+                    )
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存商品[product]数据: {product_id=}, {source=},耗时 {end_time - start_time:.2f} 秒")
+        return inserted_ids if inserted_ids else None
+
+
+async def save_sku_data_async(data: dict | list[dict]) -> list | None:
+    """
+    保存数据为json 和数据库
+    """
+    start_time = time.time()
+    if isinstance(data, dict):
+        data = [data]
+    data: list = field_filter(ProductSKU, data)
+    inserted_ids = []
+    async with AsyncSession(async_engine) as session:
+        for item in data:
+            sku_id = item.get("sku_id")
+            source = item.get("source")
+            product_id = item.get("product_id")
+
+            result = await session.execute(
+                select(ProductSKU).filter(ProductSKU.sku_id == sku_id, ProductSKU.source == source,
+                                          ProductSKU.product_id == product_id))
+            sku = result.scalars().one_or_none()
+            if sku:
+                for key, value in item.items():
+                    setattr(sku, key, value)
+                session.add(sku)
+                await session.commit()
+                await session.refresh(sku)
+                log.debug(
+                    f"更新子款[SKU] 数据成功, id={sku.id}, sku_id={sku.sku_id}, product_id={sku.product_id}, source={sku.source}"
+                )
+                inserted_ids.append(sku.id)
+            else:
+                stmt = insert(ProductSKU).values(item)
+                result = await session.execute(stmt)
+                await session.commit()
+                insert_id = result.inserted_primary_key[0] if result.inserted_primary_key else None
+                if insert_id:
+                    inserted_ids.append(insert_id)
+                    result = await session.execute(select(ProductSKU).filter(ProductSKU.id == insert_id))
+                    sku = result.scalars().one_or_none()
+                    log.debug(
+                        f"插入子款[SKU] 数据成功, id={sku.id}, sku_id={sku.sku_id}, product_id={sku.product_id}, source={sku.source}"
+                    )
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存子款[sku]数据完成，耗时 {end_time - start_time:.2f} 秒")
+        return inserted_ids if inserted_ids else None
+
+
+async def save_product_detail_data_async(data: dict | list[dict]) -> str | None:
+    """
+    保存数据为json 和数据库
+    """
+    start_time = time.time()
+    if isinstance(data, dict):
+        data = [data]
+    data: list = field_filter(ProductDetail, data)
+    inserted_ids = []
+    async with AsyncSession(async_engine) as session:
+        for item in data:
+            product_id = item.get("product_id")
+            source = item.get("source")
+
+            # 获取外键Product.id
+            result = await session.execute(
+                select(Product.id).filter(
+                    Product.product_id == product_id,
+                    Product.source == source,
+                )
+            )
+            product = result.scalar_one_or_none()
+
+            if not product:
+                log.error(f"未找到对应的Product, product_id={product_id}, source={source}")
+                continue
+
+            # 将商品的内部id 
+            item["id"] = product
+
+            result = await session.execute(
+                select(ProductDetail).filter(
+                    ProductDetail.product_id == product_id,
+                    ProductDetail.source == source,
+                )
+            )
+            product_detail = result.scalars().one_or_none()
+
+            if product_detail:
+                for key, value in item.items():
+                    setattr(product_detail, key, value)
+                session.add(product_detail)
+                await session.commit()
+                await session.refresh(product_detail)
+                inserted_ids.append(product_detail.id)
+                log.debug(
+                    f"更新商品详情[product_detail]数据成功, id={product_detail.id}, product_id={product_detail.product_id}, source={product_detail.source}"
+                )
+            else:
+                log.info(f"insert product_detail data: {item}")
+                stmt = insert(ProductDetail).values(item)
+                result = await session.execute(stmt)
+                await session.commit()
+                insert_id = result.inserted_primary_key[0] if result.inserted_primary_key else None
+                if insert_id:
+                    inserted_ids.append(insert_id)
+                    result = await session.execute(select(ProductDetail).filter(ProductDetail.id == insert_id))
+                    product_detail = result.scalars().one_or_none()
+                    log.debug(
+                        f"插入商品详情[product_detail]数据成功, id={product_detail.id}, product_id={product_detail.product_id}, source={product_detail.source}"
+                    )
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存商品详情[product_detail]数据: {product_id=}, {source=},耗时 {end_time - start_time:.2f} 秒")
+        return inserted_ids if inserted_ids else None
+
+
 if __name__ == "__main__":
     log.debug("test")
     log.error("error")
@@ -340,19 +561,49 @@ if __name__ == "__main__":
     datetime_obj = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S")
     print(datetime_obj)
 
-    print(
-        "已插入数据: ",
-        save_product_data(
+
+    async def run():
+        # result = await save_sku_data_async(
+        #     {
+        #         "product_id": 9999991,
+        #         "sku_id": 5,
+        #         "product_name": "test3",
+        #         "source": "other",
+        #         "released_at": time_string,
+        #         "color": "你好",
+        #         "attributes": {"test": 12},
+        #     }
+        # ),
+        result = await save_product_data_async(
             {
                 "product_id": 9999991,
                 "sku_id": 5,
                 "product_name": "test3",
                 "source": "other",
                 "released_at": time_string,
+                "color": "你好",
                 "attributes": {"test": 12},
             }
         ),
-    )
+        result2 = await save_product_detail_data_async(
+            {
+                "product_id": 9999991,
+                "sku_id": 5,
+                "product_name": "test3",
+                "source": "other",
+                "fit": "44",
+                "softness": "44",
+                "released_at": time_string,
+                "color": "你好",
+                "attributes": {"test": 12},
+            }
+        ),
+        log.debug(result)
+        return result, result2
+
+
+    result = asyncio.run(run())
+    print(result)
 
     # print(
     #     "已插入数据: ",

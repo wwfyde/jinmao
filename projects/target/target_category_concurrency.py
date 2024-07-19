@@ -1,6 +1,8 @@
 import asyncio
+import os
 import random
 import re
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from mimetypes import guess_extension
 from pathlib import Path
@@ -28,7 +30,7 @@ PLAYWRIGHT_CONCURRENCY = 9
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
 PLAYWRIGHT_HEADLESS: bool = True
 
-settings.save_login_state = True
+settings.save_login_state = False
 # TODO  设置是否下载图片
 should_download_image = False
 should_get_review = True
@@ -42,7 +44,7 @@ if not should_download_image:
 ua = UserAgent(browsers=["edge", "chrome"], platforms=["pc"], os=["windows"])
 
 
-async def run(playwright: Playwright) -> None:
+async def run(playwright: Playwright, url_info: tuple) -> None:
     # 从playwright对象中获取chromium浏览器
     chromium = playwright.chromium
     # 指定代理
@@ -88,290 +90,142 @@ async def run(playwright: Playwright) -> None:
 
     # 打开新的页面
     # 主类别, 子类别, 颜色, 尺码, url
-    urls = [
-
-        ("furniture", "beds", "default", "default",
-         "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22"),
-        # ("women", "maternity", "default", "default",
-        #  "https://www.target.com/c/maternity-clothing-women/-/N-5ouvi"),  # 
-        # ("women", "graphic-tees", "default", "batch1",
-        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ4u9pjZqama8Z4u9goZ5xeljZcv1blcqhq3mZ5y70kZfo87bqov5agZrg0dh?type=products&moveTo=product-list-grid"),
-        # ("women", "graphic-tees", "default", "batch2",
-        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ5xeljZvef8a?type=products&moveTo=product-list-grid"),
-        # ("women", "graphic-tees", "default", "batch3",
-        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZcv1blcs3gscZvef8a?type=products&moveTo=product-list-grid"),
-        # ("women", "graphic-tees", "default", "batch4",
-        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ4u9ldZ5y24gZ5y1h6Z5y2kw?type=products&moveTo=product-list-grid"),
-        # ("women", "graphic-tees", "pop-culture", "black",
-        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZvef8aZcv1blczeafkZ5y761?type=products&moveTo=product-list-grid"),
-        # ("women", "graphic-tees", "pop-culture", "gray",
-        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZvef8aZcv1blczeafkZ5y759?type=products&moveTo=product-list-grid"),
-
-        # 
-        # ("women", "jumpsuits-rompers", "default", "default",
-        #  "https://www.target.com/c/jumpsuits-rompers-women-s-clothing/-/N-4y52e"),  # 抓取完成
-
-        # ("women","socks-hosiery","default","default","https://www.target.com/c/socks-hosiery-women-s-clothing/-/N-5xtbdZ600jqZgfdyb?moveTo=product-list-grid"),  # win
-        # ("women","socks-hosiery","default","extra", "https://www.target.com/c/socks-hosiery-women-s-clothing/-/N-5xtbdZq8ldyZ1ktcxZ68721?moveTo=product-list-grid"),  # win
-
-        # (
-        #     "women",
-        #     "intimates",
-        #     "default",
-        #     "default",
-        #     "https://www.target.com/c/intimates-women-s-clothing/-/N-5xtcfZ5y34t",
-        # ),  # 已完成
-
-        # (
-        #     "women",
-        #     "t-shirts",
-        #     "black",
-        #     "M",
-        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y761?moveTo=product-list-grid",
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "t-shirts",
-        #     "batch1",
-        #     "M",
-        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y6q6Z5y746Z5y70hZ5y67t?moveTo=product-list-grid"
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "t-shirts",
-        #     "batch2",
-        #     "M",
-        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y73rZ5xr7iZ5y759?moveTo=product-list-grid"
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "t-shirts",
-        #     "batch3",
-        #     "M",
-        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ55iviZ5xrh3Z5y76nZ5y6hb?moveTo=product-list-grid"
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "t-shirts",
-        #     "batch4",
-        #     "M",
-        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ55iviZ5xrh3Z5y76nZ5y6hb?moveTo=product-list-grid"
-        # ),  # 完成(
-        # (
-        #     "women",
-        #     "t-shirts",
-        #     "batch5",
-        #     "M",
-        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y76dZ5y713Z5y750Z5y72c?moveTo=product-list-grid"
-        # ),  # 完成
-
-        # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),  # 完成
-        # (
-        #     "women",
-        #     "pajama-sets",
-        #     "default",
-        #     "default",
-        #     "https://www.target.com/c/pajama-sets-pajamas-loungewear-women-s-clothing/-/N-5xtbz",
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "pajama-tops",
-        #     "default",
-        #     "default",
-        #     "https://www.target.com/c/pajama-tops-pajamas-loungewear-women-s-clothing/-/N-5xtby",
-        # ),  # 抓取中 采用三级类别
-        # (
-        #     "women",
-        #     "pajama-bottoms",
-        #     "default",
-        #     "default",
-        #     "https://www.target.com/c/pajama-bottoms-pajamas-loungewear-women-s-clothing/-/N-5xtc2",
-        # ),  # 抓取中 采用三级类别
-        # (
-        #     "women",
-        #     "coats-jackets",
-        #     "default",
-        #     "default",
-        #     "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZ66rho?moveTo=product-list-grid",
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "coats-jackets",
-        #     "default",
-        #     "extra",
-        #     "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZech2s2krbvfZech2s25o21uZech2s2c5qdaZech2s25tn8bZech2s2bgfyq?moveTo=product-list-grid",
-        # ),  # win
-        # (
-        #     "women",
-        #     "bottoms",
-        #     "black",
-        #     "M",
-        #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZ5y761Zvef8a",
-        # ),  # 完成
-        # (
-        #     "women",
-        #     "bottoms",
-        #     "multi",
-        #     "M",
-        #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZvef8aZ5y6q6Z5y70hZ5y746Z5y67tZ5y759Z5y73rZ5xr7iZ5xrh3Z55iviZ5y76nZ5y6hbZ5y76dZ5y713Z5y750Z5y72c?moveTo=product-list-grid",
-        # ),  # 完成
-
-        # (
-        #     "women",
-        #     "activewear",
-        #     "default",
-        #     "default",
-        #     "https://www.target.com/c/activewear-women-s-clothing/-/N-5xtcl",
-        # ),  # win 抓取完毕
-        # (
-        #     "women",
-        #     "swimsuits",
-        #     "black",
-        #     "M",
-        #     "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
-        # ),  # 抓取完毕
-        # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
-        # ("women", "jeans", "default", "default", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8",),  # 已完成
-        # noqa # 已完成
-        # ("women", "shorts", "black", "M",
-        #  "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
-    ]
 
     # 迭代类别urls
-    for index, (primary_category, sub_category, color, size, base_url) in enumerate(urls):
-        log.info(f"正在抓取{primary_category=}, {sub_category=}")
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-        key = f"product_status:{source}:{primary_category}:{sub_category}:{color}:{size}"
-        async with r:
-            status = await r.get(key)
-            if status == "done":
-                log.warning(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品索引已建立")
-                product_urls = await r.smembers(f"{source}:{primary_category}:{sub_category}:{color}")
-                log.info("商品索引已建立,从索引获取商品")
-                log.info(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品数量: {len(product_urls)}")
-            else:
-                agent = False
-                # user_agent = ua.random
-                # context = await browser.new_context(user_agent=user_agent)
-                # context = await browser.new_context()
-                # log.info(f"当前UserAgent: {user_agent}")
-                page = await context.new_page()
-                async with page:
-                    # 拦截所有图片
-                    # await page.route(
-                    #     "**/*",
-                    #     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-                    # )
-                    product_urls: list[str] = []
-                    product_status: str = "done"
-                    plp_event = asyncio.Event()
+    primary_category, sub_category, color, size, base_url = url_info
+    log.info(f"正在抓取{primary_category=}, {sub_category=}")
+    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+    key = f"product_status:{source}:{primary_category}:{sub_category}:{color}:{size}"
+    async with r:
+        status = await r.get(key)
+        if status == "done":
+            log.warning(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品索引已建立")
+            product_urls = await r.smembers(f"{source}:{primary_category}:{sub_category}:{color}")
+            log.info("商品索引已建立,从索引获取商品")
+            log.info(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品数量: {len(product_urls)}")
+        else:
+            agent = False
+            # user_agent = ua.random
+            # context = await browser.new_context(user_agent=user_agent)
+            # context = await browser.new_context()
+            # log.info(f"当前UserAgent: {user_agent}")
+            page = await context.new_page()
+            async with page:
+                # 拦截所有图片
+                # await page.route(
+                #     "**/*",
+                #     lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+                # )
+                product_urls: list[str] = []
+                product_status: str = "done"
+                plp_event = asyncio.Event()
 
-                    async def handle_plp_route(route: Route):
-                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                        request = route.request
-                        if "plp_search_v2" in request.url:
-                            log.info(f"拦截产品列表页成功: {request.url}")
-                            response = await route.fetch()
-                            json_dict = await response.json()
-                            nonlocal product_urls
-                            metadata, product_urls = await parse_plp_api_by_category(data=json_dict)
-                            total_results = metadata.get("total_results", 0)
-                            count = metadata.get("count", 0)
-                            total_pages = metadata.get("total_pages", 0)
-                            tasks = []
-                            semaphore = asyncio.Semaphore(1)  # 设置并发请求数限制为5
-                            nonlocal product_status
-                            product_status = "done"
-                            if total_pages > 1:
-                                for i in range(1, total_pages):
-                                    product_page_url = httpx.URL(request.url).copy_set_param("offset", count * i)
-                                    tasks.append(
-                                        fetch_products(
-                                            semaphore=semaphore, url=product_page_url, headers=request.headers
-                                        )
-                                    )
-                                extra_product_urls_tuple = await asyncio.gather(*tasks, return_exceptions=True)
-                                product_status = "done"
-                                if len(extra_product_urls_tuple) == 0:
-                                    log.error("未获取到商品列表, 请尝试更换IP")
-                                    product_status = "failed"
-                                for extra_product_url in extra_product_urls_tuple:
-                                    if extra_product_url:
-                                        product_urls.extend(extra_product_url)
-                                    else:
-                                        product_status = "failed"
-                                        log.warning("部分页面获取失败")
-
-                            else:
-                                log.debug("当前类别或品牌只有1页, 无需额外页面抓取")
-                            log.info(f"预期商品数{total_results}, 实际商品数:{len(product_urls)}")
-                            key = f"product_status:{source}:{primary_category}:{sub_category}:{color}:{size}"
-
-                            async with r:
-                                await r.set(key, product_status)
-                                log.info(f"当前商品列表{primary_category=}, {key}, 标记redis状态为: {product_status}")
-                            r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                            # 将商品加入商品索引中
-                            async with r:
-                                print(await r.get("a"))
-                                redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
-                                print(redis_key)
-
-                                result = await r.sadd(redis_key, *product_urls) if product_urls else None
-                                print(result)
-                            plp_event.set()
-                        await route.continue_()
-
-                    await page.route("**/redsky.target.com/**", handle_plp_route)
-
-                    await page.goto(base_url)
-                    log.info(f"进入类别页面: {base_url=}")
-
-                    await page.wait_for_timeout(3000)
-                    await page.wait_for_load_state(timeout=60000)
-                    # scroll_pause_time = random.randrange(500, 2500, 200)
-                    # await page.wait_for_timeout(1000)
-                    # await scroll_page(page, scroll_pause_time=scroll_pause_time, step=2)
-                    # await page.pause()
-                    try:
-                        # 设置超时时间为5秒
-                        await asyncio.wait_for(plp_event.wait(), timeout=60 * 10)
-                    except asyncio.TimeoutError:
-                        print("等待超时")
-
-                    # 获取所有商品
+                async def handle_plp_route(route: Route):
                     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                    async with r:
-                        if product_urls:
-                            insert_numbers = await r.sadd(
-                                f"{source}:{primary_category}:{sub_category}:{color}", *product_urls
-                            )
-                            log.info(f"添加{insert_numbers}条数据到redis中")
+                    request = route.request
+                    if "plp_search_v2" in request.url:
+                        log.info(f"拦截产品列表页成功: {request.url}")
+                        response = await route.fetch()
+                        json_dict = await response.json()
+                        nonlocal product_urls
+                        metadata, product_urls = await parse_plp_api_by_category(data=json_dict)
+                        total_results = metadata.get("total_results", 0)
+                        count = metadata.get("count", 0)
+                        total_pages = metadata.get("total_pages", 0)
+                        tasks = []
+                        semaphore = asyncio.Semaphore(1)  # 设置并发请求数限制为5
+                        nonlocal product_status
+                        product_status = "done"
+                        if total_pages > 1:
+                            for i in range(1, total_pages):
+                                product_page_url = httpx.URL(request.url).copy_set_param("offset", count * i)
+                                tasks.append(
+                                    fetch_products(
+                                        semaphore=semaphore, url=product_page_url, headers=request.headers
+                                    )
+                                )
+                            extra_product_urls_tuple = await asyncio.gather(*tasks, return_exceptions=True)
+                            product_status = "done"
+                            if len(extra_product_urls_tuple) == 0:
+                                log.error("未获取到商品列表, 请尝试更换IP")
+                                product_status = "failed"
+                            for extra_product_url in extra_product_urls_tuple:
+                                if extra_product_url:
+                                    product_urls.extend(extra_product_url)
+                                else:
+                                    product_status = "failed"
+                                    log.warning("部分页面获取失败")
+
                         else:
-                            log.error(f"当前页面未获取到商品, 需要尝试切换IP, {base_url=}")
+                            log.debug("当前类别或品牌只有1页, 无需额外页面抓取")
+                        log.info(f"预期商品数{total_results}, 实际商品数:{len(product_urls)}")
+                        key = f"product_status:{source}:{primary_category}:{sub_category}:{color}:{size}"
 
-                        log.debug(f"{product_urls}, {len(product_urls)}")
-        semaphore = asyncio.Semaphore(PLAYWRIGHT_CONCURRENCY)  # 设置并发请求数限制为10
-        pdp_tasks = []
-        for url in product_urls:
-            url = url.replace(domain, "")
-            url = domain + url
-            pdp_tasks.append(
-                open_pdp_page(
-                    # browser,
-                    context=context,
-                    url=url,
-                    semaphore=semaphore,
-                    source=source,
-                    primary_category=primary_category,
-                    sub_category=sub_category,
-                    color=color,
-                    size=size,
-                )
+                        async with r:
+                            await r.set(key, product_status)
+                            log.info(f"当前商品列表{primary_category=}, {key}, 标记redis状态为: {product_status}")
+                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                        # 将商品加入商品索引中
+                        async with r:
+                            print(await r.get("a"))
+                            redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
+                            print(redis_key)
+
+                            result = await r.sadd(redis_key, *product_urls) if product_urls else None
+                            print(result)
+                        plp_event.set()
+                    await route.continue_()
+
+                await page.route("**/redsky.target.com/**", handle_plp_route)
+
+                await page.goto(base_url)
+                log.info(f"进入类别页面: {base_url=}")
+
+                await page.wait_for_timeout(3000)
+                await page.wait_for_load_state(timeout=60000)
+                # scroll_pause_time = random.randrange(500, 2500, 200)
+                # await page.wait_for_timeout(1000)
+                # await scroll_page(page, scroll_pause_time=scroll_pause_time, step=2)
+                # await page.pause()
+                try:
+                    # 设置超时时间为5秒
+                    await asyncio.wait_for(plp_event.wait(), timeout=60 * 10)
+                except asyncio.TimeoutError:
+                    print("等待超时")
+
+                # 获取所有商品
+                r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                async with r:
+                    if product_urls:
+                        insert_numbers = await r.sadd(
+                            f"{source}:{primary_category}:{sub_category}:{color}", *product_urls
+                        )
+                        log.info(f"添加{insert_numbers}条数据到redis中")
+                    else:
+                        log.error(f"当前页面未获取到商品, 需要尝试切换IP, {base_url=}")
+
+                    log.debug(f"{product_urls}, {len(product_urls)}")
+    semaphore = asyncio.Semaphore(PLAYWRIGHT_CONCURRENCY)  # 设置并发请求数限制为10
+    pdp_tasks = []
+    for url in product_urls:
+        url = url.replace(domain, "")
+        url = domain + url
+        pdp_tasks.append(
+            open_pdp_page(
+                # browser,
+                context=context,
+                url=url,
+                semaphore=semaphore,
+                source=source,
+                primary_category=primary_category,
+                sub_category=sub_category,
+                color=color,
+                size=size,
             )
-        print(f"一共获取商品数: {len(product_urls)}")
+        )
+    print(f"一共获取商品数: {len(product_urls)}")
 
-        results = await asyncio.gather(*pdp_tasks)
+    results = await asyncio.gather(*pdp_tasks)
 
 
 async def open_pdp_page(
@@ -557,7 +411,7 @@ async def open_pdp_page(
                     json_dict = await response.json()
                     nonlocal product
                     nonlocal sku
-                    product = await parse_target_product(
+                    product, sku = await parse_target_product(
                         json_dict,
                         primary_category=primary_category,
                         sub_category=sub_category,
@@ -667,7 +521,7 @@ async def open_pdp_page(
                         await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
                 if should_get_product or force_get_product:
                     log.warning("等待随机时间")
-                    await asyncio.sleep(random.randint(5, 30))
+                    await asyncio.sleep(random.randint(10, 30))
             else:
                 log.warning("跳过商品状态检查")
             return product_id, sku_id
@@ -1270,13 +1124,13 @@ def map_attribute_field(input: dict) -> dict:
 #         # previous_height = new_height
 
 
-async def run_playwright_instance():
+async def run_playwright_instance(url_info):
     # 创建一个playwright对象并将其传递给run函数
     retry_times = 0
     while retry_times < 1:
         try:
             async with async_playwright() as p:
-                await run(p)
+                await run(p, url_info)
                 ...
         except Exception as exc:
             log.error(f"执行失败: {exc}")
@@ -1287,37 +1141,196 @@ async def run_playwright_instance():
 
 
 async def main():
-    retry_times = 0
-    while retry_times < 1:
-        try:
-            async with async_playwright() as p:
-                await run(p)
-                ...
-        except Exception as exc:
-            log.error(f"执行失败: {exc}")
-            log.warning(f"重试次数: {retry_times}")
-        retry_times += 1
+    loop = asyncio.get_running_loop()
+    num_processes = os.cpu_count()
+    urls = []
 
-        await asyncio.sleep(15)
-    # loop = asyncio.get_running_loop()
-    # num_processes = os.cpu_count()
-    # urls = []
-    # with ProcessPoolExecutor(max_workers=num_processes) as executor:
-    #     tasks = [loop.run_in_executor(executor, run_playwright_instance) for _ in urls]
-    # 
-    #     results = await asyncio.gather(*tasks, return_exceptions=True)
-    #     for result in results:
-    #         if isinstance(result, Exception):
-    #             log.error(f"Task resulted in an exception: {result}")
-    #         else:
-    #             log.info(result)
+    urls = [
+
+        ("furniture", "beds", "default", "default",
+         "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22"),
+        # ("women", "maternity", "default", "default",
+        #  "https://www.target.com/c/maternity-clothing-women/-/N-5ouvi"),  # 
+        # ("women", "graphic-tees", "default", "batch1",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ4u9pjZqama8Z4u9goZ5xeljZcv1blcqhq3mZ5y70kZfo87bqov5agZrg0dh?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "default", "batch2",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ5xeljZvef8a?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "default", "batch3",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZcv1blcs3gscZvef8a?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "default", "batch4",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZ4u9ldZ5y24gZ5y1h6Z5y2kw?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "pop-culture", "black",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZvef8aZcv1blczeafkZ5y761?type=products&moveTo=product-list-grid"),
+        # ("women", "graphic-tees", "pop-culture", "gray",
+        #  "https://www.target.com/c/graphic-tees-sweatshirts-women-s-clothing/-/N-4y2xwZvef8aZcv1blczeafkZ5y759?type=products&moveTo=product-list-grid"),
+
+        # 
+        # ("women", "jumpsuits-rompers", "default", "default",
+        #  "https://www.target.com/c/jumpsuits-rompers-women-s-clothing/-/N-4y52e"),  # 抓取完成
+
+        # ("women","socks-hosiery","default","default","https://www.target.com/c/socks-hosiery-women-s-clothing/-/N-5xtbdZ600jqZgfdyb?moveTo=product-list-grid"),  # win
+        # ("women","socks-hosiery","default","extra", "https://www.target.com/c/socks-hosiery-women-s-clothing/-/N-5xtbdZq8ldyZ1ktcxZ68721?moveTo=product-list-grid"),  # win
+
+        # (
+        #     "women",
+        #     "intimates",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/intimates-women-s-clothing/-/N-5xtcfZ5y34t",
+        # ),  # 已完成
+
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y761?moveTo=product-list-grid",
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "batch1",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y6q6Z5y746Z5y70hZ5y67t?moveTo=product-list-grid"
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "batch2",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y73rZ5xr7iZ5y759?moveTo=product-list-grid"
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "batch3",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ55iviZ5xrh3Z5y76nZ5y6hb?moveTo=product-list-grid"
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "batch4",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ55iviZ5xrh3Z5y76nZ5y6hb?moveTo=product-list-grid"
+        # ),  # 完成(
+        # (
+        #     "women",
+        #     "t-shirts",
+        #     "batch5",
+        #     "M",
+        #     "https://www.target.com/c/t-shirts-women-s-clothing/-/N-9qjryZvef8aZ5y76dZ5y713Z5y750Z5y72c?moveTo=product-list-grid"
+        # ),  # 完成
+
+        # ("women", "dresses", "black", "M", "https://www.target.com/c/dresses-women-s-clothing/-/N-5xtcgZvef8aZ5y761"),  # 完成
+        # (
+        #     "women",
+        #     "pajama-sets",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pajama-sets-pajamas-loungewear-women-s-clothing/-/N-5xtbz",
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "pajama-tops",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pajama-tops-pajamas-loungewear-women-s-clothing/-/N-5xtby",
+        # ),  # 抓取中 采用三级类别
+        # (
+        #     "women",
+        #     "pajama-bottoms",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pajama-bottoms-pajamas-loungewear-women-s-clothing/-/N-5xtc2",
+        # ),  # 抓取中 采用三级类别
+        # (
+        #     "women",
+        #     "coats-jackets",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZ66rho?moveTo=product-list-grid",
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "coats-jackets",
+        #     "default",
+        #     "extra",
+        #     "https://www.target.com/c/coats-jackets-women-s-clothing/-/N-5xtchZech2s2krbvfZech2s25o21uZech2s2c5qdaZech2s25tn8bZech2s2bgfyq?moveTo=product-list-grid",
+        # ),  # win
+        # (
+        #     "women",
+        #     "bottoms",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZ5y761Zvef8a",
+        # ),  # 完成
+        # (
+        #     "women",
+        #     "bottoms",
+        #     "multi",
+        #     "M",
+        #     "https://www.target.com/c/bottoms-women-s-clothing/-/N-txhdtZvef8aZ5y6q6Z5y70hZ5y746Z5y67tZ5y759Z5y73rZ5xr7iZ5xrh3Z55iviZ5y76nZ5y6hbZ5y76dZ5y713Z5y750Z5y72c?moveTo=product-list-grid",
+        # ),  # 完成
+
+        # (
+        #     "women",
+        #     "activewear",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/activewear-women-s-clothing/-/N-5xtcl",
+        # ),  # win 抓取完毕
+        # (
+        #     "women",
+        #     "swimsuits",
+        #     "black",
+        #     "M",
+        #     "https://www.target.com/c/swimsuits-women-s-clothing/-/N-5xtbwZ5y34tZ5y761?moveTo=product-list-grid",
+        # ),  # 抓取完毕
+        # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
+        # ("women", "jeans", "default", "default", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8",),  # 已完成
+        # noqa # 已完成
+        # ("women", "shorts", "black", "M",
+        #  "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
+    ]
+    bed_urls = [
+        ("pets", "dog-supplies", "batch1", "unknown",
+         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),
+        ("pets", "dog-supplies", "batch2", "unknown",
+         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"),
+        ("pets", "dog-supplies", "batch3", "unknown",
+         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZe3sjevcc90xZe3sjevyxi6xZ2nsb6Z4yl7mZ4yjup?moveTo=product-list-grid"
+         ),
+        ("pets", "dog-supplies", "batch4", "unknown",
+         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZw1fi5Z4yl7mZe3sjev7pshl?moveTo=product-list-grid"
+         ),
+        ("pets", "dog-supplies", "batch5", "unknown",
+         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl7m?moveTo=product-list-grid"
+         ),
+        ("pets", "cat-supplies", "batch2", "unknown",
+         "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z6q8fqiw8pkZ4yl67Z4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"
+         ),
+        ("pets", "cat-supplies", "batch3", "unknown",
+         "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z4yl7m?moveTo=product-list-grid"
+         ),
+    ]
+    urls.extend(bed_urls)
+    with ProcessPoolExecutor(max_workers=num_processes) as executor:
+        tasks = [loop.run_in_executor(executor, async_runner, url_info) for url_info in urls]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for result in results:
+            if isinstance(result, Exception):
+                log.error(f"Task resulted in an exception: {result}")
+            else:
+                log.info(result)
 
 
 # 这是脚本的入口点。
 # 它开始执行main函数。
-def async_runner():
+def async_runner(url_info):
     # 指定本地代理
-    asyncio.run(run_playwright_instance(), debug=True)
+    asyncio.run(run_playwright_instance(url_info))
 
 
 if __name__ == '__main__':
