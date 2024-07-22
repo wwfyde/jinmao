@@ -643,7 +643,7 @@ async def run(playwright: Playwright) -> None:
     for sku in skus:
         status = await r.get(f"next_customer:0707:{sku}")
         log.info(f"{sku=}索引状态: {status}")
-        if status not in ("done", "failed"):
+        if status not in ("done"):
             log.info(f"{sku=}索引状态: {status}, 开始抓取")
             result = await get_product_urls(context=context, sku=sku)
             if result:
@@ -663,10 +663,10 @@ async def run(playwright: Playwright) -> None:
 
 
 async def get_product_urls(
-    *,
-    browser: Browser | None = None,
-    context: BrowserContext | None = None,
-    sku: str | None = None,
+        *,
+        browser: Browser | None = None,
+        context: BrowserContext | None = None,
+        sku: str | None = None,
 ):
     if browser:
         ua = UserAgent(browsers=["chrome", "safari", "edge"], os=["win", "mac", "linux"], platforms=["pc"])

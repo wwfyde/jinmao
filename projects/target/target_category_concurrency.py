@@ -36,12 +36,19 @@ should_download_image = False
 should_get_review = True
 should_get_product = True
 force_get_product = False
+should_use_proxy = False
 if should_get_product:
     PLAYWRIGHT_CONCURRENCY = 3
 if not should_download_image:
     log.warning("当前图片未设置为允许下载")
 
-ua = UserAgent(browsers=["edge", "chrome"], platforms=["pc"], os=["windows"])
+ua = UserAgent(browsers=["edge", "chrome", "safari"], platforms=["pc"], os=["windows", "macos"])
+
+
+async def get_current_ip(page: Page):
+    return await page.evaluate(
+        "async () => { const response = await fetch('https://api.ipify.org?format=json'); const data = await response.json(); return data.ip; }"
+    )
 
 
 async def run(playwright: Playwright, url_info: tuple) -> None:
@@ -51,12 +58,14 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
     # proxy = {"server": "http://127.0.0.1:7890"}
     # 启动chromium浏览器，开启开发者工具，非无头模式
     # browser = await chromium.launch(headless=False, devtools=True)
-    proxy = {
-        "server": settings.proxy_pool.server,
-        "username": settings.proxy_pool.username,
-        "password": settings.proxy_pool.password,
-    }
-    proxy = None
+    if should_use_proxy:
+        proxy = {
+            "server": settings.proxy_pool.server,
+            "username": settings.proxy_pool.username,
+            "password": settings.proxy_pool.password,
+        }
+    else:
+        proxy = None
     print(f"使用代理: {proxy}")
     user_data_dir = settings.user_data_dir
     if settings.save_login_state:
@@ -72,6 +81,8 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
             # ignore_https_errors=True,  # 忽略HTTPS错误
             # devtools=True,  # 打开开发者工具
         )
+        await context.clear_cookies()  # 清理缓存, 避免429
+        await context.clear_permissions()
     else:
         pass
         browser = await chromium.launch(
@@ -79,7 +90,9 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
             proxy=proxy,
             # devtools=True,
         )
-        context = await browser.new_context()
+        context = await browser.new_context(
+            user_agent=ua.random,
+        )
 
     # 设置全局超时
     context.set_default_timeout(settings.playwright.timeout)
@@ -100,7 +113,7 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
         status = await r.get(key)
         if status == "done":
             log.warning(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品索引已建立")
-            product_urls = await r.smembers(f"{source}:{primary_category}:{sub_category}:{color}")
+            product_urls = await r.smembers(f"target_index:{source}:{primary_category}:{sub_category}")
             log.info("商品索引已建立,从索引获取商品")
             log.info(f"类别{primary_category=}, {sub_category=}, {color=}, {size=}商品数量: {len(product_urls)}")
         else:
@@ -136,6 +149,7 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
                         semaphore = asyncio.Semaphore(1)  # 设置并发请求数限制为5
                         nonlocal product_status
                         product_status = "done"
+                        log.debug(f"当前类别或品牌总页数: {total_pages}, 总商品数: {total_results}")
                         if total_pages > 1:
                             for i in range(1, total_pages):
                                 product_page_url = httpx.URL(request.url).copy_set_param("offset", count * i)
@@ -150,7 +164,10 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
                                 log.error("未获取到商品列表, 请尝试更换IP")
                                 product_status = "failed"
                             for extra_product_url in extra_product_urls_tuple:
-                                if extra_product_url:
+                                if isinstance(extra_product_url, Exception):
+                                    log.error(f"获取额外页面失败: {extra_product_url}")
+                                    product_status = "failed"
+                                elif extra_product_url:
                                     product_urls.extend(extra_product_url)
                                 else:
                                     product_status = "failed"
@@ -159,6 +176,8 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
                         else:
                             log.debug("当前类别或品牌只有1页, 无需额外页面抓取")
                         log.info(f"预期商品数{total_results}, 实际商品数:{len(product_urls)}")
+                        if len(product_urls) == 0:
+                            product_status = "failed"
                         key = f"product_status:{source}:{primary_category}:{sub_category}:{color}:{size}"
 
                         async with r:
@@ -168,7 +187,7 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
                         # 将商品加入商品索引中
                         async with r:
                             print(await r.get("a"))
-                            redis_key = f"target_index:{source}:{primary_category}:{sub_category}:{color}"
+                            redis_key = f"target_index:{source}:{primary_category}:{sub_category}"
                             print(redis_key)
 
                             result = await r.sadd(redis_key, *product_urls) if product_urls else None
@@ -446,6 +465,8 @@ async def open_pdp_page(
             # 其他操作...
             # 暂停执行
             response = await page.goto(url, timeout=PLAYWRIGHT_TIMEOUT)
+            ip_info = await get_current_ip(page)
+            log.debug(f"当前使用ip: {ip_info}")
 
             cookies_raw = await context.cookies(url)
             cookies = {cookie["name"]: cookie["value"] for cookie in cookies_raw}
@@ -475,7 +496,7 @@ async def open_pdp_page(
             if should_get_product or force_get_product:
                 try:
                     # 设置超时时间为5秒
-                    await asyncio.wait_for(product_event.wait(), timeout=60 * 5)
+                    await asyncio.wait_for(product_event.wait(), timeout=60 * 1)
                 except asyncio.TimeoutError:
                     log.warning("等待超时")
                 log.info("PDP(产品详情页)接口执行完毕")
@@ -483,7 +504,7 @@ async def open_pdp_page(
             if should_get_review:
                 try:
                     # 设置超时时间为5秒
-                    await asyncio.wait_for(review_event.wait(), timeout=60 * 5)
+                    await asyncio.wait_for(review_event.wait(), timeout=60 * 5 * 6)
                 except asyncio.TimeoutError:
                     log.warning("等待超时")
                 log.info("Review(评论)接口执行完毕")
@@ -512,7 +533,7 @@ async def open_pdp_page(
                 r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
                 async with r:
-                    log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
+                    log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态为 {product_status}")
                     if task_type == "category":
                         await r.set(
                             f"status:{source}:{product_id}:{sku_id}", product_status
@@ -1014,19 +1035,37 @@ async def parse_plp_api_by_category(data: dict) -> tuple[dict, list]:
     for product in products:
         sku_id = product.get("tcin")
         parent = product.get("parent", {})
-        product_id = parent.get("tcin")
-        sku_url = product.get("item", {}).get("enrichment", {}).get("buy_url")
-        product_base_url = parent.get("item", {}).get("enrichment", {}).get("buy_url", "")
-        if product_base_url:
-            product_url = product_base_url + f"?preselect={sku_id}#lnk=sametab"
-            product_urls.append(product_url)
+        if parent:
+            product_id = parent.get("tcin")
+            sku_url = product.get("item", {}).get("enrichment", {}).get("buy_url")
+            product_base_url = parent.get("item", {}).get("enrichment", {}).get("buy_url", "")
+            if product_base_url:
+                product_url = product_base_url + f"?preselect={sku_id}#lnk=sametab"
+                product_urls.append(product_url)
+            else:
+                product_url = None
+            image_url = product.get("item", {}).get("enrichment", {}).get("images", {}).get("primary_image_url")
+            alternate_image_urls = (
+                product.get("item", {}).get("enrichment", {}).get("images", {}).get("alternate_image_urls", [])
+            )
+            image_urls = [image_url] + alternate_image_urls if image_url else alternate_image_urls
         else:
-            product_url = None
-        image_url = product.get("item", {}).get("enrichment", {}).get("images", {}).get("primary_image_url")
-        alternate_image_urls = (
-            product.get("item", {}).get("enrichment", {}).get("images", {}).get("alternate_image_urls", [])
-        )
-        image_urls = [image_url] + alternate_image_urls if image_url else alternate_image_urls
+            product_id = product.get("tcin")
+            sku_url = product.get("item", {}).get("enrichment", {}).get("buy_url")
+            product_base_url = product.get("item", {}).get("enrichment", {}).get("buy_url", "")
+            log.warning(f"未找到父级商品信息, {sku_id=}, {product_base_url=}")
+
+            if product_base_url:
+                product_url = product_base_url + f"?preselect={sku_id}#lnk=sametab"
+                product_urls.append(product_url)
+            else:
+                product_url = None
+            image_url = product.get("item", {}).get("enrichment", {}).get("images", {}).get("primary_image_url")
+            alternate_image_urls = (
+                product.get("item", {}).get("enrichment", {}).get("images", {}).get("alternate_image_urls", [])
+            )
+            image_urls = [image_url] + alternate_image_urls if image_url else alternate_image_urls
+    log.debug(f"解析到{len(product_urls)}件商品")
 
     return metadata, product_urls
 
@@ -1034,13 +1073,16 @@ async def parse_plp_api_by_category(data: dict) -> tuple[dict, list]:
 async def fetch_products(semaphore, url, headers):
     async with semaphore:
         try:
+            log.debug(f"请求额外类别页面: {url}")
             async with httpx.AsyncClient(timeout=60) as client:
                 response = await client.get(url, headers=headers)
+                log.debug(f"请求状态码: {response.status_code}")
                 response.raise_for_status()  # 检查HTTP请求是否成功
                 json_dict = response.json()
+                await asyncio.sleep(5)
                 return (await parse_plp_api_by_category(json_dict))[-1]
         except Exception as exc:
-            log.error(f"请求额外页面失败, {exc}")
+            log.error(f"请求额外页面失败, {exc=}, {exc.args=}")
             return []
 
 
@@ -1134,18 +1176,18 @@ async def run_playwright_instance(url_info):
                 ...
         except Exception as exc:
             log.error(f"执行失败: {exc}")
-            log.warning(f"重试次数: {retry_times}")
         retry_times += 1
+        log.warning(f"尝试重试: {retry_times}")
 
-        await asyncio.sleep(15)
+        await asyncio.sleep(5)
 
 
 async def main():
     loop = asyncio.get_running_loop()
-    num_processes = os.cpu_count()
+    num_processes = os.cpu_count() // 2
     urls = []
 
-    urls = [
+    default_urls = [
 
         ("furniture", "beds", "default", "default",
          "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22"),
@@ -1293,28 +1335,43 @@ async def main():
         # ("women", "shorts", "black", "M",
         #  "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
     ]
-    bed_urls = [
-        ("pets", "dog-supplies", "batch1", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),
-        ("pets", "dog-supplies", "batch2", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"),
-        ("pets", "dog-supplies", "batch3", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZe3sjevcc90xZe3sjevyxi6xZ2nsb6Z4yl7mZ4yjup?moveTo=product-list-grid"
-         ),
-        ("pets", "dog-supplies", "batch4", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZw1fi5Z4yl7mZe3sjev7pshl?moveTo=product-list-grid"
-         ),
-        ("pets", "dog-supplies", "batch5", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl7m?moveTo=product-list-grid"
-         ),
-        ("pets", "cat-supplies", "batch2", "unknown",
-         "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z6q8fqiw8pkZ4yl67Z4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"
-         ),
-        ("pets", "cat-supplies", "batch3", "unknown",
-         "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z4yl7m?moveTo=product-list-grid"
+    pet_urls = [
+        # ("pets", "dog-supplies", "batch1", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),
+        # ("pets", "dog-supplies", "batch2", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"),
+        # ("pets", "dog-supplies", "batch3", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZe3sjevcc90xZe3sjevyxi6xZ2nsb6Z4yl7mZ4yjup?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "dog-supplies", "batch4", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZw1fi5Z4yl7mZe3sjev7pshl?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "dog-supplies", "batch5", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl7m?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "cat-supplies", "batch2", "unknown",
+        #  "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z6q8fqiw8pkZ4yl67Z4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "cat-supplies", "batch3", "unknown",
+        #  "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z4yl7m?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "gifts-for-pets", "batch1", "unknown",
+        #  "https://www.target.com/c/gifts-for-pets/-/N-55z1mZ5n5og?moveTo=product-list-grid"
+        #  ),
+
+        # ("pets", "gifts-for-pets", "batch2", "unknown",
+        #  "https://www.target.com/c/gifts-for-pets/-/N-55z1mZ5n5p5?moveTo=product-list-grid"
+        #  ),
+        ("pets", "gifts-for-pets", "batch3", "unknown",
+         "https://www.target.com/c/gifts-for-pets/-/N-55z1mZzebtaZ4ycp2Z5n4heZ1pthuZ5n4hgZ55k79Z5n4hdZ9fm9hZsqpmwnp13q0Z5n5ofZ5n5k1Zsqpmwnqs6mxZ5n4o7?moveTo=product-list-grid"
          ),
     ]
-    urls.extend(bed_urls)
+    urls.extend(pet_urls)
+    bed_urls = [
+        ("furniture", "beds", "black", "default",
+         "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22Z5y761?moveTo=product-list-grid"),
+    ]
+    # urls.extend(bed_urls)
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
         tasks = [loop.run_in_executor(executor, async_runner, url_info) for url_info in urls]
 

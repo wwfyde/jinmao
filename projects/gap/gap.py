@@ -1,6 +1,7 @@
 import asyncio
 import json
 import random
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
 
@@ -11,7 +12,8 @@ from playwright.async_api import async_playwright, Playwright, Page, Route, Brow
 
 from crawler import log
 from crawler.config import settings
-from crawler.store import save_sku_data, save_product_data, save_review_data
+from crawler.store import save_review_data_async, save_product_data_async, \
+    save_sku_data_async, save_product_detail_data_async
 
 # urls = [
 #     {
@@ -100,7 +102,7 @@ print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 8
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-PLAYWRIGHT_HEADLESS: bool = True
+PLAYWRIGHT_HEADLESS: bool = False
 
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
@@ -184,7 +186,7 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
                     categories_dir.mkdir(parents=True, exist_ok=True)
 
                     with open(
-                        f"{categories_dir}/category-{primary_category}-{primary_category}-{index:03d}.json", "w"
+                            f"{categories_dir}/category-{primary_category}-{primary_category}-{index:03d}.json", "w"
                     ) as f:
                         f.write(json.dumps(json_dict))
 
@@ -285,14 +287,14 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
 
 
 async def open_pdp_page(
-    context: BrowserContext,
-    semaphore: asyncio.Semaphore,
-    product_id: str,
-    sku_id: str,
-    *,
-    source: str,
-    primary_category: str,
-    sub_category: str,
+        context: BrowserContext,
+        semaphore: asyncio.Semaphore,
+        product_id: str,
+        sku_id: str,
+        *,
+        source: str,
+        primary_category: str,
+        sub_category: str,
 ):
     async with semaphore:
         # product_detail_page 产品详情页
@@ -361,11 +363,11 @@ async def open_pdp_page(
                         tasks = []
                         for i in range(1, total_pages + 1):
                             review_url = (
-                                request.url
-                                + "&sort=Newest"
-                                + f"&paging.from={10 + (i - 1) * page_size}"
-                                + f"&paging.size={page_size}"
-                                + "&filters=&search=&sort=Newest&image_only=false"
+                                    request.url
+                                    + "&sort=Newest"
+                                    + f"&paging.from={10 + (i - 1) * page_size}"
+                                    + f"&paging.size={page_size}"
+                                    + "&filters=&search=&sort=Newest&image_only=false"
                             )
                             tasks.append(
                                 fetch_reviews(
@@ -399,7 +401,8 @@ async def open_pdp_page(
                             f.write(json.dumps(reviews, indent=4, ensure_ascii=False))
                         # 将评论保存到数据库
 
-                        save_review_data(reviews)
+                        # save_review_data(reviews)
+                        await save_review_data_async(reviews)
                         # log.warning("当前使用批量插入评论方式!")
                         # save_review_data_bulk(reviews)
                         if review_status == "failed":
@@ -564,7 +567,7 @@ async def parse_sku_from_api(sku: dict, sku_id: int) -> dict | None:
 
 
 async def parse_sku_from_dom_content(
-    content: str, *, product_id: str, sku_id: str, source: str, product_url: str
+        content: str, *, product_id: str, sku_id: str, source: str, product_url: str
 ) -> dict:
     """
     解析页面内容
@@ -640,35 +643,41 @@ async def parse_sku_from_dom_content(
         sku_id=sku_id,
         sku_url=product_url,
         source=source,
-        model_image_url=model_image_url,
-        outer_model_image_url=model_image_url,
-        image_url=image_url,
+        # model_image_url=model_image_url,
+        # outer_model_image_url=model_image_url,
+        # image_url=image_url,  # 避免覆盖已有数据
         outer_image_url=image_url,
-        model_image_urls=model_image_urls,
+        # model_image_urls=model_image_urls,
         outer_model_image_urls=model_image_urls,
         attributes=attributes,
         attributes_raw=attributes,
     )
     # 将从页面提取到的信息保存的数据库
-    save_sku_data(pdp_info)
-    save_product_data(
+    await save_sku_data_async(pdp_info)
+    await save_product_data_async(
         dict(
             product_id=product_id,
             product_name=product_name,
             attributes=attributes,
             attributes_raw=attributes,
             product_url=product_url,
-            sku_id=sku_id,
+            primary_sku_id=sku_id,
             source=source,
-            model_image_url=model_image_url,
-            outer_model_image_url=model_image_url,
-            image_url=image_url,
-            outer_image_url=image_url,
-            model_image_urls=model_image_urls,
-            outer_model_image_urls=model_image_urls,
+            # model_image_url=model_image_url,
+            # outer_model_image_url=model_image_url,
+            # image_url=image_url,
+            # outer_image_url=image_url,
+            # model_image_urls=model_image_urls,
+            # outer_model_image_urls=model_image_urls,
+
+        )
+    )
+    await save_product_detail_data_async(
+        dict(
+            product_id=product_id,
+            source=source,
             color=color,
             price=price,
-            image_url_outer=image_url,
             fit_size=fit_and_size,
             product_details=product_details,
             fabric_and_care=fabric_and_care,
@@ -730,7 +739,7 @@ async def scroll_to_bottom_v1(page: Page):
 
 async def scroll_to_bottom(page: Page, scroll_pause_time: int = 1000, max_scroll_attempts: int = 20):
     """
-    滚动页面到底部，以加载所有动态内容。
+    滚动页面到底部，以加载所有动态内容
 
     :param page: Playwright页面对象
     :param scroll_pause_time: 每次滚动后等待的时间（毫秒）
@@ -790,7 +799,7 @@ async def scroll_page(page: Page, scroll_pause_time: int = 1000, max_times: int 
 
 
 async def parse_category_from_api(
-    data: dict, page: Page, gender: str, *, source: str, primary_category: str, sub_category: str
+        data: dict, page: Page, gender: str, *, source: str, primary_category: str, sub_category: str
 ):
     """
     解析类型页面的API接口
@@ -881,15 +890,15 @@ async def parse_category_from_api(
                 f.write(json.dumps(sub_result, indent=4, ensure_ascii=False))
         result["skus"] = sub_results
         # 保存SKU数据
-        save_sku_data(sub_results)
+        await save_sku_data_async(sub_results)
         with open(
-            f"{settings.data_dir.joinpath(source, primary_category, sub_category, str(result['product_id']))}/product.json",
-            "w",
+                f"{settings.data_dir.joinpath(source, primary_category, sub_category, str(result['product_id']))}/product.json",
+                "w",
         ) as f:
             f.write(json.dumps(result, indent=4, ensure_ascii=False))
         results.append(result)
     # 保存商品数据
-    save_product_data(results)
+    await save_product_data_async(results)
 
     return results, product_count, pagination, skus_index
     pass
@@ -910,9 +919,11 @@ def parse_reviews_from_api(review_data: dict) -> tuple[list[dict], int | None]:
     my_reviews = []
 
     for review in reviews:
+        created_at_timestamp = review.get('details', {}).get('created_date', None)
+        update_at_timestamp = review.get('details', {}).get('updated_date', None)
         my_review = dict(
             review_id=review.get("review_id", None),
-            proudct_name=review.get("details").get("product_name", None) if review.get("details") else None,
+            # proudct_name=review.get("details").get("product_name", None) if review.get("details") else None,
             title=review.get("details").get("headline", None) if review.get("details") else None,
             comment=review.get("details").get("comments", None) if review.get("details") else None,
             nickname=review.get("details").get("nickname", None) if review.get("details") else None,
@@ -921,7 +932,12 @@ def parse_reviews_from_api(review_data: dict) -> tuple[list[dict], int | None]:
             helpful_votes=review.get("metrics").get("helpful_votes", None) if review.get("metrics") else None,
             not_helpful_votes=review.get("metrics").get("not_helpful_votes", None) if review.get("metrics") else None,
             rating=review.get("metrics").get("rating", None) if review.get("metrics") else None,
-            helpful_score=review.get("metrics").get("helpful_score", None) if review.get("metrics") else None,
+            # helpful_score=review.get("metrics").get("helpful_score", None) if review.get("metrics") else None,
+            created_at=datetime.fromtimestamp(created_at_timestamp / 1000.0).strftime(
+                '%Y-%m-%d %H:%M:%S') if created_at_timestamp else None,
+            updated_at=datetime.fromtimestamp(update_at_timestamp / 1000.0).strftime(
+                '%Y-%m-%d %H:%M:%S') if update_at_timestamp else None,
+            last_gathered_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             source=source,
         )
         my_reviews.append(my_review)
@@ -934,14 +950,14 @@ def get_cookies_from_playwright(cookies: dict) -> str:
 
 
 async def fetch_reviews(
-    semaphore,
-    url,
-    headers,
-    product_id: str | None = None,
-    index: int | None = None,
-    *,
-    primary_category: str,
-    sub_category: str,
+        semaphore,
+        url,
+        headers,
+        product_id: str | None = None,
+        index: int | None = None,
+        *,
+        primary_category: str,
+        sub_category: str,
 ) -> list | None:
     async with semaphore:
         try:

@@ -177,10 +177,10 @@ class ProductReviewSchema(ProductReviewModel):
 class ProductReviewTranslationSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    review_id: str
-    product_id: str
-    source: str
-    rating: float | None = None
+    # review_id: str
+    # product_id: str
+    # source: str
+    # rating: float | None = None
     title: str | None = None
     comment: str | None = None
 
@@ -188,11 +188,11 @@ class ProductReviewTranslationSchema(BaseModel):
 class ProductTranslationSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    product_id: str
-    source: str
+    # product_id: str
+    # source: str
     product_name: str | None = None
     description: str | None = None
-    attributes: ProductAttribute | None = None
+    attributes: ProductAttribute | list | dict | None = None
     gender: str | None = None
 
 

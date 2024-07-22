@@ -11,6 +11,7 @@ print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 8
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
+PLAYWRIGHT_HEADLESS = False
 
 
 async def run(playwright: Playwright) -> None:
@@ -21,10 +22,16 @@ async def run(playwright: Playwright) -> None:
     # 启动chromium浏览器，开启开发者工具，非无头模式
     # browser = await chromium.launch(headless=False, devtools=True)
     user_data_dir = settings.user_data_dir
+    proxy = {
+        "server": settings.proxy_pool.server,
+        "username": settings.proxy_pool.username,
+        "password": settings.proxy_pool.password,
+    }
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             headless=PLAYWRIGHT_HEADLESS,
+            proxy=proxy,
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             # args=["--start-maximized"],  # 启动时最大化窗口
@@ -32,28 +39,23 @@ async def run(playwright: Playwright) -> None:
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=True, devtools=True)
+        browser = await chromium.launch(headless=PLAYWRIGHT_HEADLESS, proxy=proxy)
         context = await browser.new_context()
 
     # 设置全局超时
     context.set_default_timeout(settings.playwright.timeout)
-    style_ids = [  # 第一批
+    """
+    客户款号GAP款号.xlsx
+    """
+    styles = []
+    style_ids_sum24_women = [  # women
         793269,
         623795,
         881150,
         885499,
         881157,
         885498,
-        401672,
-        606506,
-        735795,
-        885502,
-        608891,
-        496861,
-        608930,
-        606484,
-        878160,
-        446216,
+
         431194,
         431249,
         431270,
@@ -62,12 +64,7 @@ async def run(playwright: Playwright) -> None:
         767285,
         767303,
         810231,
-        370404,
-        370407,
-        372200,
-        618357,
-        790798,
-        796309,
+
         663802,
         663803,
         709290,
@@ -86,7 +83,29 @@ async def run(playwright: Playwright) -> None:
         739113,
         409771,
         409769,
-        407815,
+
+    ]
+    styles.extend([(item, 'women') for item in style_ids_sum24_women])
+    style_ids_sum24_men = [
+        401672,
+        606506,
+        735795,
+        885502,
+        608891,
+        496861,
+        608930,
+        606484,
+        878160,
+        446216,
+        370404,
+        370407,
+        372200,
+        618357,
+        790798,
+        796309,
+    ]
+    styles.extend([(item, 'men') for item in style_ids_sum24_men])
+    style_ids_sum24_boys = [
         407828,
         407852,
         432724,
@@ -96,12 +115,6 @@ async def run(playwright: Playwright) -> None:
         432730,
         432685,
         432715,
-        432481,
-        432484,
-        432489,
-        432479,
-        432497,
-        407965,
         881856,
         437589,
         404639,
@@ -110,11 +123,24 @@ async def run(playwright: Playwright) -> None:
         437580,
         404622,
         446230,
+    ]
+    styles.extend([(item, 'boys') for item in style_ids_sum24_boys])
+    style_ids_sum24_girls = [
+        432481,
+        432484,
+        432489,
+        432479,
+        432497,
+        407965,
+
         435032,
         446218,
         805041,
         858412,
     ]
+    styles.extend([(item, 'girls') for item in style_ids_sum24_girls])
+    style_ids_sum24_baby_girls = [407815, ]
+    styles.extend([(item, 'baby_girls') for item in style_ids_sum24_baby_girls])
     style_ids = [  # women
         793269,
         623795,
@@ -139,6 +165,7 @@ async def run(playwright: Playwright) -> None:
         739113,
         754457,
     ]
+    styles.extend([(item, 'women') for item in style_ids])
     style_ids = [  # men
         401672,
         735795,
@@ -160,6 +187,7 @@ async def run(playwright: Playwright) -> None:
         796309,
         891754,
     ]
+    styles.extend([(item, 'men') for item in style_ids])
     style_ids = [  # boys
         838218,
         874579,
@@ -179,6 +207,8 @@ async def run(playwright: Playwright) -> None:
         868273,
         805040,
     ]
+    styles.extend([(item, 'boys') for item in style_ids])
+
     style_ids = [
         838237,
         870731,
@@ -197,11 +227,14 @@ async def run(playwright: Playwright) -> None:
         886039,
         805041,
     ]  # girls
+    styles.extend([(item, 'girls') for item in style_ids])
     style_ids = [805044, 879282, 879319, 879201]  # baby_girls
-    style_ids = [879263, 879218]  # baby_boys
-    gender = "baby_boys"
+    styles.extend([(item, 'baby_girls') for item in style_ids])
 
-    for style_id in style_ids:
+    style_ids = [879263, 879218]  # baby_boys
+    styles.extend([(item, 'baby_boys') for item in style_ids])
+    print(styles, len(styles))
+    for style_id, gender in styles:
         page = await context.new_page()
         async with page:
             await page.route(

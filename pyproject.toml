@@ -18,7 +18,7 @@ aiohttp = "^3.9.5"
 aiofiles = "^23.2.1"
 python-dotenv = "^1.0.1"
 fastapi = { extras = ["all"], version = "^0.111.0" }
-pydantic = "^2.7.1"
+pydantic = "^2.8.2"
 pydantic-settings = "^2.2.1"
 sqlalchemy = { extras = ["asyncio"], version = "^2.0.31" }
 psycopg = { extras = ["binary", "pool"], version = "^3.1.19" }
@@ -39,6 +39,9 @@ tokenizers = "^0.19.1"
 python-dateutil = "^2.9.0.post0"
 fake-useragent = "^1.5.1"
 loguru = "^0.7.2"
+greenlet = "^3.0.3"
+xlsxwriter = "^3.2.0"
+openpyxl = "^3.1.5"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.1"

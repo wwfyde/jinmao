@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 from typing import TypeVar, Type
 
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, update, bindparam
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase, Session
@@ -326,7 +326,7 @@ def save_review_data_bulk(data: dict | list[dict]):
         return inserted_ids or None
 
 
-async def save_review_data_async(data: dict | list[dict]):
+async def save_review_data_async_old(data: dict | list[dict]):
     """
     保存数据为json 和数据库
     主语
@@ -383,6 +383,74 @@ async def save_review_data_async(data: dict | list[dict]):
 
         end_time = time.time()  # 结束计时
         log.debug(f"保存评论[review]数据完成，耗时 {end_time - start_time:.2f} 秒")
+        return inserted_ids if inserted_ids else None
+
+
+async def save_review_data_async(data: dict | list[dict]):
+    """
+    保存数据为json 和数据库
+    """
+    start_time = time.time()  # 开始计时
+
+    if isinstance(data, dict):
+        data = [data]
+
+    data: list[dict] = field_filter(ProductReview, data)
+
+    async with AsyncSession(async_engine) as session:
+        inserted_ids = []
+        to_insert = []
+        to_update = []
+
+        for item in data:
+            review_id = item.get("review_id")
+            source = item.get("source")
+
+            if review_id is None:
+                log.error("review_id is None")
+                continue
+
+            result = await session.execute(
+                select(ProductReview).filter(ProductReview.review_id == review_id, ProductReview.source == source)
+            )
+            review = result.scalars().one_or_none()
+
+            if review:
+                # 如果存在，更新
+                update_data = {key: value for key, value in item.items()}
+                # 携带主键
+                update_data.update({"id": review.id})
+                to_update.append(update_data)
+            else:
+                # 如果不存在，插入
+                to_insert.append(item)
+
+        # 批量插入
+        if to_insert:
+            stmt = insert(ProductReview).values(to_insert)
+            result = await session.execute(stmt)
+            await session.commit()
+            log.debug(f"批量插入评论[review]数据成功, 一共{len(to_insert)}条记录")
+            for insert_id in result.inserted_primary_key:
+                if insert_id:
+                    inserted_ids.append(insert_id)
+
+        # 批量更新
+        if to_update:
+            log.debug(f"待更新{len(to_update)}数据")
+            kwargs = {key: bindparam(key) for key in to_update[0].keys()}
+            stmt = (
+                update(ProductReview)
+                .where(ProductReview.review_id == bindparam("review_id"), ProductReview.source == bindparam("source"))
+                .values(**kwargs).execution_options(synchronize_session=False)
+            )
+
+            await session.execute(stmt, to_update)
+            await session.commit()
+            log.debug(f"批量更新评论[review]数据成功, 一共{len(to_update)}条记录")
+
+        end_time = time.time()  # 结束计时
+        log.debug(f"保存评论[review]数据完成 {len(data)}条数据，耗时 {end_time - start_time:.2f} 秒")
         return inserted_ids if inserted_ids else None
 
 

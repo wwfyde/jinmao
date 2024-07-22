@@ -11,7 +11,8 @@ from playwright.async_api import Playwright, async_playwright, BrowserContext, P
 
 from crawler.config import settings
 from crawler.deps import get_logger
-from crawler.store import save_sku_data, save_product_data, save_review_data_async
+from crawler.store import save_sku_data_async, save_product_data_async, save_review_data_async, \
+    save_product_detail_data_async
 
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 log = get_logger("next")
@@ -71,42 +72,53 @@ async def run(playwright: Playwright) -> None:
     # log.debug(f"{pages=}")
     # TODO 从redis 中获取商品列表
     # 获取商品列表
-    sub_categories = {'jumpsuit',
-                      'Blouses',
-                      'suitskirts', 'sweattops', 'jumpers',
-                      'Dresses',
-                      'hoodies', 'waistcoats',
-                      'socks', 'bodies', 'tankinis', 'tights', 'tunics',
-                      'jackets',
-                      'shorts', 'ponchos', 'topshortsets',
-                      'suittrousers', 'vests', 'playsuits', 'tanktops', 'croptops', 'fleeces', 'rashvests', 'dungarees',
-                      'bikinis',
-                      'loungewearsets', 'gilets', 'coats', 'Hoodies', 'joggers', 'camisoles', 'rompersuits',
-                      'leggings',
-                      'T-Shirts',
-                      'topleggingset',
-                      'blazers',
-                      'coverups',
-                      'suitjackets', 'bodysuits',
-                      'jeans',
-                      'tracksuits', 'poloshirts',
-                      'Jackets',
-                      'cardigans',
-                      'trousers',
-                      'shirts',
-                      'skirts',
-                      'boobtube'}
-    sub_categories = {'tanktops', 'shirts', 'coats', 'trousers', 'poloshirts', 'cardigans', 'ponchos', 'hoodies',
-                      'jumpers', 'jeans', 'shorts', 'suittrousers', 'leggings', 'topshortsets', 'tights', 'waistcoats',
-                      'vests', 'swimshorts', 'suitjackets', 'tracksuits', 'footballshirts', 'rashvests', 'fleeces',
-                      'gilets', 'sweattops', 'sweattopjoggersets', 'joggers', 'rugbyshirts', 'jackets', 'socks',
-                      'tshirts'}
-    sub_categories = {'pets'}
+    category_indexes = []
 
-    for sub_category in sub_categories:
+    sub_categories_women = {'jumpsuit',
+                            'Blouses',
+                            'suitskirts', 'sweattops', 'jumpers',
+                            'Dresses',
+                            'hoodies', 'waistcoats',
+                            'socks', 'bodies', 'tankinis', 'tights', 'tunics',
+                            'jackets',
+                            'shorts', 'ponchos', 'topshortsets',
+                            'suittrousers', 'vests', 'playsuits', 'tanktops', 'croptops', 'fleeces', 'rashvests',
+                            'dungarees',
+                            'bikinis',
+                            'loungewearsets', 'gilets', 'coats', 'Hoodies', 'joggers', 'camisoles', 'rompersuits',
+                            'leggings',
+                            'T-Shirts',
+                            'topleggingset',
+                            'blazers',
+                            'coverups',
+                            'suitjackets', 'bodysuits',
+                            'jeans',
+                            'tracksuits', 'poloshirts',
+                            'Jackets',
+                            'cardigans',
+                            'trousers',
+                            'shirts',
+                            'skirts',
+                            'boobtube'}
+    category_indexes.extend({('women', item) for item in sub_categories_women})
+    sub_categories_men = {'tanktops', 'shirts', 'coats', 'trousers', 'poloshirts', 'cardigans', 'ponchos', 'hoodies',
+                          'jumpers', 'jeans', 'shorts', 'suittrousers', 'leggings', 'topshortsets', 'tights',
+                          'waistcoats',
+                          'vests', 'swimshorts', 'suitjackets', 'tracksuits', 'footballshirts', 'rashvests', 'fleeces',
+                          'gilets', 'sweattops', 'sweattopjoggersets', 'joggers', 'rugbyshirts', 'jackets', 'socks',
+                          'tshirts'}
+    category_indexes.extend({("men", item) for item in sub_categories_men})
+    sub_categories_gifts = {'pets'}
+    category_indexes.extend({("gifts", item) for item in sub_categories_gifts})
+
+    sub_categories_bed = {'bedsets', 'throws', 'bedsheets', 'pillowcases', 'duvets', 'pillows', 'duvetcover',
+                          'protectors',
+                          'toppers', 'blankets', 'valances'}
+    category_indexes.extend({("bed", item) for item in sub_categories_bed})
+    # for main_category, sub_category in category_indexes:
+    for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
         async with r:
             source = "next"
-            main_category = "bed"
             sub_category = sub_category
 
             status = await r.get(f"category_task_status:next:{main_category}:{sub_category}")
@@ -207,7 +219,8 @@ async def open_pdp_page(
 
                 sku_id_raw = product.get("sku_id_raw")
                 product.update(dict(sub_category=sub_category, source=source))
-                save_product_data(product)
+                await save_product_data_async(product)
+                await save_sku_data_async(product)
 
                 log.debug(f"源sku_id: {sku_id_raw}")
                 # 获取数据信息
@@ -446,18 +459,22 @@ async def parse_next_sku(
         washing_instructions=washing_instructions,
     )
     # 将sku 入库到数据库
-    save_sku_data(sku)
-    save_product_data(
-        dict(
-            product_id=product_id,
-            sku_id=sku_id,
-            color=color,
-            size=size,
-            price=price,
-            source=source,
-            description=description,
-            attributes=attributes,
-        )
+    await save_sku_data_async(sku)
+    product_extra_info = dict(
+        product_id=product_id,
+        primary_sku_id=sku_id,
+        color=color,
+        size=size,
+        price=price,
+        source=source,
+        description=description,
+        attributes=attributes,
+    )
+    await save_product_data_async(
+        product_extra_info
+    )
+    await save_product_detail_data_async(
+        product_extra_info
     )
     return sku
 
@@ -515,6 +532,7 @@ async def parse_next_product(page: Page, product_id: str, sku_id: str) -> dict |
         source="next",
         product_url=page.url,
         sku_id=sku_id.upper(),
+        primary_sku_id=sku_id.upper(),
         sku_id_raw=sku_id_raw,
         product_name=product_name,
         department=department,
@@ -523,8 +541,8 @@ async def parse_next_product(page: Page, product_id: str, sku_id: str) -> dict |
         outer_image_url=image_url,
         model_image_urls=model_image_urls,
         outer_model_image_urls=model_image_urls,
-        outer_model_image_url=model_image_url,
-        model_image_url=model_image_url,
+        # outer_model_image_url=model_image_url,
+        # model_image_url=model_image_url,
         color=color,
         brand=brand,
         category=category,

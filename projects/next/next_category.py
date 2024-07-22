@@ -256,14 +256,14 @@ async def run(playwright: Playwright) -> None:
         # ("jumpsuit", "1"),
         # ("suits", "1"),
     ]
-    gender = "unknown"
+    gender = "gifts"
     # categories = [("bedding", 143)]
     categories = [('pets', 677)]
 
     # 床上用品
-    categories = [('bedsets', '1263'), ('throws', '577'), ('bedsheets', '435'), ('pillowcases', '399'),
-                  ('duvets', '238'), ('pillows', '161'), ('duvetcover', '100'), ('protectors', '66'), ('toppers', '39'),
-                  ('blankets', '10'), ('valances', '7')]
+    # categories = [('bedsets', '1263'), ('throws', '577'), ('bedsheets', '435'), ('pillowcases', '399'),
+    #               ('duvets', '238'), ('pillows', '161'), ('duvetcover', '100'), ('protectors', '66'), ('toppers', '39'),
+    #               ('blankets', '10'), ('valances', '7')]
 
     for category, count in categories:
         print(category, count)
@@ -279,7 +279,7 @@ async def run(playwright: Playwright) -> None:
         # 分段 当页数太多时可能导致chrome内存爆裂
 
         base_url = 'https://www.next.co.uk/shop/productaffiliation-gifts/category-pets'
-        base_url = f'https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/category-{category}'
+        # base_url = f'https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/category-{category}'
         category = base_url.split("/")[-1].split("-")[-1]
         segment = 40
         times = (page_count + segment - 1) // segment

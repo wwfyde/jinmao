@@ -40,7 +40,7 @@ async def run(playwright: Playwright) -> None:
     # 设置全局超时
     context.set_default_timeout(settings.playwright.timeout)
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-    gender = "women"
+    gender = "*"
     async with r:
         keys: list[str] = await r.keys(f"gap_search:{gender}:*")
         pass

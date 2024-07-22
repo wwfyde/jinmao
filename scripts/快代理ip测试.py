@@ -7,6 +7,7 @@
 """
 
 import httpx
+from playwright.async_api import Page
 
 from crawler.config import settings
 
@@ -18,7 +19,7 @@ username = settings.proxy_pool.username
 password = settings.proxy_pool.password
 
 
-async def get_current_ip(page):
+async def get_current_ip(page: Page):
     return await page.evaluate(
         "async () => { const response = await fetch('https://api.ipify.org?format=json'); const data = await response.json(); return data.ip; }"
     )
@@ -29,7 +30,9 @@ proxy_url = f"http://{settings.proxy_pool.username}:{settings.proxy_pool.passwor
 proxies = httpx.Proxy(url=proxy_url)
 
 with httpx.Client(proxies=proxies, timeout=60) as client:
-    r = client.get("https://dev.kdlapi.com/testproxy")
-    print(r.text)
+    # r = client.get("https://dev.kdlapi.com/testproxy")
+    # print(r.text)
     r = client.get("https://api.ipify.org?format=json")
     print(r.text)
+
+print(get_current_ip())

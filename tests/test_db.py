@@ -2,17 +2,20 @@ from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 
 from crawler.db import engine
-from crawler.models import ProductReview
+from crawler.deps import get_logger
+from crawler.models import ProductReview, Product
+
+log = get_logger("test")
 
 
 def test_insert_or_update():
     with Session(engine) as session:
         item = {
-            "product_id": 33,
+            "product_id": 999993444,
             "sku_id": 1,
             "rating": 5,
             "title": "测试",
-            "review": "good",
+            "source": "other"
         }
         id = item["product_id"]
         # result = session.execute(text("select version()")).scalars().one_or_none()
@@ -36,3 +39,11 @@ def test_insert_or_update():
             result = session.execute(stmt)
             session.commit()
             log.info(result)
+
+
+def test_product_sku():
+    with Session(engine) as session:
+        result: Product = session.execute(
+            select(Product).where(Product.source == 'gap', Product.product_id == '728681')).scalars().one_or_none()
+        if result:
+            assert result.product_id == '728681'
