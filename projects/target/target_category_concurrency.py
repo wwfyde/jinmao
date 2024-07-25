@@ -30,11 +30,11 @@ PLAYWRIGHT_CONCURRENCY = 9
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
 PLAYWRIGHT_HEADLESS: bool = True
 
-settings.save_login_state = True
+settings.save_login_state = False
 # TODO  设置是否下载图片
 should_download_image = False
 should_get_review = True
-should_get_product = False
+should_get_product = True
 force_get_product = False
 should_use_proxy = False
 if should_get_product:
