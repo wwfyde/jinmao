@@ -306,9 +306,10 @@ async def run_playwright_instance(url_info):
 async def main():
     loop = asyncio.get_running_loop()
     num_processes = os.cpu_count() // 2
+    num_processes = 2
     urls = []
 
-    default_urls = [
+    women_urls = [
         # ("women", "maternity", "default", "default",
         #  "https://www.target.com/c/maternity-clothing-women/-/N-5ouvi"),  # 
         # ("women", "graphic-tees", "default", "batch1",
@@ -450,42 +451,187 @@ async def main():
         # ("women", "jeans", "black", "M", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8Z5y761Zvef8a?moveTo=product-list-grid",),  # noqa # 已完成
         # ("women", "jeans", "default", "default", "https://www.target.com/c/jeans-women-s-clothing/-/N-5xtc8",),  # 已完成
         # noqa # 已完成
-        # ("women", "shorts", "black", "M",
-        #  "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5Zvef8aZ5y761?moveTo=product-list-grid"),  # 已完成
+        ("women", "shorts", "default", "default",
+         "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5"),  # 已完成
     ]
-    pet_urls = [
-        ("pets", "dog-supplies", "batch1", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),
-        ("pets", "dog-supplies", "batch2", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"),
-        ("pets", "dog-supplies", "batch3", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZe3sjevcc90xZe3sjevyxi6xZ2nsb6Z4yl7mZ4yjup?moveTo=product-list-grid"
-         ),
-        ("pets", "dog-supplies", "batch4", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZw1fi5Z4yl7mZe3sjev7pshl?moveTo=product-list-grid"
-         ),
-        ("pets", "dog-supplies", "batch5", "unknown",
-         "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl7m?moveTo=product-list-grid"
-         ),
-        ("pets", "cat-supplies", "batch2", "unknown",
-         "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z6q8fqiw8pkZ4yl67Z4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"
-         ),
-        ("pets", "cat-supplies", "batch3", "unknown",
-         "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z4yl7m?moveTo=product-list-grid"
-         ),
-        ("pets", "gifts-for-pets", "batch1", "unknown",
-         "https://www.target.com/c/gifts-for-pets/-/N-55z1mZ5n5og?moveTo=product-list-grid"
-         ),
+    urls.extend(women_urls)
+    men_urls = [
+        # (
+        #     "men",
+        #     "pants",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/pants-men-s-clothing/-/N-5xu29",
+        # ),  # 完成
+        # (
+        #     "men",
+        #     "shorts",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/shorts-men-s-clothing/-/N-5xu27",
+        # ),
+        # (
+        #     "men",
+        #     "swimsuits",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/swimsuits-men-s-clothing/-/N-5xu1y",
+        # ),
+        # (
+        #     "men",
+        #     "jeans",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/jeans-men-s-clothing/-/N-5xu2b",
+        # ),
+        # (
+        #     "men",
+        #     "activewear",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/activewear-men-s-clothing/-/N-5xu2e",
+        # ),
+        # (
+        #     "men",
+        #     "jackets-coats",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/jackets-coats-men-s-clothing/-/N-5xu2a",
+        # ),
+        # (
+        #     "men",
+        #     "sleepwear-pajamas-robes",
+        #     "black",
+        #     "default",
+        #     "https://www.target.com/c/sleepwear-pajamas-robes-men-s-clothing/-/N-5xu26Zgup4zc5zk7s?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "sleepwear-pajamas-robes",
+        #     "batch1",
+        #     "default",
+        #     "https://www.target.com/c/sleepwear-pajamas-robes-men-s-clothing/-/N-5xu26Zgup4zc5xkwhZgup4zc5xku0Zgup4zc5xktoZgup4zc5xkumZgup4zc5xktmZgup4zc5xkunZgup4zc5xkw9?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "sleepwear-pajamas-robes",
+        #     "batch2",
+        #     "default",
+        #     "https://www.target.com/c/sleepwear-pajamas-robes-men-s-clothing/-/N-5xu26Zgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
+        # ),
 
-        ("pets", "gifts-for-pets", "batch2", "unknown",
-         "https://www.target.com/c/gifts-for-pets/-/N-55z1mZ5n5p5?moveTo=product-list-grid"
-         ),
-        ("pets", "gifts-for-pets", "batch3", "unknown",
-         "https://www.target.com/c/gifts-for-pets/-/N-55z1mZzebtaZ4ycp2Z5n4heZ1pthuZ5n4hgZ55k79Z5n4hdZ9fm9hZsqpmwnp13q0Z5n5ofZ5n5k1Zsqpmwnqs6mxZ5n4o7?moveTo=product-list-grid"
-         ),
+        # (
+        #     "men",
+        #     "socks",
+        #     "batch1",
+        #     "default",
+        #     "https://www.target.com/c/socks-men-s-clothing/-/N-5xu21Zgup4zc5zkqbZgup4zc5xkwhZgup4zc5xku0Zgup4zc5xktoZgup4zc5xkumZgup4zc5zk7sZgup4zc5xktmZgup4zc5xkun?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "socks",
+        #     "batch2",
+        #     "default",
+        #     "https://www.target.com/c/socks-men-s-clothing/-/N-5xu21Zgup4zc5xkw9?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "socks",
+        #     "batch3",
+        #     "default",
+        #     "https://www.target.com/c/socks-men-s-clothing/-/N-5xu21Zgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
+        # ),
+
+        (
+            "men",
+            "underwear",
+            "default",
+            "default",
+            "https://www.target.com/c/underwear-men-s-clothing/-/N-4vr7v",
+        ),
+        (
+            "men",
+            "undershirts",
+            "default",
+            "default",
+            "https://www.target.com/c/undershirts-men-s-clothing/-/N-4vr7u",
+        ),
+        (
+            "men",
+            "suits",
+            "default",
+            "default",
+            "https://www.target.com/c/suits-men-s-clothing/-/N-5xu20",
+        ),
+        (
+            "men",
+            "shoes",
+            "batch1",
+            "default",
+            "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5zk7s?moveTo=product-list-grid",
+        ),
+        (
+            "men",
+            "shoes",
+            "batch2",
+            "default",
+            "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5zkqbZgup4zc5xku0Zgup4zc5xktoZgup4zc5xktmZgup4zc5xkun?moveTo=product-list-grid",
+        ),
+        (
+            "men",
+            "shoes",
+            "batch3",
+            "default",
+            "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5xkumZgup4zc5xkwhZgup4zc5xkw9Zgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
+        ),
+        # TODO 大量 https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxi
+    ]
+    # urls.extend(men_urls)
+    pet_urls = [
+        # ("pets", "dog-supplies", "batch1", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),
+        # ("pets", "dog-supplies", "batch2", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"),
+        # ("pets", "dog-supplies", "batch3", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZe3sjevcc90xZe3sjevyxi6xZ2nsb6Z4yl7mZ4yjup?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "dog-supplies", "batch4", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZw1fi5Z4yl7mZe3sjev7pshl?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "dog-supplies", "batch5", "unknown",
+        #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ4yl7m?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "cat-supplies", "batch2", "unknown",
+        #  "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z6q8fqiw8pkZ4yl67Z4yl4tZ4yl59Z4yl4i?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "cat-supplies", "batch3", "unknown",
+        #  "https://www.target.com/c/cat-supplies-pets/-/N-5xt42Z4yl7m?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "gifts-for-pets", "batch1", "unknown",
+        #  "https://www.target.com/c/gifts-for-pets/-/N-55z1mZ5n5og?moveTo=product-list-grid"
+        #  ),
+        # 
+        # ("pets", "gifts-for-pets", "batch2", "unknown",
+        #  "https://www.target.com/c/gifts-for-pets/-/N-55z1mZ5n5p5?moveTo=product-list-grid"
+        #  ),
+        # ("pets", "gifts-for-pets", "batch3", "unknown",
+        #  "https://www.target.com/c/gifts-for-pets/-/N-55z1mZzebtaZ4ycp2Z5n4heZ1pthuZ5n4hgZ55k79Z5n4hdZ9fm9hZsqpmwnp13q0Z5n5ofZ5n5k1Zsqpmwnqs6mxZ5n4o7?moveTo=product-list-grid"
+        #  ),
         # ("pets", "dog-food", "default", "unknown",
         #  "https://www.target.com/c/dog-food-supplies-pets/-/N-5xt3m"
         #  ),
+        ("pets", "cat-food", "default", "unknown",
+         "https://www.target.com/c/cat-food-supplies-pets/-/N-5xt3y"
+         ),
+        ("pets", "cat-litter", "default", "unknown",
+         "https://www.target.com/c/cat-litter-supplies-pets/-/N-5xt3v"
+         ),
+        ("pets", "cat-toys", "default", "unknown",
+         "https://www.target.com/c/cat-toys-supplies-pets/-/N-5xt3u"
+         ),
+        ("pets", "cat-treats", "default", "unknown",
+         "https://www.target.com/c/cat-treats-supplies-pets/-/N-bpteb"
+         ),
     ]
     # urls.extend(pet_urls)
     bed_urls = [
@@ -502,7 +648,7 @@ async def main():
         ("furniture", "beds", "misc2", "default",
          "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22Z5y73rZ5xr7iZ5y76dZ5y713Z55iviZ5xrh3Z5y76nZ5y67tZ5y6hbZ5y72c?moveTo=product-list-grid"),
     ]  # 索引建立完成
-    urls.extend(bed_urls)
+    # urls.extend(bed_urls)
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
         tasks = [loop.run_in_executor(executor, async_runner, url_info) for url_info in urls]
 

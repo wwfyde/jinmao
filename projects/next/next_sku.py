@@ -115,8 +115,8 @@ async def run(playwright: Playwright) -> None:
                           'protectors',
                           'toppers', 'blankets', 'valances'}
     category_indexes.extend({("bed", item) for item in sub_categories_bed})
-    # for main_category, sub_category in category_indexes:
-    for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
+    for main_category, sub_category in category_indexes:
+        # for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
         async with r:
             source = "next"
             sub_category = sub_category
@@ -135,7 +135,7 @@ async def run(playwright: Playwright) -> None:
                 )
                 for url in product_urls
             ]
-            results = await asyncio.gather(*tasks)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
             # log.debug(f"{results=}")
             log.debug(f"完成{sub_category=}的抓取")
             async with r:
@@ -220,6 +220,7 @@ async def open_pdp_page(
                 sku_id_raw = product.get("sku_id_raw")
                 product.update(dict(sub_category=sub_category, source=source))
                 await save_product_data_async(product)
+                await save_product_detail_data_async(product)
                 await save_sku_data_async(product)
 
                 log.debug(f"源sku_id: {sku_id_raw}")
@@ -469,6 +470,7 @@ async def parse_next_sku(
         source=source,
         description=description,
         attributes=attributes,
+        attributes_raw=attributes,
     )
     await save_product_data_async(
         product_extra_info
@@ -560,7 +562,7 @@ async def main():
         except Exception as exc:
             log.error(f"出现错误: {exc}")
             i += 1
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
             continue
 
 

@@ -30,7 +30,7 @@ async def ai_translator(data: dict, llm_channel: Literal['glm4_air', 'ark_doubao
         model=getattr(settings, llm_channel).model,
         messages=[
             {"role": "system", "content": settings.translate_prompt},
-            {"role": "user", "content": str(data)},
+            {"role": "user", "content": json.dumps(data, ensure_ascii=False)},
         ],
     )
     result = chat_completion.choices[0].message.content
@@ -266,7 +266,7 @@ async def product_run_sync():
     # get the data from the database
     session = sessionmaker(engine)
     with session() as session:
-        stmt = select(Product).where(Product.source == 'gap')
+        stmt = select(Product).where(Product.source == 'target')
         result = session.execute(stmt)
         products_in_uat: list[Product] = result.scalars().all()
         log.info(f"一共获取到 {len(products_in_uat)} 条数据")
@@ -335,7 +335,7 @@ async def product_run_sync():
 
     log.info("任务执行完毕")
     # await async_engine.dispose()
-    
+
 
 if __name__ == '__main__':
     # asyncio.run(ai_translator({"hello": "world"}))

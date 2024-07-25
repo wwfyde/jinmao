@@ -195,7 +195,10 @@ class ProductDetail(Base):
     raw_data: Mapped[dict | None] = mapped_column(JSON, comment="原始数据, json字段")
     parent_category: Mapped[str | None] = mapped_column(String(256), comment="父商品类别")  # optional: jcpenney, target
     category_breadcrumbs: Mapped[str | None] = mapped_column(String(1024), comment="商品类别级联")
-    sub_category: Mapped[str | None] = mapped_column(String(256), comment="子类别")  # optional: jcpenney, target
+    main_category: Mapped[str | None] = mapped_column(String(256),
+                                                      comment="主类别, 用于抓取时类别标识")  # optional: jcpenney, target
+    sub_category: Mapped[str | None] = mapped_column(String(256),
+                                                     comment="子类别, 用于抓取时类别标识")  # optional: jcpenney, target
     lot_id: Mapped[str | None] = mapped_column(
         String(128), nullable=True, comment="产品批次 ID"
     )  # required: jcpenney

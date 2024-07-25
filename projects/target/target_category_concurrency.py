@@ -30,7 +30,7 @@ PLAYWRIGHT_CONCURRENCY = 9
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
 PLAYWRIGHT_HEADLESS: bool = True
 
-settings.save_login_state = False
+settings.save_login_state = True
 # TODO  设置是否下载图片
 should_download_image = False
 should_get_review = True
@@ -119,8 +119,8 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
         url = domain + url
         pdp_tasks.append(
             open_pdp_page(
-                # browser,
                 context=context,
+                # browser=browser,
                 url=url,
                 semaphore=semaphore,
                 source=source,
@@ -351,6 +351,7 @@ async def open_pdp_page(
             # 导航到指定的URL
             # 其他操作...
             # 暂停执行
+
             response = await page.goto(url, timeout=PLAYWRIGHT_TIMEOUT)
             # ip_info = await get_current_ip(page)
             # log.debug(f"当前使用ip: {ip_info}")
@@ -360,7 +361,7 @@ async def open_pdp_page(
             headers = response.headers
 
             # await page.pause()
-            log.info("等待页面加载")
+            log.info(f"等待页面加载, {url=}")
             await page.wait_for_timeout(3000)
             # 滚动页面以加载评论
             scroll_pause_time = random.randrange(1000, 2500, 500)
@@ -385,7 +386,7 @@ async def open_pdp_page(
                     # 设置超时时间以避免代码阻塞
                     await asyncio.wait_for(product_event.wait(), timeout=60 * 2)
                 except asyncio.TimeoutError:
-                    log.warning("等待超时")
+                    log.warning("等待商品PDP超时, 请切换IP, 或检查商品状态")
                 log.info("PDP(产品详情页)接口执行完毕")
             # await skus_event.wait()
             if should_get_review:
@@ -394,7 +395,7 @@ async def open_pdp_page(
 
                     await asyncio.wait_for(review_event.wait(), timeout=60 * 10)
                 except asyncio.TimeoutError:
-                    log.warning("等待超时")
+                    log.warning("等待评论接口超时, 疑似评论不存在, 或商品已失效")
                 log.info("Review(评论)接口执行完毕")
 
             # await page.pause()
@@ -430,7 +431,7 @@ async def open_pdp_page(
                         await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
                 if should_get_product or force_get_product:
                     log.warning("等待随机时间")
-                    await asyncio.sleep(random.randint(10, 30))
+                    await asyncio.sleep(random.randint(15, 30))
             else:
                 log.warning("跳过商品状态检查")
             return product_id, sku_id
@@ -887,6 +888,7 @@ async def parse_target_product(
         description=description,  # 描述信息
         review_count=review_count,  # 评论数
         gender=primary_category,  # 大类别
+        main_category=primary_category,  # 大类别
         inner_category=sub_category,  # 内部类别
         sub_category=sub_category,  # 子类别
     )
@@ -1066,14 +1068,35 @@ async def run_playwright_instance(main_category, subcategory):
 async def main():
     loop = asyncio.get_running_loop()
     num_processes = os.cpu_count() // 2
+    num_processes = 2
 
     # TODO (wwfyde) 请在此处配置待抓取商品索引 
     categories = [
-        ("pets", "dog-supplies"),
-        ("pets", "cat-supplies"),
-        ("pets", "gifts-for-pets"),
-        ("pets", "dog-food"),
-        ("furniture", "beds"),
+        # ("women", "jeans"),  # mac finished 抓取完毕 0725 重新尝试
+        ("women", "shorts"),  # TODO
+        # ("pets", "dog-supplies"),  # mac finished 抓取完毕 0724
+        # ("pets", "cat-supplies"),  # 188  finished 抓取完毕 0723
+        # ("pets", "gifts-for-pets"),  # 188 finished 抓取完毕 0723
+        # ("pets", "dog-food"),  # 102  finished 抓取完毕 0723
+        # ("furniture", "beds"),  # 115 finished 抓取完毕 0724
+        # ("pets", "dog-toys"),  # 188 finished 抓取完毕 0724
+        # ("pets", "dog-treats"),  # 188 finished 抓取完毕 0724
+        # ("pets", "cat-food"),  # 188 finished 抓取完毕 0724
+        # ("pets", "cat-litter"),  # 188 finished 抓取完毕 0724
+        # ("pets", "cat-toys"),  # 102 finished 抓取完毕 0724
+        # ("pets", "cat-treats"),  # 102 finished 抓取完毕 0724
+        # ("men", "pants"),  # 102 finished 抓取完毕 0724
+        # ("men", "shorts"),  # mac finished 抓取完毕 0724
+        # ("men", "swimsuits"),  # 188 抓取完毕 0724
+        # ("men", "jackets-coats"),  # 188 finished 抓取完毕 0724 
+        # ("men", "jeans"),  # mac finished 抓取完毕 0724
+        # ("men", "socks"),  # 188 finished 抓取完毕 0725
+        # ("men", "activewear"),  # 102 finished 抓取完毕 0725 
+        # ("men", "sleepwear-pajamas-robes"),  # 115 finished 抓取完毕 0725 
+        # ("men", "underwear"),  # 102 processing 
+        # ("men", "undershirts"),  # 102 finished 抓取完毕 0725
+        # ("men", "suits"),  # 188 processing
+        # ("men", "shoes"),  # 115 processing
     ]
 
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
