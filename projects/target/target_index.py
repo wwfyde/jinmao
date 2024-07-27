@@ -137,7 +137,7 @@ async def run(playwright: Playwright, url_info: tuple) -> None:
                         count = metadata.get("count", 0)
                         total_pages = metadata.get("total_pages", 0)
                         tasks = []
-                        semaphore = asyncio.Semaphore(1)  # 设置并发请求数限制为5
+                        semaphore = asyncio.Semaphore(5)  # 设置并发请求数限制为5
                         nonlocal product_status
                         product_status = "done"
                         log.debug(f"当前类别或品牌总页数: {total_pages}, 总商品数: {total_results}")
@@ -454,7 +454,7 @@ async def main():
         ("women", "shorts", "default", "default",
          "https://www.target.com/c/shorts-women-s-clothing/-/N-5xtc5"),  # 已完成
     ]
-    urls.extend(women_urls)
+    # urls.extend(women_urls)
     men_urls = [
         # (
         #     "men",
@@ -542,51 +542,250 @@ async def main():
         #     "https://www.target.com/c/socks-men-s-clothing/-/N-5xu21Zgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
         # ),
 
-        (
-            "men",
-            "underwear",
-            "default",
-            "default",
-            "https://www.target.com/c/underwear-men-s-clothing/-/N-4vr7v",
-        ),
-        (
-            "men",
-            "undershirts",
-            "default",
-            "default",
-            "https://www.target.com/c/undershirts-men-s-clothing/-/N-4vr7u",
-        ),
-        (
-            "men",
-            "suits",
-            "default",
-            "default",
-            "https://www.target.com/c/suits-men-s-clothing/-/N-5xu20",
-        ),
-        (
-            "men",
-            "shoes",
-            "batch1",
-            "default",
-            "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5zk7s?moveTo=product-list-grid",
-        ),
-        (
-            "men",
-            "shoes",
-            "batch2",
-            "default",
-            "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5zkqbZgup4zc5xku0Zgup4zc5xktoZgup4zc5xktmZgup4zc5xkun?moveTo=product-list-grid",
-        ),
-        (
-            "men",
-            "shoes",
-            "batch3",
-            "default",
-            "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5xkumZgup4zc5xkwhZgup4zc5xkw9Zgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
-        ),
+        # (
+        #     "men",
+        #     "underwear",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/underwear-men-s-clothing/-/N-4vr7v",
+        # ),
+        # (
+        #     "men",
+        #     "undershirts",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/undershirts-men-s-clothing/-/N-4vr7u",
+        # ),
+        # (
+        #     "men",
+        #     "suits",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/suits-men-s-clothing/-/N-5xu20",
+        # ),
+        # (
+        #     "men",
+        #     "shoes",
+        #     "batch1",
+        #     "default",
+        #     "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5zk7s?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "shoes",
+        #     "batch2",
+        #     "default",
+        #     "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5zkqbZgup4zc5xku0Zgup4zc5xktoZgup4zc5xktmZgup4zc5xkun?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "shoes",
+        #     "batch3",
+        #     "default",
+        #     "https://www.target.com/c/men-s-shoes/-/N-5xu1wZgup4zc5xkumZgup4zc5xkwhZgup4zc5xkw9Zgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
+        # ),
         # TODO 大量 https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxi
+        # (
+        #     "men",
+        #     "sweaters",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/sweaters-men-s-clothing/-/N-5xu1z",
+        # ),
+        # (
+        #     "men",
+        #     "polo-shirts",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/polo-shirts-men-s-clothing/-/N-55cxg",
+        # ),
+        # (
+        #     "men",
+        #     "dress-shirts",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/dress-shirts-men-s-clothing/-/N-37dl1",
+        # ),
+        # (
+        #     "men",
+        #     "casual-button-downs-shirts",
+        #     "default",
+        #     "default",
+        #     "https://www.target.com/c/casual-button-downs-shirts-men-s-clothing/-/N-55cxe",
+        # ),
+        # # 按type + color 分类 然后集合
+        # (
+        #     "men",
+        #     "t-shirts-tank-tops",
+        #     "black",
+        #     "medium",
+        #     "https://www.target.com/c/t-shirts-tank-tops-men-s-clothing/-/N-4ujkzZgup4zc5zk7sZ5y34tZyshar?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "t-shirts-tank-tops",
+        #     "batch1",
+        #     "default",
+        #     "https://www.target.com/c/t-shirts-tank-tops-men-s-clothing/-/N-4ujkzZysharZgup4zc5xku0Zgup4zc5xktoZgup4zc5xktmZgup4zc5xkun?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "t-shirts-tank-tops",
+        #     "gray",
+        #     "default",
+        #     "https://www.target.com/c/t-shirts-tank-tops-men-s-clothing/-/N-4ujkzZysharZgup4zc5xkum?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "t-shirts-tank-tops",
+        #     "batch2",
+        #     "default",
+        #     "https://www.target.com/c/t-shirts-tank-tops-men-s-clothing/-/N-4ujkzZysharZgup4zc5xkw9Zgup4zc5xkugZgup4zc5xkwhZgup4zc5xkerZesftkZgup4zc5xkwkZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "t-shirts-tank-tops",
+        #     "type1",
+        #     "default",
+        #     "https://www.target.com/c/t-shirts-tank-tops-men-s-clothing/-/N-4ujkzZ3zu90Z8vd6xZyk58tZ8r6cnZxjnrxZ4r9n4Z329yuZl99ueZ6mtooZ6n8y3Zal25lfve9g3Zfg86zZd6tkuZal25lfljjs7Zh85adZbkzaeZngyq0?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "t-shirts-tank-tops",
+        #     "tank-tops",
+        #     "default",
+        #     "https://www.target.com/c/t-shirts-tank-tops-men-s-clothing/-/N-4ujkzZt0hxy?moveTo=product-list-grid",
+        # ),
+
+        # TODO TopsSweatshirts & Hoodies  https://www.target.com/c/hoodies-sweatshirts-men-s-clothing/-/N-551v0?moveTo=product-list-grid
+        # 
+        # (
+        #     "men",
+        #     "hoodies-sweatshirts",
+        #     "blue",
+        #     "default",
+        #     "https://www.target.com/c/hoodies-sweatshirts-men-s-clothing/-/N-551v0Zgup4zc5xku0?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "hoodies-sweatshirts",
+        #     "batch1",
+        #     "default",
+        #     "https://www.target.com/c/hoodies-sweatshirts-men-s-clothing/-/N-551v0Zgup4zc5zkqbZgup4zc5xkw9Zgup4zc5xkugZgup4zc5xkwhZgup4zc5xktoZgup4zc5xkerZesftkZgup4zc5xktmZgup4zc5xkunZgup4zc5xkwkZgup4zc5xkvl?moveTo=product-list-grid",
+        # ), (
+        #     "men",
+        #     "hoodies-sweatshirts",
+        #     "batch2",
+        #     "default",
+        #     "https://www.target.com/c/hoodies-sweatshirts-men-s-clothing/-/N-551v0Zgup4zc5xkpkZgup4zc5xkwvZgup4zc5zk8t?moveTo=product-list-grid",
+        # ), (
+        #     "men",
+        #     "hoodies-sweatshirts",
+        #     "gray",
+        #     "default",
+        #     "https://www.target.com/c/hoodies-sweatshirts-men-s-clothing/-/N-551v0Zgup4zc5xkum?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "hoodies-sweatshirts",
+        #     "black",
+        #     "default",
+        #     "https://www.target.com/c/hoodies-sweatshirts-men-s-clothing/-/N-551v0Zgup4zc5zk7s?moveTo=product-list-grid",
+        # ),
+
+        # TODO Graphic Tees & Sweatshirts https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxi
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "father-s-day",
+        #     "default",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/father-s-day/-/N-55cxiZ8zw2q",
+        # ),
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "americana",
+        #     "default",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/americana/-/N-55cxiZgejlf",
+        # ),
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "pop-culture",
+        #     "batch1",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZgup4zc5xktmZiv1xsZmr8zmZrhi27Zgup4zc5xku0Zgup4zc5xkunZgup4zc5xkto?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "pop-culture",
+        #     "black",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZiv1xsZmr8zmZrhi27Zgup4zc5zk7s?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "pop-culture",
+        #     "batch2",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZgup4zc5xkumZiv1xsZmr8zmZrhi27Zgup4zc5xkwhZgup4zc5xkw9?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "pop-culture",
+        #     "batch3",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZiv1xsZmr8zmZrhi27ZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvlZgup4zc5zk8tZgup4zc5xkpkZgup4zc5xkwv?moveTo=product-list-grid",
+        # ),
+        # (
+        #     "men",
+        #     "graphic-tees-t-shirts",
+        #     "music",
+        #     "default",
+        #     "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/music/-/N-55cxiZj7oro",
+        # ),
+        (
+            "men",
+            "graphic-tees-t-shirts",
+            "tv-and-movie",
+            "batch1",
+            "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZfo87bqov5agZrg0dhZgup4zc5xktm?type=products&moveTo=product-list-grid",
+        ),
+        (
+            "men",
+            "graphic-tees-t-shirts",
+            "tv-and-movie",
+            "batch2",
+            "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZfo87bqov5agZrg0dhZgup4zc5zk7s?type=products&moveTo=product-list-grid",
+        ),
+        (
+            "men",
+            "graphic-tees-t-shirts",
+            "tv-and-movie",
+            "batch3",
+            "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZfo87bqov5agZrg0dhZgup4zc5xku0?type=products&moveTo=product-list-grid",
+        ),
+        (
+            "men",
+            "graphic-tees-t-shirts",
+            "tv-and-movie",
+            "batch4",
+            "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZgup4zc5zkqbZgup4zc5xktoZgup4zc5xkunZfo87bqov5agZrg0dhZgup4zc5xkum?type=products&moveTo=product-list-grid",
+        ), (
+            "men",
+            "graphic-tees-t-shirts",
+            "tv-and-movie",
+            "batch5",
+            "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZfo87bqov5agZrg0dhZgup4zc5xkwhZgup4zc5xkw9ZesftkZgup4zc5xkwkZgup4zc5xkugZgup4zc5xkvl?type=products&moveTo=product-list-grid",
+        ), (
+            "men",
+            "graphic-tees-t-shirts",
+            "tv-and-movie",
+            "batch6",
+            "https://www.target.com/c/graphic-tees-t-shirts-men-s-clothing/-/N-55cxiZfo87bqov5agZrg0dhZgup4zc5zk8tZgup4zc5xkwvZgup4zc5xkpk?type=products&moveTo=product-list-grid",
+        ),
+
     ]
-    # urls.extend(men_urls)
+    urls.extend(men_urls)
     pet_urls = [
         # ("pets", "dog-supplies", "batch1", "unknown",
         #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),

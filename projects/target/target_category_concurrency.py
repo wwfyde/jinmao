@@ -11,7 +11,7 @@ from typing import Literal
 import httpx
 import redis.asyncio as redis
 from fake_useragent import UserAgent
-from playwright.async_api import Playwright, async_playwright, Route, Page, BrowserContext
+from playwright.async_api import Playwright, async_playwright, Route, Page, Browser
 
 from crawler.config import settings
 from crawler.deps import get_logger
@@ -38,11 +38,11 @@ should_get_product = True
 force_get_product = False
 should_use_proxy = False
 if should_get_product:
-    PLAYWRIGHT_CONCURRENCY = 3
+    PLAYWRIGHT_CONCURRENCY = 6
 if not should_download_image:
     log.warning("当前图片未设置为允许下载")
 
-ua = UserAgent(browsers=["edge", "chrome", "safari"], platforms=["pc"], os=["windows", "macos"])
+ua = UserAgent(browsers=["edge", "chrome", "safari"], platforms=["mobile"], os=["ios", "android"])
 
 
 async def get_current_ip(page: Page):
@@ -85,14 +85,14 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
         await context.clear_permissions()
     else:
         pass
-        browser = await chromium.launch(
-            headless=PLAYWRIGHT_HEADLESS,
-            proxy=proxy,
-            # devtools=True,
-        )
-        context = await browser.new_context(
-            user_agent=ua.random,
-        )
+    browser = await chromium.launch(
+        headless=PLAYWRIGHT_HEADLESS,
+        proxy=proxy,
+        # devtools=True,
+    )
+    context = await browser.new_context(
+        user_agent=ua.random,
+    )
 
     # 设置全局超时
     context.set_default_timeout(settings.playwright.timeout)
@@ -119,8 +119,8 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
         url = domain + url
         pdp_tasks.append(
             open_pdp_page(
-                context=context,
-                # browser=browser,
+                # context=context,
+                browser=browser,
                 url=url,
                 semaphore=semaphore,
                 source=source,
@@ -134,11 +134,12 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
     for result in results:
         if isinstance(result, Exception):
             log.error(f"抓取商品失败: {result}")
+            raise ValueError(f"抓取商品失败: {result}")
 
 
 async def open_pdp_page(
-        context: BrowserContext,
-        # browser: Browser,
+        # context: BrowserContext,
+        browser: Browser,
         *,
         url: str,
         semaphore: asyncio.Semaphore,
@@ -194,9 +195,9 @@ async def open_pdp_page(
                 log.info(
                     f"抓取商品或评论:{product_id=}, {sku_id},{category_status_flag=}, {category_review_status_flag=}, {brand_status_flag=}, {brand_review_status_flag=} 开始抓取")
 
-        # user_agent = ua.random
-        # log.info(f"当前UserAgent: {user_agent}")
-        # context = await browser.new_context(user_agent=user_agent)
+        user_agent = ua.random
+        log.info(f"当前UserAgent: {user_agent}")
+        context = await browser.new_context(user_agent=user_agent)
         # context = await browser.new_context()
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
@@ -431,7 +432,7 @@ async def open_pdp_page(
                         await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
                 if should_get_product or force_get_product:
                     log.warning("等待随机时间")
-                    await asyncio.sleep(random.randint(15, 30))
+                    await asyncio.sleep(random.randint(30, 32))
             else:
                 log.warning("跳过商品状态检查")
             return product_id, sku_id
@@ -744,6 +745,7 @@ async def parse_target_product(
     product: dict | None = data.get("data").get("product") if data.get("data") else {}
     if not product:
         log.error(f"未从接口中获取到商品信息,{product_id=}, {sku_id=}, {task_type=} ")
+        raise ValueError(f"未从接口中获取到商品信息,{product_id=}, {sku_id=}, {task_type=} ")
         return None, None
     product_id_from_api = product.get("tcin")
     if product_id_from_api != product_id:
@@ -1052,7 +1054,7 @@ def map_attribute_field(input: dict) -> dict:
 async def run_playwright_instance(main_category, subcategory):
     # 创建一个playwright对象并将其传递给run函数
     retry_times = 0
-    while retry_times < 1:
+    while retry_times < 10:
         try:
             async with async_playwright() as p:
                 await run(p, main_category, subcategory)
@@ -1073,7 +1075,7 @@ async def main():
     # TODO (wwfyde) 请在此处配置待抓取商品索引 
     categories = [
         # ("women", "jeans"),  # mac finished 抓取完毕 0725 重新尝试
-        ("women", "shorts"),  # TODO
+        # ("women", "shorts"),  # 102 finished 抓取完毕 0726
         # ("pets", "dog-supplies"),  # mac finished 抓取完毕 0724
         # ("pets", "cat-supplies"),  # 188  finished 抓取完毕 0723
         # ("pets", "gifts-for-pets"),  # 188 finished 抓取完毕 0723
@@ -1093,10 +1095,17 @@ async def main():
         # ("men", "socks"),  # 188 finished 抓取完毕 0725
         # ("men", "activewear"),  # 102 finished 抓取完毕 0725 
         # ("men", "sleepwear-pajamas-robes"),  # 115 finished 抓取完毕 0725 
-        # ("men", "underwear"),  # 102 processing 
+        # ("men", "underwear"),  # 102 finished 抓取完毕 0726 
         # ("men", "undershirts"),  # 102 finished 抓取完毕 0725
-        # ("men", "suits"),  # 188 processing
-        # ("men", "shoes"),  # 115 processing
+        # ("men", "suits"),  # 188 finished 抓取完毕 0725
+        # ("men", "shoes"),  # 115 finished 抓取完毕 0727
+        # ("men", "t-shirts-tank-tops"),  # 188 finished 抓取完毕 0727
+        # ("men", "casual-button-downs-shirts"),  # 115 finished 抓取完毕 0726
+        # ("men", "dress-shirts"),  # 188 finished 抓取完毕 0725
+        # ("men", "sweaters"),  # 188 finished 抓取完毕 0725
+        # ("men", "polo-shirts"),  # 188 finished 抓取完毕 0725
+        # ("men", "hoodies-sweatshirts"),  # mac+188 processing
+        ("men", "graphic-tees-t-shirts"),  # 184 processing TODO indexing
     ]
 
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
