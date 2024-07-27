@@ -477,11 +477,17 @@ async def save_product_data_async(data: dict | list[dict]) -> str | None:
             product = result.scalars().one_or_none()
 
             if product:
+                log.debug(
+                    f"更新前的数据: {product.product_id=}, {product.primary_sku_id=}, {product.source=}, {product.product_name=}, {product.product_url=}, {product.category=}, {product.gender=}, {product.released_at=}")
+
                 for key, value in item.items():
                     setattr(product, key, value)
                 session.add(product)
                 await session.commit()
                 await session.refresh(product)
+                log.debug(
+                    f"更新后的数据: {product.product_id=}, {product.primary_sku_id=}, {product.source=}, {product.product_name=}, {product.product_url=}, {product.category=}, {product.gender=}, {product.released_at=}")
+                log.debug(f"插入的数据 {item}")
                 inserted_ids.append(product.id)
                 log.debug(
                     f"更新商品[product]数据成功, id={product.id}, product_id={product.product_id}, source={product.source}"
