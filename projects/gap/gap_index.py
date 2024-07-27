@@ -12,7 +12,9 @@ PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 8
+log.warning(f"并发请求数: {PLAYWRIGHT_CONCURRENCY}")
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
+should_use_proxy = False
 
 
 async def run(playwright: Playwright) -> None:
@@ -22,11 +24,20 @@ async def run(playwright: Playwright) -> None:
     # proxy = {"server": "http://127.0.0.1:7890"}
     # 启动chromium浏览器，开启开发者工具，非无头模式
     # browser = await chromium.launch(headless=False, devtools=True)
+    if should_use_proxy:
+        proxy = {
+            "server": settings.proxy_pool.server,
+            "username": settings.proxy_pool.username,
+            "password": settings.proxy_pool.password,
+        }
+    else:
+        proxy = None
     user_data_dir = settings.user_data_dir
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             headless=PLAYWRIGHT_HEADLESS,
+            proxy=proxy
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             # args=["--start-maximized"],  # 启动时最大化窗口
@@ -34,7 +45,7 @@ async def run(playwright: Playwright) -> None:
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=True, devtools=True)
+        browser = await chromium.launch(headless=True, devtools=True, proxy=proxy)
         context = await browser.new_context()
 
     # 设置全局超时
@@ -60,7 +71,7 @@ async def run(playwright: Playwright) -> None:
                 semaphore,
                 product_id,
                 sku_id,
-                primary_category=gender,
+                main_category=gender,
                 sub_category="default",
                 source="gap",
             )

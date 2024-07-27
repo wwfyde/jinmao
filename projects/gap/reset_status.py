@@ -230,13 +230,22 @@ if __name__ == "__main__":
     # ]  # girls
     # products += [805044, 879282, 879319, 879201]  # baby_girls
     # products += [879263, 879218]  # baby_boys
+
+    products = ['879147', '879171', '879129', '432715', '879218', '407852', '838218', '805044', '432755', '879075',
+                '432732', '432479', '432724', '870729', '432685', '879319', '874583', '432730', '879063', '432726',
+                '790798', '870731', '874579', '370407', '879169', '372200', '879263', '879170', '879029', '805040',
+                '891754', '878911', '879282', '879160', '407828', '805041', '534205', '455206', '534158', '715087',
+                '503901', '448147', '468396', '440935', '468428', '500368', '523809', '563514', '513101', '534366',
+                '544165', '476307', '468807', '500541', '890843', '544307', '441013', '500437', '476251', '476370',
+                '501490', '787704', '760330', '417442']
+
     genders = ["women", "men", "girls", "boys", "baby_girls", "baby_boys"]
     for gender in genders:
         for product in products:
-            image_pattern = f"image_status:gap:{gender}:default:{product}*"
-            main_pattern = f"status:gap:{gender}:default:{product}*"
-            image_download_pattern = f"image_download_status:gap:{gender}:default:{product}*"
+            # image_pattern = f"image_status:gap:{product}*"
+            main_pattern = f"status:gap:{product}*"
+            # image_download_pattern = f"image_download_status:gap:{gender}:default:{product}*"
             # image_pattern = "image_status:gap:men:default*"
             delete_keys_by_pattern(image_pattern)
-            delete_keys_by_pattern(image_download_pattern)
+            # delete_keys_by_pattern(image_download_pattern)
             delete_keys_by_pattern(main_pattern)

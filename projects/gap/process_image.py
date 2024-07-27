@@ -1,14 +1,10 @@
 from pathlib import Path
 
 import redis
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from crawler import log
 from crawler.config import settings
-from crawler.db import engine
-from crawler.models import Product
-from crawler.store import save_sku_data, save_product_data
+from crawler.store import save_sku_data
 from crawler.utils import upload_image
 
 
@@ -46,13 +42,6 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                     product_id = product_dir.name
                                     product_data = {"product_id": product_id, "skus": []}
                                     # 从数据库获取 product_id 对应的 sku_id
-                                    product_sku_id = None
-                                    with Session(engine) as session:
-                                        stmt = select(Product.sku_id).where(
-                                            Product.product_id == product_id, Product.source == source
-                                        )
-
-                                        product_sku_id = session.execute(stmt).scalars().first()
 
                                     for sku_dir in product_dir.iterdir():
                                         if sku_dir.is_dir() and sku_dir.name != "raw_data":
@@ -63,10 +52,10 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                                             with r:
                                                 image_status = r.get(
-                                                    f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}"
+                                                    f"image_status:{source}:{product_id}:{sku_id}"
                                                 )
                                                 image_download_status = r.get(
-                                                    f"image_download_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                    f"image_download_status:{source}:{product_id}:{sku_id}",
                                                 )
                                                 if image_status == "done" or image_download_status != "done":
                                                     log.warning(
@@ -77,8 +66,8 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                             for model_dir in sku_dir.iterdir():
                                                 if model_dir.is_dir() and model_dir.name == "model":
                                                     for image_file in sorted(
-                                                        model_dir.iterdir(),
-                                                        key=lambda x: int(x.name.split("-")[1]),
+                                                            model_dir.iterdir(),
+                                                            key=lambda x: int(x.name.split("-")[1]),
                                                     ):
                                                         if image_file.is_file() and image_file.suffix in [
                                                             ".jpg",
@@ -115,19 +104,16 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                             print(sku_data_db)
                                             save_sku_data(sku_data_db)
                                             log.info(f"Saving sku data for {sku_id}")
-                                            if product_sku_id and sku_id == product_sku_id:
-                                                log.info(f"Saving product data for {product_id}")
-                                                save_product_data(sku_data_db)
 
                                             product_data["skus"].append(sku_data)
                                             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                                             image_download_status = r.get(
-                                                f"image_download_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                f"image_download_status:{source}:{product_id}:{sku_id}",
                                             )
                                             if len(sku_images) > 0 and image_download_status == "done":
                                                 with r:
                                                     r.set(
-                                                        f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                        f"image_status:{source}:{product_id}:{sku_id}",
                                                         "done",
                                                     )
                                                     log.debug(
@@ -142,7 +128,7 @@ def process_directory(data_dir: Path | str, source: str = "gap", category_identi
                                                 )
                                                 with r:
                                                     r.set(
-                                                        f"image_status:{source}:{primary_category_name}:{sub_category_name}:{product_id}:{sku_id}",
+                                                        f"image_status:{source}:{product_id}:{sku_id}",
                                                         "none",
                                                     )
                                                     log.warning(

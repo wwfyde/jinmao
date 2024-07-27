@@ -103,7 +103,7 @@ PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 8
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
 PLAYWRIGHT_HEADLESS: bool = False
-
+should_use_proxy = True
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
 """
@@ -130,10 +130,20 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
     # 启动chromium浏览器，开启开发者工具，非无头模式
     # browser = await chromium.launch(headless=False, devtools=True)
     user_data_dir = settings.user_data_dir
+    if should_use_proxy:
+        proxy = {
+            "server": settings.proxy_pool.server,
+            "username": settings.proxy_pool.username,
+            "password": settings.proxy_pool.password,
+        }
+    else:
+        proxy = None
+    print(f"使用代理: {proxy}")
     if settings.save_login_state:
         context = await playwright.chromium.launch_persistent_context(
             user_data_dir,
             headless=PLAYWRIGHT_HEADLESS,
+            proxy=proxy,
             # headless=False,
             # slow_mo=50,  # 每个操作的延迟时间（毫秒），便于调试
             args=["--start-maximized"],  # 启动时最大化窗口
@@ -141,7 +151,9 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
             # devtools=True,  # 打开开发者工具
         )
     else:
-        browser = await chromium.launch(headless=True, devtools=True)
+        browser = await chromium.launch(headless=PLAYWRIGHT_HEADLESS, devtools=False,
+                                        proxy=proxy
+                                        )
         context = await browser.new_context()
 
     # 设置全局超时
@@ -151,7 +163,7 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
     # 在浏览器上下文中打开一个新页面
 
     # 打开新的页面
-    for index, (primary_category, sub_category, base_url) in enumerate(urls):
+    for index, (main_category, sub_category, base_url) in enumerate(urls):
         page = await context.new_page()
         async with page:
             # 拦截所有图像
@@ -186,18 +198,18 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
                     categories_dir.mkdir(parents=True, exist_ok=True)
 
                     with open(
-                            f"{categories_dir}/category-{primary_category}-{primary_category}-{index:03d}.json", "w"
+                            f"{categories_dir}/category-{main_category}-{main_category}-{index:03d}.json", "w"
                     ) as f:
                         f.write(json.dumps(json_dict))
 
                     # TODO  获取products by categories
-                    log.info(f"从类别[category]页面: {primary_category}-{sub_category}获取商品数据")
+                    log.info(f"从类别[category]页面: {main_category}-{sub_category}获取商品数据")
                     products, _product_count, _pages, _sku_index = await parse_category_from_api(
                         json_dict,
                         page,
-                        gender=primary_category,
+                        gender=main_category,
                         source=source,
-                        primary_category=primary_category,
+                        main_category=main_category,
                         sub_category=sub_category,
                     )
                     nonlocal product_count
@@ -246,7 +258,7 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
             # # 提取所有商品链接
             # main_content = await page.content()
             # main_tree = etree.HTML(main_content)
-            # # log.info("从route获取到的数据: ", result)
+            # # log.info("从route获取到的数据: ", results)
 
             # 等待路由事件完成
             await main_route_event.wait()
@@ -270,14 +282,17 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
                         semaphore,
                         product_id,
                         sku_id,
-                        primary_category=primary_category,
+                        main_category=main_category,
                         sub_category=sub_category,
                         source=source,
                     )
                 )
 
-            result = await asyncio.gather(*tasks)
-            log.info(f"获取到的商品sku_id 列表: {result}")
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            log.info(f"获取到的商品sku_id 列表: {len(results)}")
+            for result in results:
+                if isinstance(result, Exception):
+                    log.warning(f"获取商品sku_id列表出现部分异常: {result}")
 
             # break
         # 商品摘取完毕
@@ -293,9 +308,12 @@ async def open_pdp_page(
         sku_id: str,
         *,
         source: str,
-        primary_category: str,
+        main_category: str,
         sub_category: str,
 ):
+    """
+    打开产品详情, 所有程序入口
+    """
     async with semaphore:
         # product_detail_page 产品详情页
         pdp_url = f"https://www.gap.com/browse/product.do?pid={sku_id}#pdp-page-content"
@@ -305,7 +323,7 @@ async def open_pdp_page(
         # 检查商品是否已抓取过
         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
         async with r:
-            result = await r.get(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}")
+            result = await r.get(f"status:{source}:{product_id}:{sku_id}")
             log.info(f"商品{product_id}, sku:{sku_id}, redis抓取状态标记: {result=}")
             if result == "done":
                 log.warning(f"商品:{product_id=}, {sku_id}已抓取过, 跳过")
@@ -333,7 +351,7 @@ async def open_pdp_page(
                     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                     result = None
                     async with r:
-                        result = await r.get(f"review_status:{source}:{primary_category}:{sub_category}:{product_id}")
+                        result = await r.get(f"review_status:{source}:{product_id}")
                         log.info(f"商品评论: {product_id} 评论, redis状态标记: {result=}")
                         if result == "done":
                             log.warning(f"商品{product_id=}, {sku_id=}的评论已抓取过, 跳过")
@@ -345,7 +363,7 @@ async def open_pdp_page(
                         # 将评论信息保存到文件 注意分页
 
                         product_raw_dir = settings.data_dir.joinpath(
-                            source, primary_category, sub_category, product_id, "raw_data"
+                            source, main_category, sub_category, product_id, "raw_data"
                         )
                         product_raw_dir.mkdir(parents=True, exist_ok=True)
 
@@ -376,7 +394,7 @@ async def open_pdp_page(
                                     request.headers,
                                     product_id=product_id,
                                     index=i,
-                                    primary_category=primary_category,
+                                    main_category=main_category,
                                     sub_category=sub_category,
                                 )
                             )
@@ -393,7 +411,7 @@ async def open_pdp_page(
                         log.info(f"实际评论数{len(reviews)}")
                         # 存储评论信息
                         product_store_dir = settings.data_dir.joinpath(
-                            source, primary_category, sub_category, product_id
+                            source, main_category, sub_category, product_id
                         )
                         product_store_dir.mkdir(parents=True, exist_ok=True)
                         with open(f"{product_store_dir}/review-{product_id}.json", "w") as f:
@@ -410,7 +428,7 @@ async def open_pdp_page(
                             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                             async with r:
                                 await r.set(
-                                    f"review_status:{source}:{primary_category}:{sub_category}:{product_id}", "failed"
+                                    f"review_status:{source}:{product_id}", "failed"
                                 )
 
                         else:
@@ -418,7 +436,7 @@ async def open_pdp_page(
                             async with r:
                                 log.info(f"商品评论{product_id}抓取完毕, 标记redis状态")
                                 await r.set(
-                                    f"review_status:{source}:{primary_category}:{sub_category}:{product_id}", "done"
+                                    f"review_status:{source}:{product_id}", "done"
                                 )
                         # # 聚合评论
                         # product_store_dir2 = settings.data_dir.joinpath(source, "reviews")
@@ -454,32 +472,34 @@ async def open_pdp_page(
             await sub_page.wait_for_timeout(1000)
             await sub_page.wait_for_load_state("domcontentloaded")
             content = await sub_page.content()
-            raw_data_dir = settings.data_dir.joinpath(source, primary_category, sub_category, product_id, "raw_data")
+            raw_data_dir = settings.data_dir.joinpath(source, main_category, sub_category, product_id, "raw_data")
             raw_data_dir.mkdir(parents=True, exist_ok=True)
             with open(f"{raw_data_dir}/pdp-{product_id}.html", "w") as f:
                 f.write(content)
             # 获取产品详情页(pdp)信息
             dom_pdp_info = await parse_sku_from_dom_content(
-                content, product_id=product_id, sku_id=str(sku_id), source=source, product_url=pdp_url
+                content, product_id=product_id, sku_id=str(sku_id), source=source, product_url=pdp_url,
+                main_category=main_category, sub_category=sub_category,
             )
             # TODO 更新信息到数据库和json文件 或者等从接口拿取后统一写入
-            model_image_urls = dom_pdp_info.get("model_image_urls", [])
+            model_image_urls = dom_pdp_info.get("outer_model_image_urls", [])
             print(
                 f"{model_image_urls=}",
             )
             r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
             async with r:
                 image_status = await r.get(
-                    f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}"
+                    f"image_download_status:{source}:{product_id}:{sku_id}"
                 )
                 if image_status == "done":
                     log.warning(f"商品: {product_id}, sku:{sku_id}, 图片下载状态: {image_status}, 跳过")
                 else:
+                    log.debug(f"商品: {product_id}, sku:{sku_id}, 正在下载图片")
                     base_url = "https://www.gap.com"
                     image_tasks = []
                     semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为10
                     sku_dir = settings.data_dir.joinpath(
-                        source, primary_category, sub_category, str(product_id), str(sku_id)
+                        source, main_category, sub_category, str(product_id), str(sku_id)
                     )
                     sku_model_dir = sku_dir.joinpath("model")
                     sku_model_dir.mkdir(parents=True, exist_ok=True)
@@ -499,7 +519,7 @@ async def open_pdp_page(
                         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                         async with r:
                             await r.set(
-                                f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}",
+                                f"image_download_status:{source}:{product_id}:{sku_id}",
                                 "done",
                             )
                             log.warning(f"商品图片: {product_id}, sku:{sku_id}, 图片下载完成, 标记状态为done")
@@ -508,7 +528,7 @@ async def open_pdp_page(
                         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
                         async with r:
                             await r.set(
-                                f"image_download_status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}",
+                                f"image_download_status:{source}:{product_id}:{sku_id}",
                                 "failed",
                             )
                         log.warning("商品图片抓取失败")
@@ -531,7 +551,8 @@ async def open_pdp_page(
         r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
         async with r:
             log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
-            await r.set(f"status:{source}:{primary_category}:{sub_category}:{product_id}:{sku_id}", "done")
+            await r.set(f"status:{source}:{product_id}:{sku_id}", "done")
+        await sub_page.pause()
         return sku_id
 
 
@@ -567,7 +588,9 @@ async def parse_sku_from_api(sku: dict, sku_id: int) -> dict | None:
 
 
 async def parse_sku_from_dom_content(
-        content: str, *, product_id: str, sku_id: str, source: str, product_url: str
+        content: str, *, product_id: str, sku_id: str, source: str, product_url: str,
+        main_category: str = None,
+        sub_category: str = None,
 ) -> dict:
     """
     解析页面内容
@@ -575,6 +598,9 @@ async def parse_sku_from_dom_content(
     tree = etree.HTML(content)
 
     # 获取商品名称
+    category_node = tree.xpath('//*[@id="product"]/div[1]/div[1]/div[1]/div/nav/span/a/text()')
+    category = category_node[-1].title() if category_node else None
+    log.info(f"{category=}")
     product_name_node = tree.xpath('//*[@id="buy-box"]/div/h1/text()')
     product_name = product_name_node[0] if product_name_node else None
     log.info(f"{product_name=}")
@@ -624,11 +650,11 @@ async def parse_sku_from_dom_content(
         model_image_urls.append("https://www.gap.com" + item)
     # product_id = product_details[-1] if product_details else None
     if len(model_image_urls) > 0:
-        model_image_url = model_image_urls[0]
-        image_url = model_image_urls[-1]
+        # model_image_url = model_image_urls[0]
+        image_url = model_image_urls[0]
     else:
         log.warning(f"当前商品:{product_id=}, {sku_id=}, 未获取到图片")
-        model_image_url = None
+        # model_image_url = None
         image_url = None
 
     pdp_info = dict(
@@ -641,8 +667,15 @@ async def parse_sku_from_dom_content(
         fabric_and_care=fabric_and_care,
         product_id=product_id,
         sku_id=sku_id,
+        primary_sku_id=sku_id,
         sku_url=product_url,
         source=source,
+        brand="gap",
+        main_category=main_category,
+        sub_category=sub_category,
+        gender=main_category,
+        category=category,
+
         # model_image_url=model_image_url,
         # outer_model_image_url=model_image_url,
         # image_url=image_url,  # 避免覆盖已有数据
@@ -651,37 +684,16 @@ async def parse_sku_from_dom_content(
         outer_model_image_urls=model_image_urls,
         attributes=attributes,
         attributes_raw=attributes,
+        product_url=product_url,
     )
     # 将从页面提取到的信息保存的数据库
     await save_sku_data_async(pdp_info)
-    await save_product_data_async(
-        dict(
-            product_id=product_id,
-            product_name=product_name,
-            attributes=attributes,
-            attributes_raw=attributes,
-            product_url=product_url,
-            primary_sku_id=sku_id,
-            source=source,
-            # model_image_url=model_image_url,
-            # outer_model_image_url=model_image_url,
-            # image_url=image_url,
-            # outer_image_url=image_url,
-            # model_image_urls=model_image_urls,
-            # outer_model_image_urls=model_image_urls,
 
-        )
+    await save_product_data_async(
+        pdp_info
     )
     await save_product_detail_data_async(
-        dict(
-            product_id=product_id,
-            source=source,
-            color=color,
-            price=price,
-            fit_size=fit_and_size,
-            product_details=product_details,
-            fabric_and_care=fabric_and_care,
-        )
+        pdp_info
     )
     # with Session(engine) as session:
     #     stmt = select(Product.sku_id).where(Product.product_id == product_id, Product.source == source)
@@ -799,7 +811,7 @@ async def scroll_page(page: Page, scroll_pause_time: int = 1000, max_times: int 
 
 
 async def parse_category_from_api(
-        data: dict, page: Page, gender: str, *, source: str, primary_category: str, sub_category: str
+        data: dict, page: Page, gender: str, *, source: str, main_category: str, sub_category: str
 ):
     """
     解析类型页面的API接口
@@ -810,14 +822,15 @@ async def parse_category_from_api(
     category_skus = data.get("categories")[0]["ccList"]
     skus_index = [(item["styleId"], item["ccId"]) for item in category_skus]
     pagination = dict(
-        current_page=data.get("pagination").get("currentPage") if data.get("pagination") else None,
-        page_size=data.get("pagination").get("currentPage") if data.get("pagination") else None,
-        total_pages=data.get("pagination").get("currentPage") if data.get("pagination") else None,
+        current_page=data.get("pagination", {}).get("currentPage"),
+        page_size=data.get("pagination", {}).get("currentPage"),
+        total_pages=data.get("pagination", {}).get("currentPage"),
         total=data.get("totalColors"),
     )
     log.info(f"通过接口, 共发现{product_count}件商品")
     for product in products:
         # TODO 需要商品图片连接
+        category_breadcrumbs: str = product.get("webProductType", "")
         result = dict(
             product_id=product.get("styleId", None),  # 商品id
             product_name=product.get("styleName", None),  # 商品名称
@@ -825,7 +838,8 @@ async def parse_category_from_api(
             review_count=product.get("reviewCount", None),  # 评论数量
             rating_count=product.get("reviewCount", None),  # 评分数量
             type=product.get("webProductType", None),  # 商品类型
-            category=product.get("webProductType", None),  # 商品类别
+            category=category_breadcrumbs.split(" ")[-1].title() if category_breadcrumbs else None,  # 商品类别
+            category_breadcrumbs=category_breadcrumbs,
             # released_at=product.get("releaseDate", None),  # 发布日期
             brand="gap",  # 品牌
             gender=gender,  # 性别
@@ -835,37 +849,12 @@ async def parse_category_from_api(
         skus = product.get("styleColors", [])
         # 将sku_id添加到product中
         if len(skus) > 0:
-            result["sku_id"] = skus[0].get("ccId", None)
-            images = skus[0].get("images", [])
-            # for item in images:
-            #     # 获取主图
-            #     if item["type"] == "AV6_Z":
-            #         result["image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
-            #         continue
-            #     if item["type"] == "Z":
-            #         result["model_image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
-            #     if item["type"] == "AV1_Z":
-            #         result["_image_url"] = "https://www.gap.com" + item.get("path") if item.get("path") else None
-
-            # 将图片上传到oss
-            # 下载图片
-            # FIXME
-            # try:
-            #     async with httpx.AsyncClient(timeout=15) as client:
-            #         response = await client.get(result["image_url"] + "?q=h&w=322")
-            #         image_bytes = response.content
-            #         image_url_stored = upload_image(
-            #             filename=result["image_url"].replace("https://www.gap.com/", ""),
-            #             data=image_bytes,
-            #             prefix=f"crawlers/{PROVIDER}",
-            #         )
-            #
-            #         result["image_url_stored"] = image_url_stored
-            # except Exception as exc:
-            #     log.error(f"下载图片失败: {exc}")
+            sku_id = skus[0].get("ccId", None)
+            result['sku_id'] = sku_id
+            result['primary_sku_id'] = sku_id
 
         sub_results = []
-        product_dir = settings.data_dir.joinpath(source, primary_category, sub_category, str(result["product_id"]))
+        product_dir = settings.data_dir.joinpath(source, main_category, sub_category, str(result["product_id"]))
         product_dir.mkdir(parents=True, exist_ok=True)
         for sku in skus:
             sub_result = dict(
@@ -876,10 +865,11 @@ async def parse_category_from_api(
                 color=sku.get("ccName", None),  # 颜色
                 description=sku.get("ccShortDescription", None),  # sku 描述
                 inventory=sku.get("inventoryCount", None),  # 库存
-                size=None,
+                # size=None,
                 inventory_status=sku.get("inventoryStatus", None),  # 库存状态
                 vendor=sku.get("vendorName", None),  # 供应商
                 gender=gender,
+                main_category=main_category,
                 sub_category=sub_category,
                 source=source,
             )
@@ -892,14 +882,15 @@ async def parse_category_from_api(
         # 保存SKU数据
         await save_sku_data_async(sub_results)
         with open(
-                f"{settings.data_dir.joinpath(source, primary_category, sub_category, str(result['product_id']))}/product.json",
+                f"{settings.data_dir.joinpath(source, main_category, sub_category, str(result['product_id']))}/product.json",
                 "w",
         ) as f:
             f.write(json.dumps(result, indent=4, ensure_ascii=False))
         results.append(result)
     # 保存商品数据
     await save_product_data_async(results)
-
+    await save_product_detail_data_async(results)
+    await page.pause()
     return results, product_count, pagination, skus_index
     pass
 
@@ -908,10 +899,10 @@ def parse_reviews_from_api(review_data: dict) -> tuple[list[dict], int | None]:
     # 获取分页信息
     review_domain = "https://display.powerreviews.com"
     paging_raw = review_data.get("paging", {})
-    total_count = paging_raw.get("total_results", None) if paging_raw else None
-    current_page = paging_raw.get("current_page_number", None) if paging_raw else None
-    total_results = paging_raw.get("total_results", None) if paging_raw else None
-    total_pages = paging_raw.get("pages_total", None) if paging_raw else None
+    total_count = paging_raw.get("total_results", None)
+    current_page = paging_raw.get("current_page_number", None)
+    total_results = paging_raw.get("total_results", None)
+    total_pages = paging_raw.get("pages_total", None)
 
     # 获取评论
     reviews: list = review_data.get("results", [])[0].get("reviews", [])
@@ -924,14 +915,14 @@ def parse_reviews_from_api(review_data: dict) -> tuple[list[dict], int | None]:
         my_review = dict(
             review_id=review.get("review_id", None),
             # proudct_name=review.get("details").get("product_name", None) if review.get("details") else None,
-            title=review.get("details").get("headline", None) if review.get("details") else None,
-            comment=review.get("details").get("comments", None) if review.get("details") else None,
-            nickname=review.get("details").get("nickname", None) if review.get("details") else None,
-            product_id=review.get("details").get("product_page_id", None) if review.get("details") else None,
-            sku_id=review.get("details").get("product_variant", None) if review.get("details") else None,
-            helpful_votes=review.get("metrics").get("helpful_votes", None) if review.get("metrics") else None,
-            not_helpful_votes=review.get("metrics").get("not_helpful_votes", None) if review.get("metrics") else None,
-            rating=review.get("metrics").get("rating", None) if review.get("metrics") else None,
+            title=review.get("details", {}).get("headline", None),
+            comment=review.get("details", {}).get("comments", None),
+            nickname=review.get("details", {}).get("nickname", None),
+            product_id=review.get("details", {}).get("product_page_id", None),
+            sku_id=review.get("details", {}).get("product_variant", None),
+            helpful_votes=review.get("metrics", {}).get("helpful_votes", None),
+            not_helpful_votes=review.get("metrics", {}).get("not_helpful_votes", None),
+            rating=review.get("metrics", {}).get("rating", None),
             # helpful_score=review.get("metrics").get("helpful_score", None) if review.get("metrics") else None,
             created_at=datetime.fromtimestamp(created_at_timestamp / 1000.0).strftime(
                 '%Y-%m-%d %H:%M:%S') if created_at_timestamp else None,
@@ -956,7 +947,7 @@ async def fetch_reviews(
         product_id: str | None = None,
         index: int | None = None,
         *,
-        primary_category: str,
+        main_category: str,
         sub_category: str,
 ) -> list | None:
     async with semaphore:
@@ -966,7 +957,7 @@ async def fetch_reviews(
                 response.raise_for_status()  # 检查HTTP请求是否成功
                 json_dict = response.json()
                 raw_review_data = settings.data_dir.joinpath(
-                    source, primary_category, sub_category, product_id, "raw_data"
+                    source, main_category, sub_category, product_id, "raw_data"
                 )
                 raw_review_data.mkdir(parents=True, exist_ok=True)
                 with open(f"{raw_review_data}/review-{product_id}-{index:02d}.json", "w") as f:
