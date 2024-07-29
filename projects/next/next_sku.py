@@ -213,12 +213,13 @@ async def open_pdp_page(
             #     log.debug("该商品没有评论")
             await page.wait_for_load_state(timeout=30000)
             # 获取product_style 信息
-            product = await parse_next_product(page, product_id=product_id, sku_id=sku_id)
+            product = await parse_next_product(page, product_id=product_id, sku_id=sku_id, main_category=main_category,
+                                               sub_category=sub_category)
             if product:
                 log.debug(f"从Page中解析 商品信息{product=}")
 
                 sku_id_raw = product.get("sku_id_raw")
-                product.update(dict(sub_category=sub_category, source=source))
+                # product.update(dict(sub_category=sub_category, source=source, main_category=main_category))
                 await save_product_data_async(product)
                 await save_product_detail_data_async(product)
                 await save_sku_data_async(product)
@@ -458,30 +459,18 @@ async def parse_next_sku(
         description=description,
         attributes=attributes,
         washing_instructions=washing_instructions,
+        primary_sku_id=sku_id,
+        attributes_raw=attributes,
     )
     # 将sku 入库到数据库
     await save_sku_data_async(sku)
-    product_extra_info = dict(
-        product_id=product_id,
-        primary_sku_id=sku_id,
-        color=color,
-        size=size,
-        price=price,
-        source=source,
-        description=description,
-        attributes=attributes,
-        attributes_raw=attributes,
-    )
-    await save_product_data_async(
-        product_extra_info
-    )
-    await save_product_detail_data_async(
-        product_extra_info
-    )
+    await save_product_data_async(sku)
+    await save_product_detail_data_async(sku)
     return sku
 
 
-async def parse_next_product(page: Page, product_id: str, sku_id: str) -> dict | None:
+async def parse_next_product(page: Page, product_id: str, sku_id: str, *, main_category: str,
+                             sub_category: str) -> dict | None:
     """
     从DOM中解析商品信息
     """
@@ -545,6 +534,8 @@ async def parse_next_product(page: Page, product_id: str, sku_id: str) -> dict |
         outer_model_image_urls=model_image_urls,
         # outer_model_image_url=model_image_url,
         # model_image_url=model_image_url,
+        main_category=main_category,
+        sub_category=sub_category,
         color=color,
         brand=brand,
         category=category,
