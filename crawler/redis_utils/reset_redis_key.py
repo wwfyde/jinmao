@@ -3,8 +3,8 @@ import redis.asyncio as redis
 from crawler.config import settings
 
 subcategory = "shorts"
-source_key = f"target_index:target:women:{subcategory}:black"
-target_key = f"target_index:target:women:{subcategory}"
+source_key = "next:women:Blouses"
+target_key = "next:women:blouses"
 
 
 async def main():

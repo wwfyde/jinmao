@@ -256,7 +256,6 @@ async def run(playwright: Playwright) -> None:
         # ("jumpsuit", "1"),
         # ("suits", "1"),
     ]
-    gender = "gifts"
     # categories = [("bedding", 143)]
     categories = [('pets', 677)]
 
@@ -264,90 +263,147 @@ async def run(playwright: Playwright) -> None:
     # categories = [('bedsets', '1263'), ('throws', '577'), ('bedsheets', '435'), ('pillowcases', '399'),
     #               ('duvets', '238'), ('pillows', '161'), ('duvetcover', '100'), ('protectors', '66'), ('toppers', '39'),
     #               ('blankets', '10'), ('valances', '7')]
+    categories = dict(
+        baby=[
+            ('dresses', '1095'),
+            ('tshirts', '1056'), ('sleepsuits', '472'), ('jackets', '433'),
+            ('shorts', '405'), ('socks', '328'), ('trousers', '300'), ('topshortsets', '278'), ('shirts', '252'),
+            ('bodysuits', '210'), ('cardigans', '205'), ('leggings', '199'), ('hoodies', '187'),
+            ('joggers', '179'), ('rompersuits', '173'), ('sweattops', '160'), ('coats', '157'),
+            ('poloshirts', '150'), ('tights', '141'), ('topleggingset', '137'), ('dungarees', '121'),
+            ('sweattopjoggersets', '115'), ('jumpers', '113'), ('jeans', '111'), ('skirts', '92'),
+            ('rashvests', '77'), ('tracksuits', '77'), ('blouses', '69'), ('dungareeset', '58'),
+            ('puddlesuits', '54'), ('allinone', '50'), ('vests', '48'), ('playsuits', '45'),
+            ('sweattopleggingset', '40'), ('pramsuits', '34'), ('sweattopshortset', '34'), ('sleepsuitset', '33'),
+            ('jumpsuit', '32'), ('fleeces', '31'), ('bikinis', '29'), ('coverups', '26'), ('gilets', '25'),
+            ('ponchos', '25'), ('snowsuits', '22'), ('dressset', '19'), ('shirttrouserset', '19'),
+            ('bodies', '16'), ('topskirtset', '16'), ('jumperleggingsset', '14'), ('bodysuitleggingsset', '13')],
+        women=[
+            # ('dresses', '11286'),
+            ('tshirts', '3497'), ('blouses', '3076'), ('trousers', '2783'),
+            ('jackets', '2058'), ('skirts', '1597'), ('shirts', '1564'), ('shorts', '1537'),
+            ('jeans', '1451'), ('jumpers', '1448'), ('bikinis', '1406'), ('vests', '1170'),
+            ('jumpsuit', '914'), ('leggings', '736'), ('cardigans', '735'), ('coats', '638'),
+            ('sweattops', '605'), ('hoodies', '557'), ('socks', '526'), ('coverups', '488'),
+            ('joggers', '463'), ('tunics', '428'), ('tanktops', '350'), ('camisoles', '340'),
+            ('fleeces', '242'), ('playsuits', '213'), ('bodies', '199'), ('waistcoats', '194'),
+            ('gilets', '178'), ('tights', '151'), ('poloshirts', '137'), ('suittrousers', '123'),
+            ('tankinis', '97'), ('suitjackets', '84'), ('croptops', '75'), ('ponchos', '46'),
+            ('dungarees', '36'), ('boobtube', '35'), ('tracksuits', '28'), ('bodysuits', '25'),
+            ('rashvests', '18'), ('allinone', '11'), ('loungewearsets', '11'), ('topshortsets', '10'),
+            ('blazers', '6'), ('suitskirts', '2'), ('hoodiejoggerset', '1'), ('jacketshirttrouserset', '1'),
+            ('jackettoptrouserset', '1'), ('sweattopjoggersets', '1')]
+    )
+    base_url_config = dict(
+        women="https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category",
+        baby="https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category",
+    )
+    # TODO 修复 base_url
+    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
-    for category, count in categories:
-        print(category, count)
-        total = int(count)
-        page_size = 12
-        page_count = (total + page_size - 1) // page_size
-        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-hoodies"
-        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
-        base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-jumpers"
-        base_url = f"https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-{category}"
-        base_url = "https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/"
-        base_url = f"https://www.next.co.uk/shop/gender-men-productaffiliation-clothing/category-{category}"
-        # 分段 当页数太多时可能导致chrome内存爆裂
+    for gender, subcategories in categories.items():
+        for category, count in subcategories:
+            async with r:
+                key = f"next_category_status:{gender}:{category}"
+                result = await r.get(key)
+                if result == "done":
+                    log.info(f"对 {key} 类别的商品索引已经建立")
+                    continue
+                else:
+                    log.info(f"开始对{key} 类别的商品建立索引")
+            print(category, count)
+            total = int(count)
+            page_size = 12
+            page_count = (total + page_size - 1) // page_size
+            base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-hoodies"
+            base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
+            base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-jumpers"
+            base_url = f"https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-{category}"
+            base_url = "https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/"
+            base_url = f"https://www.next.co.uk/shop/gender-men-productaffiliation-clothing/category-{category}"
+            base_url = f"https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category-{category}"
+            # 分段 当页数太多时可能导致chrome内存爆裂
 
-        base_url = 'https://www.next.co.uk/shop/productaffiliation-gifts/category-pets'
-        # base_url = f'https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/category-{category}'
-        category = base_url.split("/")[-1].split("-")[-1]
-        segment = 40
-        times = (page_count + segment - 1) // segment
-        dresses_not = ["549_600", "825_900"]
-        log.debug(f"分页{segment=}, {times=}")
-        for j in range(0, times):
-            next_base_url = base_url + f"?p={j * segment + 1}"
+            # base_url = 'https://www.next.co.uk/shop/productaffiliation-gifts/category-pets'
+            # base_url = f'https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/category-{category}'
+            base_url = base_url_config.get(gender, "")
+            category_url = f"{base_url}-{category}"
+            # category = category_url.split("/")[-1].split("-")[-1]
+            segment = 40
+            times = (page_count + segment - 1) // segment
+            print(f"{times=}")
+            dresses_not = ["549_600", "825_900"]
+            log.debug(f"分页{segment=}, {times=}")
+            for j in range(0, times):
+                log.debug(f"开始第{j + 1}轮 处理, 共 {times} 轮")
+                next_base_url = category_url + f"?p={j * segment + 1}"
 
-            page = await context.new_page()
-            async with page:
-                # base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
-                # base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-dresses"
-                a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
-                b = ["1-50", "51-100", "101-200", "200, .."]
-                c = [""]
-                # category = base_url.split("/")[-1].split("-")[-1]
-                print(category)
-                # 拦截所有图片
-                await page.route(
-                    "**/*",
-                    lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-                )
-                log.debug(f"打开页面: {next_base_url}")
-                await page.goto(next_base_url)
-                b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
-                selector = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
-                li_selector = (
-                    "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[2]/div[2]/div/div/div/ul/li/a"
-                )
-                await page.wait_for_load_state(timeout=60000)
-                await page.wait_for_timeout(5000)
-                scroll_pause_time = random.randrange(1000, 1800, 200)
-                # await page.wait_for_timeout(1000)
-                log.debug("开始滚动页面")
-                await scroll_page(page, scroll_pause_time=scroll_pause_time, source="next", page_size=segment)
-                # await page.pause()
-                product_locators = page.locator(li_selector)
-                product_count = await product_locators.count()
-                log.info(f"locators数量: {product_count}")
-                product_urls = []
-                for i in range(product_count):
-                    try:
-                        url = await product_locators.nth(i).get_attribute("href", timeout=5000)
-                        log.debug(f"抓取到商品数量{url}")
-                        product_urls.append(url)
-                    # TODO 将 所有url 存入redis, 以持久化
-                    except Exception as exc:
-                        log.error(f"获取商品url失败: {exc}")
-                        pass
-                print(f"一共获取商品数: {len(product_urls)}")
+                page = await context.new_page()
+                async with page:
+                    # base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
+                    # base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-dresses"
+                    a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
+                    b = ["1-50", "51-100", "101-200", "200, .."]
+                    c = [""]
+                    # category = base_url.split("/")[-1].split("-")[-1]
+                    print(category)
+                    # 拦截所有图片
+                    await page.route(
+                        "**/*",
+                        lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+                    )
+                    log.debug(f"打开页面: {next_base_url}")
+                    await page.goto(next_base_url)
+                    b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
+                    selector = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
+                    li_selector = (
+                        "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[2]/div[2]/div/div/div/ul/li/a"
+                    )
+                    await page.wait_for_load_state(timeout=60000)
+                    await page.wait_for_timeout(5000)
+                    scroll_pause_time = random.randrange(1000, 1800, 200)
+                    # await page.wait_for_timeout(1000)
+                    log.debug("开始滚动页面")
+                    await scroll_page(page, scroll_pause_time=scroll_pause_time, source="next", page_size=segment)
+                    # await page.pause()
+                    product_locators = page.locator('[data-testid="plp-product-grid-item"]')
+                    product_count = await product_locators.count()
+                    log.info(f"locators数量: {product_count}")
+                    product_urls = []
+                    for i in range(product_count):
+                        try:
+                            url = await product_locators.nth(i).locator(
+                                "section > div > div:nth-child(2) > a").get_attribute(
+                                "href", timeout=10000)
+                            log.debug(f"抓取到商品数量{url}")
+                            product_urls.append(url)
+                        # TODO 将 所有url 存入redis, 以持久化
+                        except Exception as exc:
+                            log.error(f"获取商品url失败: {exc}")
+                            pass
+                    print(f"一共获取商品数: {len(product_urls)}")
 
-                r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                async with r:
-                    # print(await r.get("a"))
-                    if product_urls:
-                        result = await r.sadd(f"next:{gender}:{category}", *product_urls)
-                        print(result)
-                    else:
-                        log.warning(f"没有获取到商品url: {next_base_url}")
-                # print(products_urls)
-                # 将数据持久化到本地
-                with open(settings.project_dir.joinpath("data", f"{gender}-{category}-next_urls.txt"), "w") as f:
-                    for url in product_urls:
-                        f.write(url + "\n")
-                print(page.url)
-                # await page.pause()
-                log.debug(f"第{j + 1}轮: {page.url}")
-                await page.wait_for_timeout(2000)
+                    async with r:
+                        # print(await r.get("a"))
+                        if product_urls:
+                            result = await r.sadd(f"next:{gender}:{category}", *product_urls)
+                            print(result)
+                        else:
+                            log.warning(f"没有获取到商品url: {next_base_url}")
+                    # print(products_urls)
+                    # 将数据持久化到本地
+                    with open(settings.project_dir.joinpath("data", f"{gender}-{category}-next_urls.txt"), "w") as f:
+                        for url in product_urls:
+                            f.write(url + "\n")
+                    print(page.url)
+                    # await page.pause()
+                    log.debug(f"第{j + 1}轮: {page.url}")
+                    await page.wait_for_timeout(2000)
+            log.debug(f"完成 对 {category} 类别的商品索引建立")
+            async with r:
+                await r.set(f"next_category_status:{gender}:{category}", "done")
+                log.info(f"完成 对next_category_status:{gender}:{category} 类别的商品索引建立")
+
     await context.close()
 
 

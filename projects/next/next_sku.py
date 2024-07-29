@@ -74,32 +74,14 @@ async def run(playwright: Playwright) -> None:
     # 获取商品列表
     category_indexes = []
 
-    sub_categories_women = {'jumpsuit',
-                            'Blouses',
-                            'suitskirts', 'sweattops', 'jumpers',
-                            'Dresses',
-                            'hoodies', 'waistcoats',
-                            'socks', 'bodies', 'tankinis', 'tights', 'tunics',
-                            'jackets',
-                            'shorts', 'ponchos', 'topshortsets',
-                            'suittrousers', 'vests', 'playsuits', 'tanktops', 'croptops', 'fleeces', 'rashvests',
-                            'dungarees',
-                            'bikinis',
-                            'loungewearsets', 'gilets', 'coats', 'Hoodies', 'joggers', 'camisoles', 'rompersuits',
-                            'leggings',
-                            'T-Shirts',
-                            'topleggingset',
-                            'blazers',
-                            'coverups',
-                            'suitjackets', 'bodysuits',
-                            'jeans',
-                            'tracksuits', 'poloshirts',
-                            'Jackets',
-                            'cardigans',
-                            'trousers',
-                            'shirts',
-                            'skirts',
-                            'boobtube'}
+    sub_categories_women = {'dresses', 'tshirts', 'blouses', 'trousers', 'jackets', 'skirts', 'shirts', 'shorts',
+                            'jeans', 'jumpers', 'bikinis', 'vests', 'jumpsuit', 'leggings', 'cardigans', 'coats',
+                            'sweattops', 'hoodies', 'socks', 'coverups', 'joggers', 'tunics', 'tanktops', 'camisoles',
+                            'fleeces', 'playsuits', 'bodies', 'waistcoats', 'gilets', 'tights', 'poloshirts',
+                            'suittrousers', 'tankinis', 'suitjackets', 'croptops', 'ponchos', 'dungarees', 'boobtube',
+                            'tracksuits', 'bodysuits', 'rashvests', 'allinone', 'loungewearsets', 'topshortsets',
+                            'blazers', 'suitskirts', 'hoodiejoggerset', 'jacketshirttrouserset', 'jackettoptrouserset',
+                            'sweattopjoggersets'}
     category_indexes.extend({('women', item) for item in sub_categories_women})
     sub_categories_men = {'tanktops', 'shirts', 'coats', 'trousers', 'poloshirts', 'cardigans', 'ponchos', 'hoodies',
                           'jumpers', 'jeans', 'shorts', 'suittrousers', 'leggings', 'topshortsets', 'tights',
@@ -107,14 +89,24 @@ async def run(playwright: Playwright) -> None:
                           'vests', 'swimshorts', 'suitjackets', 'tracksuits', 'footballshirts', 'rashvests', 'fleeces',
                           'gilets', 'sweattops', 'sweattopjoggersets', 'joggers', 'rugbyshirts', 'jackets', 'socks',
                           'tshirts'}
-    category_indexes.extend({("men", item) for item in sub_categories_men})
+    # category_indexes.extend({("men", item) for item in sub_categories_men})
     sub_categories_gifts = {'pets'}
-    category_indexes.extend({("gifts", item) for item in sub_categories_gifts})
+    # category_indexes.extend({("gifts", item) for item in sub_categories_gifts})
 
     sub_categories_bed = {'bedsets', 'throws', 'bedsheets', 'pillowcases', 'duvets', 'pillows', 'duvetcover',
                           'protectors',
                           'toppers', 'blankets', 'valances'}
-    category_indexes.extend({("bed", item) for item in sub_categories_bed})
+    # category_indexes.extend({("bed", item) for item in sub_categories_bed})
+    sub_categories_baby = {'dresses', 'tshirts', 'sleepsuits', 'jackets', 'shorts', 'socks', 'trousers', 'topshortsets',
+                           'shirts', 'bodysuits', 'cardigans', 'leggings', 'hoodies', 'joggers', 'rompersuits',
+                           'sweattops', 'coats', 'poloshirts', 'tights', 'topleggingset', 'dungarees',
+                           'sweattopjoggersets', 'jumpers', 'jeans', 'skirts', 'rashvests', 'tracksuits', 'blouses',
+                           'dungareeset', 'puddlesuits', 'allinone', 'vests', 'playsuits', 'sweattopleggingset',
+                           'pramsuits', 'sweattopshortset', 'sleepsuitset', 'jumpsuit', 'fleeces', 'bikinis',
+                           'coverups', 'gilets', 'ponchos', 'snowsuits', 'dressset', 'shirttrouserset', 'bodies',
+                           'topskirtset', 'jumperleggingsset', 'bodysuitleggingsset'}
+    # category_indexes.extend({("baby", item) for item in sub_categories_baby})
+
     for main_category, sub_category in category_indexes:
         # for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
         async with r:

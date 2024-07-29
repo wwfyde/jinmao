@@ -43,11 +43,11 @@ def save_to_json(data: dict, path: Path, filename: str):
 
 
 def upload_image(
-    filename: str,
-    data: str | bytes,
-    prefix: str = "tmp",
-    rename: bool = True,
-    domain: str = None,
+        filename: str,
+        data: str | bytes,
+        prefix: str = "tmp",
+        rename: bool = True,
+        domain: str = None,
 ) -> str:
     """
     上传图片到OSS并返回其访问链接
@@ -85,12 +85,12 @@ def upload_image(
 
 
 async def scroll_page(
-    page: Page,
-    scroll_pause_time: int = 1000,
-    max_attempt: int | None = None,
-    source: str | None = None,
-    step: int = 1,
-    page_size: int = 50,
+        page: Page,
+        scroll_pause_time: int = 1000,
+        max_attempt: int | None = None,
+        source: str | None = None,
+        step: int = 1,
+        page_size: int = 50,
 ):
     viewport_height = await page.evaluate("window.innerHeight") / step
     i = 0
@@ -121,7 +121,10 @@ async def scroll_page(
         if max_attempt and i >= max_attempt:
             log.info(f"最大尝试次数: {i}, 停止")
             break
-        if source == "next" and int(httpx.URL(page.url).params.get("p")) % page_size == 0:
-            print("下一页")
-            break
+
+        if source == "next":
+            p = httpx.URL(page.url).params.get("p")
+            if p and int(p) % page_size == 0:
+                print("下一页")
+                break
         # previous_height = new_height
