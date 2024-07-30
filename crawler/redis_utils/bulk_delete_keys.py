@@ -1,7 +1,7 @@
 import redis.asyncio as redis
 from crawler.config import settings
 
-key_pattern = 'category_task_status:next:women:*'
+key_pattern = 'category_task_status:next:girls:*'
 
 
 async def main():

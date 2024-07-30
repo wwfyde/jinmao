@@ -785,7 +785,7 @@ async def main():
         ),
 
     ]
-    urls.extend(men_urls)
+    # urls.extend(men_urls)
     pet_urls = [
         # ("pets", "dog-supplies", "batch1", "unknown",
         #  "https://www.target.com/c/dog-supplies-pets/-/N-5xt3tZ6q8fqiw8pkZ4yl67?moveTo=product-list-grid"),
@@ -846,8 +846,78 @@ async def main():
          "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22Z5y70hZ5y6q6Z5y6nd?moveTo=product-list-grid"),
         ("furniture", "beds", "misc2", "default",
          "https://www.target.com/c/beds-bedroom-furniture/-/N-4ym22Z5y73rZ5xr7iZ5y76dZ5y713Z55iviZ5xrh3Z5y76nZ5y67tZ5y6hbZ5y72c?moveTo=product-list-grid"),
-    ]  # 索引建立完成
+    ]  # 索引建立完成 deprecated, 不再需要抓取
     # urls.extend(bed_urls)
+    kids_urls = [
+        # ("girls", "girls-uniforms", "default", "default",
+        #  "https://www.target.com/c/girls-uniforms-school-kids/-/N-55q4q"),  # noinspection
+        # ("girls", "tops", "gray", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5zkqbZgup4zc5xktoZgup4zc5xktmZgup4zc5xkum?moveTo=product-list-grid"),
+        # # noinspection
+        # ("girls", "tops", "black", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5zk7s?moveTo=product-list-grid"),  # partial
+        # ("girls", "tops", "blue", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xku0?moveTo=product-list-grid"),  # partial
+        # ("girls", "tops", "green", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkwh?moveTo=product-list-grid"),
+        # ("girls", "tops", "batch", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkw9Zgup4zc5xkpkZgup4zc5xkerZgup4zc5zk8tZesftk?moveTo=product-list-grid"),
+        # ("girls", "tops", "pink", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkwk?moveTo=product-list-grid"),
+        # ("girls", "tops", "purple", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkug?moveTo=product-list-grid"),
+        # ("girls", "tops", "purple", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkug?moveTo=product-list-grid"),
+        # ("girls", "tops", "red", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkvl?moveTo=product-list-grid"),
+        # ("girls", "tops", "red", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkvl?moveTo=product-list-grid"),
+        # ("girls", "tops", "white", "default",
+        #  "https://www.target.com/c/tops-girls-clothing-kids/-/N-5xtvuZgup4zc5xkwv?moveTo=product-list-grid"),
+        ("girls", "bottoms", "default", "default",
+         "https://www.target.com/c/bottoms-girls-clothing-kids/-/N-5xtw6"),
+        ("girls", "dresses-rompers", "default", "default",
+         "https://www.target.com/c/dresses-rompers-girls-clothing-kids/-/N-5xtvz"),
+        ("girls", "pajamas-robes", "default", "default",
+         "https://www.target.com/c/pajamas-robes-girls-clothing-kids/-/N-5xtvx"),
+        ("girls", "swimsuits", "default", "default",
+         "https://www.target.com/c/swimsuits-girls-clothing-kids/-/N-5xtvv"),
+        ("girls", "coats-jackets", "default", "default",
+         "https://www.target.com/c/coats-jackets-girls-clothing-kids/-/N-5xtvy"),
+        ("girls", "girls-accessories", "default", "default",
+         "https://www.target.com/c/girls-accessories-kids/-/N-5xtwl"),
+        ("girls", "socks-tights", "default", "default",
+         "https://www.target.com/c/socks-tights-girls-clothing-kids/-/N-5xtvw"),
+        ("girls", "underwear-bras", "default", "default",
+         "https://www.target.com/c/underwear-bras-girls-clothing-kids/-/N-5xtvp"),
+        ("girls", "activewear", "default", "default",
+         "https://www.target.com/c/activewear-girls-clothing-kids/-/N-5xtw9"),
+        ("girls", "multipacks", "default", "default",
+         "https://www.target.com/c/girls-multipacks/-/N-4a9wj"),
+        ("girls", "new-arrivals", "default", "default",
+         "https://www.target.com/c/girls-new-arrivals/-/N-n9klq"),
+        ("girls", "shoes", "default", "default",
+         "https://www.target.com/c/girls-shoes/-/N-5xtvo"),
+        ("girls", "adaptive-clothing", "default", "default",
+         "https://www.target.com/c/girls-adaptive-clothing-kids/-/N-8b31p"),
+        ("girls", "outfit-sets", "default", "default",
+         "https://www.target.com/c/outfit-sets-girls-clothing-kids-shoes-accessories/-/N-55yiu"),
+        ("girls", "all-in-motion", "default", "default",
+         "https://www.target.com/c/all-in-motion-girls/-/N-rhwq0"),
+
+        # TODO  Girls’ Character Clothing https://www.target.com/c/girls-character-clothing/-/N-4u9ul
+
+        ("boys", "boys-uniforms", "default", "default",
+         "https://www.target.com/c/boys-uniforms-school-kids/-/N-55q4r"),
+        ("boys", "tween-boys", "default", "default",
+         "https://www.target.com/c/tween-boys-clothing/-/N-2ldf3"),
+        ("boys", "bottoms", "default", "default",
+         "https://www.target.com/c/bottoms-boys-clothing-kids/-/N-5xty0"),
+        ("boys", "dresswear", "default", "default",
+         "https://www.target.com/c/dresswear-boys-clothing-kids/-/N-5xtxw"),
+
+    ]
+    urls.extend(kids_urls)
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
         tasks = [loop.run_in_executor(executor, async_runner, url_info) for url_info in urls]
 

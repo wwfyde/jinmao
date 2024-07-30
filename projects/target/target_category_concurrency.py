@@ -90,12 +90,12 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
         proxy=proxy,
         # devtools=True,
     )
-    context = await browser.new_context(
-        user_agent=ua.random,
-    )
-
-    # 设置全局超时
-    context.set_default_timeout(settings.playwright.timeout)
+    # context = await browser.new_context(
+    #     user_agent=ua.random,
+    # )
+    # 
+    # # 设置全局超时
+    # context.set_default_timeout(settings.playwright.timeout)
     # context.set_default_timeout(60000)
     # 创建一个新的浏览器上下文，设置视口大小
     # context = await browser.new_context(viewport={"width": 1920, "height": 1080})
@@ -135,6 +135,7 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
         if isinstance(result, Exception):
             log.error(f"抓取商品失败: {result}")
             raise ValueError(f"抓取商品失败: {result}")
+    await browser.close()
 
 
 async def open_pdp_page(
@@ -198,244 +199,245 @@ async def open_pdp_page(
         user_agent = ua.random
         log.info(f"当前UserAgent: {user_agent}")
         context = await browser.new_context(user_agent=user_agent)
-        # context = await browser.new_context()
-        page = await context.new_page()
-        page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
-        async with page:
-            # 拦截所有图像
-            await page.route(
-                "**/*",
-                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
-            )
+        async with context:
+            # context = await browser.new_context()
+            page = await context.new_page()
+            page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
+            async with page:
+                # 拦截所有图像
+                await page.route(
+                    "**/*",
+                    lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+                )
 
-            # TODO 指定url
+                # TODO 指定url
 
-            review_status = None  # 评论抓取状态跟踪
-            # product_id = None  # 从pdp页接口获取商品id
-            product: dict | None = None
-            sku: dict | None = None
-            if should_get_product or force_get_product:
-                product_event = asyncio.Event()
-            if should_get_review:
-                review_event = asyncio.Event()
+                review_status = None  # 评论抓取状态跟踪
+                # product_id = None  # 从pdp页接口获取商品id
+                product: dict | None = None
+                sku: dict | None = None
+                if should_get_product or force_get_product:
+                    product_event = asyncio.Event()
+                if should_get_review:
+                    review_event = asyncio.Event()
 
-            # skus_event = asyncio.Event()
+                # skus_event = asyncio.Event()
 
-            async def handle_review_route(route: Route):
-                request = route.request
-                # 等待商品接口获取到product_id 后再执行评论
-                # await product_event.wait()
-                # nonlocal product_id
-                if "summary" in request.url:
-                    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-                    async with r:
-                        category_key = f"review_status:{source}:{product_id}"
-                        category_review_status = await r.get(category_key)
-                        log.info(f"拦截评论请求API:{route.request.url}")
-                        brand_key = f"review_status_brand:{source}:{brand}:{product_id}"
-                        brand_review_status = await r.get(brand_key)
+                async def handle_review_route(route: Route):
+                    request = route.request
+                    # 等待商品接口获取到product_id 后再执行评论
+                    # await product_event.wait()
+                    # nonlocal product_id
+                    if "summary" in request.url:
+                        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                        async with r:
+                            category_key = f"review_status:{source}:{product_id}"
+                            category_review_status = await r.get(category_key)
+                            log.info(f"拦截评论请求API:{route.request.url}")
+                            brand_key = f"review_status_brand:{source}:{brand}:{product_id}"
+                            brand_review_status = await r.get(brand_key)
+                            log.info(
+                                f"商品评论: {product_id} 评论, redis状态标记:{category_review_status=}, {brand_review_status=}")
+                            log.info(f"拦截评论请求API:{route.request.url}")
+
+                        if category_review_status != "done" and brand_review_status != "done":
+                            response = await route.fetch()
+                            json_dict = await response.json()
+                            # TODO  获取评论信息
+                            reviews, total_count = parse_target_review_from_api(json_dict)
+                            # log.info(f"预期评论数{total_count}")
+                            # log.info(f"预期评论数{total_count}, reviews: , {len(reviews)}")
+                            page_size = 50
+                            total_pages = (total_count + page_size - 1) // page_size
+                            total_pages = total_pages if total_pages <= 50 else 50
+                            log.info(f"总页数{total_pages}")
+
+                            semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
+                            tasks = []
+                            reviews = []  # 该项目中需要清除默认8条
+                            for i in range(0, total_pages):
+                                review_url = (
+                                    httpx.URL(request.url).copy_set_param("page", i).copy_set_param("size", page_size)
+                                )
+                                tasks.append(fetch_reviews(semaphore, review_url, request.headers))
+
+                            new_reviews = await asyncio.gather(*tasks)
+                            nonlocal review_status
+                            for review in new_reviews:
+                                if review is not None:
+                                    reviews.extend(review)
+                                else:
+                                    review_status = "failed"
+                                    log.warning(f"评论获取失败: {review}")
+
+                            log.info(f"商品:{product_id=}, 预期评论数{total_count}, 实际评论数{len(reviews)}")
+
+                            if review_status == "failed":
+                                async with r:
+                                    if task_type == "category":
+                                        await r.set(category_key, "failed")
+                                    elif task_type == "brand":
+                                        await r.set(brand_key, "failed")
+                            else:
+                                # 保存评论到数据库
+                                if len(reviews) > 0:
+                                    log.info("保存评论到数据库")
+                                    # save_review_data(reviews)
+                                    await save_review_data_async(reviews)
+                                else:
+                                    pass
+
+                                async with r:
+                                    log.info(f"商品评论{product_id}抓取完毕, 标记redis状态")
+                                    if task_type == "category":
+                                        await r.set(category_key, "done")
+                                    elif task_type == "brand":
+                                        await r.set(brand_key, "done")
+
+                            review_event.set()
+                            # with open("review.json", "w") as f:
+                            #     # 使用orjson以支持datetime格式
+                            #     f.write(orjson.dumps(reviews, option=orjson.OPT_NAIVE_UTC).decode("utf-8"))
+                        else:
+                            log.warning(
+                                f"商品[{product_id=}]的评论已抓取过, 类别状态: {category_review_status}, 品牌状态: {brand_review_status}, 跳过")
+                            review_event.set()
+                            # log.info("获取评论信息")
+                            # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
+                            #     f.write(json.dumps(json_dict))
+                            # pass
+                    # if "api" in request.pdp_url or "service" in request.pdp_url:
+                    #
+                    #     log.info(f"API Request URL: {request.pdp_url}")
+                    await route.continue_()
+
+                async def handle_pdp_route(route: Route):
+                    request = route.request
+                    if "pdp_client" in request.url:
                         log.info(
-                            f"商品评论: {product_id} 评论, redis状态标记:{category_review_status=}, {brand_review_status=}")
-                        log.info(f"拦截评论请求API:{route.request.url}")
-
-                    if category_review_status != "done" and brand_review_status != "done":
+                            f"拦截产品详情页API: {route.request.url}",
+                        )
+                        # TODO 获取产品信息
                         response = await route.fetch()
                         json_dict = await response.json()
-                        # TODO  获取评论信息
-                        reviews, total_count = parse_target_review_from_api(json_dict)
-                        # log.info(f"预期评论数{total_count}")
-                        # log.info(f"预期评论数{total_count}, reviews: , {len(reviews)}")
-                        page_size = 50
-                        total_pages = (total_count + page_size - 1) // page_size
-                        total_pages = total_pages if total_pages <= 50 else 50
-                        log.info(f"总页数{total_pages}")
+                        nonlocal product
+                        nonlocal sku
+                        product, sku = await parse_target_product(
+                            json_dict,
+                            primary_category=primary_category,
+                            sub_category=sub_category,
+                            source=source,
+                            sku_id=sku_id,
+                            product_id=product_id,
+                            # cookies=cookies,
+                            # headers=headers,
+                            brand=brand,
+                            task_type=task_type,
+                        )
+                        product_event.set()
+                        log.info(f"商品详情: {product}")
 
-                        semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为5
-                        tasks = []
-                        reviews = []  # 该项目中需要清除默认8条
-                        for i in range(0, total_pages):
-                            review_url = (
-                                httpx.URL(request.url).copy_set_param("page", i).copy_set_param("size", page_size)
-                            )
-                            tasks.append(fetch_reviews(semaphore, review_url, request.headers))
+                    # if "pdp_variation_hierarchy" in request.url:
+                    #     log.info(f"拦截产品变体API: {route.request.url}")
+                    #     response = await route.fetch()
+                    #     json_dict = await response.json()
+                    #     skus = parse_target_product_variation(json_dict)
+                    #     skus_event.set()
+                    #     log.info(f"商品变体: {len(skus) if skus else 0}")
+                    await route.continue_()
 
-                        new_reviews = await asyncio.gather(*tasks)
-                        nonlocal review_status
-                        for review in new_reviews:
-                            if review is not None:
-                                reviews.extend(review)
-                            else:
-                                review_status = "failed"
-                                log.warning(f"评论获取失败: {review}")
+                if should_get_review:
+                    await page.route("**/r2d2.target.com/**", handle_review_route)
 
-                        log.info(f"商品:{product_id=}, 预期评论数{total_count}, 实际评论数{len(reviews)}")
+                if should_get_product or force_get_product:
+                    await page.route("**/redsky.target.com/**", handle_pdp_route)
+                # 导航到指定的URL
+                # 其他操作...
+                # 暂停执行
 
-                        if review_status == "failed":
-                            async with r:
-                                if task_type == "category":
-                                    await r.set(category_key, "failed")
-                                elif task_type == "brand":
-                                    await r.set(brand_key, "failed")
-                        else:
-                            # 保存评论到数据库
-                            if len(reviews) > 0:
-                                log.info("保存评论到数据库")
-                                # save_review_data(reviews)
-                                await save_review_data_async(reviews)
-                            else:
-                                pass
+                response = await page.goto(url, timeout=PLAYWRIGHT_TIMEOUT)
+                # ip_info = await get_current_ip(page)
+                # log.debug(f"当前使用ip: {ip_info}")
 
-                            async with r:
-                                log.info(f"商品评论{product_id}抓取完毕, 标记redis状态")
-                                if task_type == "category":
-                                    await r.set(category_key, "done")
-                                elif task_type == "brand":
-                                    await r.set(brand_key, "done")
+                cookies_raw = await context.cookies(url)
+                cookies = {cookie["name"]: cookie["value"] for cookie in cookies_raw}
+                headers = response.headers
 
-                        review_event.set()
-                        # with open("review.json", "w") as f:
-                        #     # 使用orjson以支持datetime格式
-                        #     f.write(orjson.dumps(reviews, option=orjson.OPT_NAIVE_UTC).decode("utf-8"))
-                    else:
-                        log.warning(
-                            f"商品[{product_id=}]的评论已抓取过, 类别状态: {category_review_status}, 品牌状态: {brand_review_status}, 跳过")
-                        review_event.set()
-                        # log.info("获取评论信息")
-                        # with open(f"{settings.project_dir.joinpath('data', 'product_info')}/data-.json", "w") as f:
-                        #     f.write(json.dumps(json_dict))
-                        # pass
-                # if "api" in request.pdp_url or "service" in request.pdp_url:
-                #
-                #     log.info(f"API Request URL: {request.pdp_url}")
-                await route.continue_()
+                # await page.pause()
+                log.info(f"等待页面加载, {url=}")
+                await page.wait_for_timeout(3000)
+                # 滚动页面以加载评论
+                scroll_pause_time = random.randrange(1000, 2500, 500)
+                await scroll_page(page, scroll_pause_time)
+                # 通过点击按钮加载评论
+                # await page.locator('//*[@id="above-the-fold-information"]/div[2]/div/div/div/div[3]/button').click()
 
-            async def handle_pdp_route(route: Route):
-                request = route.request
-                if "pdp_client" in request.url:
-                    log.info(
-                        f"拦截产品详情页API: {route.request.url}",
-                    )
-                    # TODO 获取产品信息
-                    response = await route.fetch()
-                    json_dict = await response.json()
-                    nonlocal product
-                    nonlocal sku
-                    product, sku = await parse_target_product(
-                        json_dict,
-                        primary_category=primary_category,
-                        sub_category=sub_category,
-                        source=source,
-                        sku_id=sku_id,
-                        product_id=product_id,
-                        # cookies=cookies,
-                        # headers=headers,
-                        brand=brand,
-                        task_type=task_type,
-                    )
-                    product_event.set()
-                    log.info(f"商品详情: {product}")
+                await page.wait_for_load_state("domcontentloaded")  # 等待页面加载
+                log.info("页面加载完成")
 
-                # if "pdp_variation_hierarchy" in request.url:
-                #     log.info(f"拦截产品变体API: {route.request.url}")
-                #     response = await route.fetch()
-                #     json_dict = await response.json()
-                #     skus = parse_target_product_variation(json_dict)
-                #     skus_event.set()
-                #     log.info(f"商品变体: {len(skus) if skus else 0}")
-                await route.continue_()
+                # 或者等待某个selector 加载完成
 
-            if should_get_review:
-                await page.route("**/r2d2.target.com/**", handle_review_route)
-
-            if should_get_product or force_get_product:
-                await page.route("**/redsky.target.com/**", handle_pdp_route)
-            # 导航到指定的URL
-            # 其他操作...
-            # 暂停执行
-
-            response = await page.goto(url, timeout=PLAYWRIGHT_TIMEOUT)
-            # ip_info = await get_current_ip(page)
-            # log.debug(f"当前使用ip: {ip_info}")
-
-            cookies_raw = await context.cookies(url)
-            cookies = {cookie["name"]: cookie["value"] for cookie in cookies_raw}
-            headers = response.headers
-
-            # await page.pause()
-            log.info(f"等待页面加载, {url=}")
-            await page.wait_for_timeout(3000)
-            # 滚动页面以加载评论
-            scroll_pause_time = random.randrange(1000, 2500, 500)
-            await scroll_page(page, scroll_pause_time)
-            # 通过点击按钮加载评论
-            # await page.locator('//*[@id="above-the-fold-information"]/div[2]/div/div/div/div[3]/button').click()
-
-            await page.wait_for_load_state("domcontentloaded")  # 等待页面加载
-            log.info("页面加载完成")
-
-            # 或者等待某个selector 加载完成
-
-            # await page.wait_for_timeout(1000)
-            # await page.pause()
-
-            # DOM中解析商品属性并下载商品图片并保存
-
-            #  优化商品属性 获取方案, 通过API 完成 deprecated
-            # description, attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
-            if should_get_product or force_get_product:
-                try:
-                    # 设置超时时间以避免代码阻塞
-                    await asyncio.wait_for(product_event.wait(), timeout=60 * 2)
-                except asyncio.TimeoutError:
-                    log.warning("等待商品PDP超时, 请切换IP, 或检查商品状态")
-                log.info("PDP(产品详情页)接口执行完毕")
-            # await skus_event.wait()
-            if should_get_review:
-                try:
-                    # 设置超时时间以避免代码阻塞
-
-                    await asyncio.wait_for(review_event.wait(), timeout=60 * 10)
-                except asyncio.TimeoutError:
-                    log.warning("等待评论接口超时, 疑似评论不存在, 或商品已失效")
-                log.info("Review(评论)接口执行完毕")
-
-            # await page.pause()
-            if should_get_product or force_get_product:
-                if product:
-                    # product.update(dict(attributes=attributes, description=description))
-                    log.info(f"商品{product_id=}, {sku_id=}获取到产品信息, 保存到数据库")
-                    await save_product_data_async(product)
-                    await save_product_detail_data_async(product)  # 保存商品详情
-                    product_status = "done"
-
-                else:
-                    product_status = "faild"
-                    log.warning(f"商品{product_id=}, {sku_id=}未获取到产品信息,")
-                if sku:
-                    await save_sku_data_async(sku)  # 保存sku信息
-                else:
-                    log.warning(f"商品{product_id=}, {sku_id=}未获取到SKU信息")
-
-                # 保存产品信息到数据库
+                # await page.wait_for_timeout(1000)
                 # await page.pause()
 
-                # fit_size 适合人群
-                r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+                # DOM中解析商品属性并下载商品图片并保存
 
-                async with r:
-                    log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态为 {product_status}")
-                    if task_type == "category":
-                        await r.set(
-                            f"status:{source}:{product_id}:{sku_id}", product_status
-                        )
-                    elif task_type == "brand":
-                        await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
+                #  优化商品属性 获取方案, 通过API 完成 deprecated
+                # description, attributes = await parse_pdp_from_dom(page, sku_id=sku_id, cookies=cookies, headers=headers)
                 if should_get_product or force_get_product:
-                    log.warning("等待随机时间")
-                    await asyncio.sleep(random.randint(30, 32))
-            else:
-                log.warning("跳过商品状态检查")
-            return product_id, sku_id
+                    try:
+                        # 设置超时时间以避免代码阻塞
+                        await asyncio.wait_for(product_event.wait(), timeout=60 * 2)
+                    except asyncio.TimeoutError:
+                        log.warning("等待商品PDP超时, 请切换IP, 或检查商品状态")
+                    log.info("PDP(产品详情页)接口执行完毕")
+                # await skus_event.wait()
+                if should_get_review:
+                    try:
+                        # 设置超时时间以避免代码阻塞
+
+                        await asyncio.wait_for(review_event.wait(), timeout=60 * 10)
+                    except asyncio.TimeoutError:
+                        log.warning("等待评论接口超时, 疑似评论不存在, 或商品已失效")
+                    log.info("Review(评论)接口执行完毕")
+
+                # await page.pause()
+                if should_get_product or force_get_product:
+                    if product:
+                        # product.update(dict(attributes=attributes, description=description))
+                        log.info(f"商品{product_id=}, {sku_id=}获取到产品信息, 保存到数据库")
+                        await save_product_data_async(product)
+                        await save_product_detail_data_async(product)  # 保存商品详情
+                        product_status = "done"
+
+                    else:
+                        product_status = "faild"
+                        log.warning(f"商品{product_id=}, {sku_id=}未获取到产品信息,")
+                    if sku:
+                        await save_sku_data_async(sku)  # 保存sku信息
+                    else:
+                        log.warning(f"商品{product_id=}, {sku_id=}未获取到SKU信息")
+
+                    # 保存产品信息到数据库
+                    # await page.pause()
+
+                    # fit_size 适合人群
+                    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+
+                    async with r:
+                        log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态为 {product_status}")
+                        if task_type == "category":
+                            await r.set(
+                                f"status:{source}:{product_id}:{sku_id}", product_status
+                            )
+                        elif task_type == "brand":
+                            await r.set(f"status_brand:{source}:{brand}:{product_id}:{sku_id}", product_status)
+                    if should_get_product or force_get_product:
+                        log.warning("等待随机时间")
+                        await asyncio.sleep(random.randint(30, 32))
+                else:
+                    log.warning("跳过商品状态检查")
+                return product_id, sku_id
 
 
 async def fetch_reviews(semaphore, url, headers):
@@ -1054,7 +1056,7 @@ def map_attribute_field(input: dict) -> dict:
 async def run_playwright_instance(main_category, subcategory):
     # 创建一个playwright对象并将其传递给run函数
     retry_times = 0
-    while retry_times < 10:
+    while retry_times < 2:
         try:
             async with async_playwright() as p:
                 await run(p, main_category, subcategory)
@@ -1076,6 +1078,7 @@ async def main():
     categories = [
         # ("women", "jeans"),  # mac finished 抓取完毕 0725 重新尝试
         # ("women", "shorts"),  # 102 finished 抓取完毕 0726
+        ("women", "dresses"),
         # ("pets", "dog-supplies"),  # mac finished 抓取完毕 0724
         # ("pets", "cat-supplies"),  # 188  finished 抓取完毕 0723
         # ("pets", "gifts-for-pets"),  # 188 finished 抓取完毕 0723
@@ -1104,8 +1107,26 @@ async def main():
         # ("men", "dress-shirts"),  # 188 finished 抓取完毕 0725
         # ("men", "sweaters"),  # 188 finished 抓取完毕 0725
         # ("men", "polo-shirts"),  # 188 finished 抓取完毕 0725
-        # ("men", "hoodies-sweatshirts"),  # mac+188 processing
-        ("men", "graphic-tees-t-shirts"),  # 184 processing TODO indexing
+        # ("men", "hoodies-sweatshirts"),  # mac+188 finished 抓取完毕 0728
+        # ("men", "graphic-tees-t-shirts"),  # mac+184 finished 抓取完毕 0728
+        # ("girls", "tops"),  # mac+115 processing 0728
+        # ("girls", "girls-uniforms"),  # 102 finished 0729
+        # ("girls", "bottoms"),  # 188 finished 抓取完成 0729
+        # ("girls", "dresses-rompers"),  # 188 finished 抓取完毕 0729
+        # ("girls", "pajamas-robes"),  # 188 processing
+        # ("girls", "swimsuits"),  # 188 processing
+        # ("girls", "coats-jackets"),  # 188 processing
+        # ("girls", "girls-accessories"),  # mac finished 抓取完毕 0729
+        # ("girls", "socks-tights"),  # mac finished 抓取完毕 0729
+        # ("girls", "underwear-bras"),  # mac finished 抓取完毕 0729
+        # ("girls", "activewear"),  # mac finished 抓取完毕 0729
+        # ("girls", "multipacks"),  # 135 finished 抓取完毕 0729
+        # ("girls", "new-arrivals"),  # 135 finished 抓取完毕 0729
+        ("girls", "shoes"),  # 184 finished 抓取完毕 0730
+        # ("girls", "adaptive-clothing"),  # 184 finished 抓取完毕 0729
+        # ("girls", "outfit-sets"),  # processing 135
+        # ("girls", "all-in-motion"),  # processing 135
+
     ]
 
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
@@ -1128,4 +1149,4 @@ def async_runner(main_category, subcategory):
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(main(), debug=True)
