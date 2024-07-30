@@ -107,7 +107,7 @@ async def run(playwright: Playwright) -> None:
                            'baselayers', 'sleepsuitset', 'shirttrouserset'}
     category_indexes.extend({("boys", item) for item in sub_categories_boys})
     sub_categories_gifts = {'pets'}  # finished
-    # category_indexes.extend({("gifts", item) for item in sub_categories_gifts})
+    category_indexes.extend({("gifts", item) for item in sub_categories_gifts})
 
     sub_categories_bed = {'bedsets', 'throws', 'bedsheets', 'pillowcases', 'duvets', 'pillows', 'duvetcover',
                           'protectors',
@@ -127,8 +127,7 @@ async def run(playwright: Playwright) -> None:
         # for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
         async with r:
             source = "next"
-            sub_category = sub_category
-
+            log.info(f"开始抓取{main_category=}, {sub_category=}")
             status = await r.get(f"category_task_status:next:{main_category}:{sub_category}")
             if status == "done":
                 log.warning(f"该类别{main_category=},{sub_category=}已抓取完毕, 跳过")

@@ -478,7 +478,7 @@ async def save_product_data_async(data: dict | list[dict]) -> str | None:
 
             if product:
                 log.debug(
-                    f"更新前的数据: {product.product_id=}, {product.primary_sku_id=}, {product.source=}, {product.product_name=}, {product.product_url=}, {product.category=}, {product.gender=}, {product.released_at=}")
+                    f"更新前的product数据: {product.product_id=}, {product.primary_sku_id=}, {product.source=}, {product.product_name=}, {product.product_url=}, {product.category=}, {product.gender=}, {product.released_at=}")
 
                 for key, value in item.items():
                     setattr(product, key, value)
@@ -486,8 +486,8 @@ async def save_product_data_async(data: dict | list[dict]) -> str | None:
                 await session.commit()
                 await session.refresh(product)
                 log.debug(
-                    f"更新后的数据: {product.product_id=}, {product.primary_sku_id=}, {product.source=}, {product.product_name=}, {product.product_url=}, {product.category=}, {product.gender=}, {product.released_at=}")
-                log.debug(f"插入的数据 {item}")
+                    f"更新后的product数据: {product.product_id=}, {product.primary_sku_id=}, {product.source=}, {product.product_name=}, {product.product_url=}, {product.category=}, {product.gender=}, {product.released_at=}")
+                log.debug(f"插入的product数据: {item}")
                 inserted_ids.append(product.id)
                 log.debug(
                     f"更新商品[product]数据成功, id={product.id}, product_id={product.product_id}, source={product.source}"
@@ -530,11 +530,16 @@ async def save_sku_data_async(data: dict | list[dict]) -> list | None:
                                           ProductSKU.product_id == product_id))
             sku = result.scalars().one_or_none()
             if sku:
+                log.debug(
+                    f"更新前的SKU数据: {sku.product_id=}, {sku.sku_id=}, {sku.source=}, {sku.color=}, {sku.product_url=}, {sku.outer_model_image_urls=}")
                 for key, value in item.items():
                     setattr(sku, key, value)
                 session.add(sku)
                 await session.commit()
                 await session.refresh(sku)
+                log.debug(
+                    f"更新后的SKU数据: {sku.product_id=}, {sku.sku_id=}, {sku.source=}, {sku.color=}, {sku.product_url=}, {sku.outer_model_image_urls=}")
+                log.debug(f"插入的product数据: {item}")
                 log.debug(
                     f"更新子款[SKU] 数据成功, id={sku.id}, sku_id={sku.sku_id}, product_id={sku.product_id}, source={sku.source}"
                 )
@@ -595,11 +600,17 @@ async def save_product_detail_data_async(data: dict | list[dict]) -> str | None:
             product_detail = result.scalars().one_or_none()
 
             if product_detail:
+                log.debug(
+                    f"更新前的product_detail数据: {product_detail.product_id=}, {product_detail.main_category=}, {product_detail.sub_category=}, {product_detail.source=}")
                 for key, value in item.items():
                     setattr(product_detail, key, value)
                 session.add(product_detail)
                 await session.commit()
                 await session.refresh(product_detail)
+                log.debug(
+                    f"更新后的product_detail数据: {product_detail.product_id=}, {product_detail.main_category=}, {product_detail.sub_category=}, {product_detail.source=}")
+                log.debug(f"插入的product_detail数据: {item}")
+
                 inserted_ids.append(product_detail.id)
                 log.debug(
                     f"更新商品详情[product_detail]数据成功, id={product_detail.id}, product_id={product_detail.product_id}, source={product_detail.source}"

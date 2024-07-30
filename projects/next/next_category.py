@@ -58,226 +58,7 @@ async def run(playwright: Playwright) -> None:
     # 打开新的页面
     # for base_url in urls:
 
-    # 获取所有类别
-    categories = [
-        # ("dresses", "14340"),
-        # ("tshirts", "4256"),
-        # ("blouses", "4132"),
-        # ("trousers", "3531"),
-        # ("jackets", "2729"),
-        # ("jumpers", "2310"),
-        # ("skirts", "2131"),  # TODO160 之后没拿对, 原722条
-        # ("shirts", "2081"),
-        # ("jeans", "1901"),
-        # ("shorts", "1841"),
-        # ("bikinis", "1763"),
-        # ("vests", "1380"),
-        # ("jumpsuit", "1226"),
-        # ("cardigans", "1041"),
-        # ("coats", "971"),
-        # ("leggings", "954"),
-        # ("sweattops", "934"),
-        # ("hoodies", "786"),
-        # ("tunics", "660"),
-        # ("joggers", "651"),
-        # ("socks", "611"),
-        # ("coverups", "600"),
-        # ("tanktops", "471"),
-        # ("camisoles", "408"),
-        # ("fleeces", "320"),
-        # ("waistcoats", "307"),
-        # ("gilets", "249"),
-        # ("bodies", "246"),
-        # ("playsuits", "244"),
-        # ("suitjackets", "185"),
-        # ("poloshirts", "178"),
-        # ("suittrousers", "156"),
-        # ("tights", "154"),
-        # ("croptops", "122"),
-        # ("tankinis", "118"),
-        # ("ponchos", "52"),
-        # ("dungarees", "44"),
-        # ("boobtube", "43"),
-        # ("tracksuits", "32"),
-        # ("rashvests", "27"),
-        # ("bodysuits", "22"),
-        # ("allinone", "13"),
-        ("loungewearsets", "12"),
-        ("topshortsets", "12"),
-        ("blazers", "9"),
-        ("topleggingset", "5"),
-        ("suitskirts", "3"),
-        ("rompersuits", "2"),
-        ("snowsuits", "2"),
-        ("dungareeset", "1"),
-    ]
-    # boys
-    categories = [
-        ("tshirts", "2339"),
-        ("shorts", "1079"),
-        ("shirts", "700"),
-        ("hoodies", "629"),
-        ("poloshirts", "556"),
-        ("jackets", "535"),
-        ("pyjamas", "515"),
-        ("socks", "496"),
-        ("trousers", "487"),
-        ("joggers", "459"),
-        ("swimshorts", "339"),
-        ("jeans", "256"),
-        ("sleepsuits", "219"),
-        ("rompersuits", "207"),
-        ("topshortsets", "189"),
-        ("bodysuits", "187"),
-        ("tracksuits", "137"),
-        ("jumpers", "126"),
-        ("rashvests", "109"),
-        ("coats", "108"),
-        ("dungarees", "105"),
-        ("sweattops", "104"),
-        ("trunks", "95"),
-        ("sweattopjoggersets", "86"),
-        ("footballshirts", "85"),
-        ("boxers", "82"),
-        ("cardigans", "75"),
-        ("dungareeset", "63"),
-        ("robes", "63"),
-        ("sweattopshortset", "62"),
-        ("allinone", "59"),
-        ("leggings", "55"),
-        ("gilets", "55"),
-        ("swimsuits", "52"),
-        ("fleeces", "50"),
-        ("suittrousers", "48"),
-        ("briefs", "47"),
-        ("sunsafesuits", "46"),
-        ("suitjackets", "42"),
-        ("vests", "41"),
-        ("topleggingset", "36"),
-        ("puddlesuits", "35"),
-        ("coverups", "31"),
-        ("sleepsuitset", "29"),
-        ("wetsuits", "28"),
-        ("baselayers", "27"),
-        ("waistcoats", "27"),
-        ("shirttrouserset", "23"),
-        ("hoodiejoggerset", "21"),
-        ("pramsuits", "20"),
-    ]
-    # girls
-    categories = [
-        ("dresses", "2350"),
-        ("tshirts", "1347"),
-        ("shorts", "585"),
-        ("leggings", "492"),
-        ("pyjamas", "473"),
-        ("sleepsuits", "439"),
-        ("jackets", "433"),
-        ("socks", "361"),
-        ("hoodies", "349"),
-        ("topshortsets", "347"),
-        ("skirts", "303"),
-        ("jeans", "280"),
-        ("cardigans", "279"),
-        ("sweattops", "275"),
-        ("trousers", "266"),
-        ("swimsuits", "262"),
-        ("rompersuits", "240"),
-        ("joggers", "206"),
-        ("bodysuits", "202"),
-        ("blouses", "175"),
-        ("playsuits", "157"),
-        ("topleggingset", "150"),
-        ("vests", "141"),
-        ("tights", "139"),
-        ("briefs", "129"),
-        ("coats", "120"),
-        ("jumpsuit", "118"),
-        ("jumpers", "99"),
-        ("sunsafesuits", "91"),
-        ("dungarees", "87"),
-        ("rashvests", "68"),
-        ("shirts", "67"),
-        ("allinone", "64"),
-        ("bras", "57"),
-        ("nighties", "45"),
-        ("sweattopleggingset", "44"),
-        ("topskirtset", "44"),
-        ("sweattopjoggersets", "41"),
-        ("slippers", "39"),
-        ("dressset", "38"),
-        ("ponchos", "37"),
-        ("puddlesuits", "37"),
-        ("sweattopshortset", "37"),
-        ("coverups", "36"),
-        ("robes", "36"),
-        ("fleeces", "33"),
-        ("poloshirts", "32"),
-        ("tracksuits", "29"),
-        ("pramsuits", "28"),
-        ("sleepsuitset", "28"),
-    ]
-
-    # men
-    categories = [
-        # ("tshirts", "3658"),
-        # ("shirts", "2579"),
-        # ("shorts", "1888"),
-        # ("jackets", "1604"),
-        # ("poloshirts", "1603"),
-        # ("trousers", "1117"),
-        # ("hoodies", "1070"),
-        # ("sweattops", "654"),
-        # ("socks", "652"),
-        # ("joggers", "605"),
-        # ("jeans", "576"),
-        # ("jumpers", "512"),
-        # ("footballshirts", "463"),
-        # ("swimshorts", "421"),
-        # ("suittrousers", "392"),
-        # ("suitjackets", "386"),
-        # ("fleeces", "248"),
-        # ("waistcoats", "238"),
-        # ("coats", "205"),
-        # ("gilets", "181"),
-        # ("vests", "142"),
-        # ("tracksuits", "67"),
-        # ("cardigans", "39"),
-        # ("rashvests", "32"),
-        # ("topshortsets", "23"),
-        # ("rugbyshirts", "20"),
-        # ("leggings", "14"),
-        # ("ponchos", "6"),
-        ("allinone", "4"),
-        ("loungewearsets", "3"),
-        ("sweattopjoggersets", "3"),
-        ("tights", "3"),
-        ("tanktops", "2"),
-        # ("jumpsuit", "1"),
-        # ("suits", "1"),
-    ]
-    # categories = [("bedding", 143)]
-    categories = [('pets', 677)]
-
-    # 床上用品
-    # categories = [('bedsets', '1263'), ('throws', '577'), ('bedsheets', '435'), ('pillowcases', '399'),
-    #               ('duvets', '238'), ('pillows', '161'), ('duvetcover', '100'), ('protectors', '66'), ('toppers', '39'),
-    #               ('blankets', '10'), ('valances', '7')]
     categories = dict(
-        baby=[
-            ('dresses', '1095'),
-            ('tshirts', '1056'), ('sleepsuits', '472'), ('jackets', '433'),
-            ('shorts', '405'), ('socks', '328'), ('trousers', '300'), ('topshortsets', '278'), ('shirts', '252'),
-            ('bodysuits', '210'), ('cardigans', '205'), ('leggings', '199'), ('hoodies', '187'),
-            ('joggers', '179'), ('rompersuits', '173'), ('sweattops', '160'), ('coats', '157'),
-            ('poloshirts', '150'), ('tights', '141'), ('topleggingset', '137'), ('dungarees', '121'),
-            ('sweattopjoggersets', '115'), ('jumpers', '113'), ('jeans', '111'), ('skirts', '92'),
-            ('rashvests', '77'), ('tracksuits', '77'), ('blouses', '69'), ('dungareeset', '58'),
-            ('puddlesuits', '54'), ('allinone', '50'), ('vests', '48'), ('playsuits', '45'),
-            ('sweattopleggingset', '40'), ('pramsuits', '34'), ('sweattopshortset', '34'), ('sleepsuitset', '33'),
-            ('jumpsuit', '32'), ('fleeces', '31'), ('bikinis', '29'), ('coverups', '26'), ('gilets', '25'),
-            ('ponchos', '25'), ('snowsuits', '22'), ('dressset', '19'), ('shirttrouserset', '19'),
-            ('bodies', '16'), ('topskirtset', '16'), ('jumperleggingsset', '14'), ('bodysuitleggingsset', '13')],
         women=[
             ('dresses', '11286'),
             ('tshirts', '3497'), ('blouses', '3076'), ('trousers', '2783'),
@@ -292,7 +73,7 @@ async def run(playwright: Playwright) -> None:
             ('dungarees', '36'), ('boobtube', '35'), ('tracksuits', '28'), ('bodysuits', '25'),
             ('rashvests', '18'), ('allinone', '11'), ('loungewearsets', '11'), ('topshortsets', '10'),
             ('blazers', '6'), ('suitskirts', '2'), ('hoodiejoggerset', '1'), ('jacketshirttrouserset', '1'),
-            ('jackettoptrouserset', '1'), ('sweattopjoggersets', '1')],
+            ('jackettoptrouserset', '1'), ('sweattopjoggersets', '1')],  # finished
         men=[('tshirts', '3974'), ('shirts', '2741'), ('shorts', '1960'), ('poloshirts', '1729'), ('jackets', '1675'),
              ('trousers', '1191'), ('hoodies', '1119'), ('sweattops', '703'), ('socks', '678'), ('joggers', '629'),
              ('jeans', '620'), ('jumpers', '551'), ('footballshirts', '456'), ('swimshorts', '431'),
@@ -301,6 +82,17 @@ async def run(playwright: Playwright) -> None:
              ('rashvests', '36'), ('rugbyshirts', '22'), ('topshortsets', '21'), ('leggings', '15'), ('ponchos', '6'),
              ('allinone', '3'), ('loungewearsets', '3'), ('sweattopjoggersets', '3'), ('tights', '3'),
              ('swimsuits', '2'), ('tanktops', '2'), ('suits', '1')],
+        girls=[('dresses', '1548'), ('tshirts', '933'), ('shorts', '397'), ('leggings', '361'), ('jackets', '360'),
+               ('sleepsuits', '339'), ('pyjamas', '337'), ('socks', '330'), ('hoodies', '237'), ('skirts', '237'),
+               ('trousers', '227'), ('cardigans', '222'), ('sweattops', '207'), ('topshortsets', '194'),
+               ('swimsuits', '177'), ('joggers', '174'), ('jeans', '172'), ('bodysuits', '159'), ('coats', '146'),
+               ('tights', '125'), ('blouses', '124'), ('briefs', '113'), ('topleggingset', '111'),
+               ('rompersuits', '107'), ('playsuits', '93'), ('jumpers', '90'), ('vests', '85'), ('dungarees', '63'),
+               ('tracksuits', '63'), ('sunsafesuits', '61'), ('jumpsuit', '60'), ('sweattopleggingset', '54'),
+               ('rashvests', '54'), ('sweattopjoggersets', '53'), ('shirts', '49'), ('allinone', '42'), ('bras', '42'),
+               ('nighties', '42'), ('poloshirts', '41'), ('robes', '35'), ('puddlesuits', '34'), ('slippers', '31'),
+               ('topskirtset', '30'), ('fleeces', '26'), ('dungareeset', '25'), ('ponchos', '25'), ('pramsuits', '25'),
+               ('coverups', '22'), ('dressset', '21'), ('sleepsuitset', '19')],
         boys=[('tshirts', '1758'), ('shorts', '740'), ('shirts', '480'), ('jackets', '478'), ('hoodies', '448'),
               ('socks', '445'), ('trousers', '423'), ('poloshirts', '393'), ('pyjamas', '380'), ('joggers', '345'),
               ('swimshorts', '226'), ('jeans', '213'), ('sleepsuits', '172'), ('footballshirts', '168'),
@@ -313,25 +105,30 @@ async def run(playwright: Playwright) -> None:
               ('vests', '33'), ('puddlesuits', '33'), ('wetsuits', '28'), ('hoodiejoggerset', '22'),
               ('waistcoats', '22'), ('coverups', '21'), ('pramsuits', '19'), ('baselayers', '18'),
               ('sleepsuitset', '18'), ('shirttrouserset', '13')],
-        girls=[('dresses', '1548'), ('tshirts', '933'), ('shorts', '397'), ('leggings', '361'), ('jackets', '360'),
-               ('sleepsuits', '339'), ('pyjamas', '337'), ('socks', '330'), ('hoodies', '237'), ('skirts', '237'),
-               ('trousers', '227'), ('cardigans', '222'), ('sweattops', '207'), ('topshortsets', '194'),
-               ('swimsuits', '177'), ('joggers', '174'), ('jeans', '172'), ('bodysuits', '159'), ('coats', '146'),
-               ('tights', '125'), ('blouses', '124'), ('briefs', '113'), ('topleggingset', '111'),
-               ('rompersuits', '107'), ('playsuits', '93'), ('jumpers', '90'), ('vests', '85'), ('dungarees', '63'),
-               ('tracksuits', '63'), ('sunsafesuits', '61'), ('jumpsuit', '60'), ('sweattopleggingset', '54'),
-               ('rashvests', '54'), ('sweattopjoggersets', '53'), ('shirts', '49'), ('allinone', '42'), ('bras', '42'),
-               ('nighties', '42'), ('poloshirts', '41'), ('robes', '35'), ('puddlesuits', '34'), ('slippers', '31'),
-               ('topskirtset', '30'), ('fleeces', '26'), ('dungareeset', '25'), ('ponchos', '25'), ('pramsuits', '25'),
-               ('coverups', '22'), ('dressset', '21'), ('sleepsuitset', '19')],
+        baby=[
+            ('dresses', '1095'),
+            ('tshirts', '1056'), ('sleepsuits', '472'), ('jackets', '433'),
+            ('shorts', '405'), ('socks', '328'), ('trousers', '300'), ('topshortsets', '278'), ('shirts', '252'),
+            ('bodysuits', '210'), ('cardigans', '205'), ('leggings', '199'), ('hoodies', '187'),
+            ('joggers', '179'), ('rompersuits', '173'), ('sweattops', '160'), ('coats', '157'),
+            ('poloshirts', '150'), ('tights', '141'), ('topleggingset', '137'), ('dungarees', '121'),
+            ('sweattopjoggersets', '115'), ('jumpers', '113'), ('jeans', '111'), ('skirts', '92'),
+            ('rashvests', '77'), ('tracksuits', '77'), ('blouses', '69'), ('dungareeset', '58'),
+            ('puddlesuits', '54'), ('allinone', '50'), ('vests', '48'), ('playsuits', '45'),
+            ('sweattopleggingset', '40'), ('pramsuits', '34'), ('sweattopshortset', '34'), ('sleepsuitset', '33'),
+            ('jumpsuit', '32'), ('fleeces', '31'), ('bikinis', '29'), ('coverups', '26'), ('gilets', '25'),
+            ('ponchos', '25'), ('snowsuits', '22'), ('dressset', '19'), ('shirttrouserset', '19'),
+            ('bodies', '16'), ('topskirtset', '16'), ('jumperleggingsset', '14'), ('bodysuitleggingsset', '13')],
+        gifts=[('pets', 677)],
 
     )
     base_url_config = dict(
         women="https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category",
-        baby="https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category",
         men="https://www.next.co.uk/shop/gender-men-productaffiliation-clothing/category",
+        girls="https://www.next.co.uk/shop/gender-newborngirls-gender-newbornunisex-gender-oldergirls-gender-youngergirls-productaffiliation-girlsclothing/category",
         boys="https://www.next.co.uk/shop/gender-newbornboys-gender-newbornunisex-gender-olderboys-gender-youngerboys-productaffiliation-boysclothing/category",
-        girls="https://www.next.co.uk/shop/gender-newborngirls-gender-newbornunisex-gender-oldergirls-gender-youngergirls-productaffiliation-girlsclothing/category"
+        baby="https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category",
+        gifts="https://www.next.co.uk/shop/productaffiliation-gifts/category",
     )
     # TODO 修复 base_url
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
@@ -350,24 +147,13 @@ async def run(playwright: Playwright) -> None:
             total = int(count)
             page_size = 12
             page_count = (total + page_size - 1) // page_size
-            base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-hoodies"
-            base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
-            base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-jumpers"
-            base_url = f"https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-{category}"
-            base_url = "https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/"
-            base_url = f"https://www.next.co.uk/shop/gender-men-productaffiliation-clothing/category-{category}"
-            base_url = f"https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category-{category}"
-            # 分段 当页数太多时可能导致chrome内存爆裂
 
-            # base_url = 'https://www.next.co.uk/shop/productaffiliation-gifts/category-pets'
-            # base_url = f'https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding/category-{category}'
             base_url = base_url_config.get(gender, "")
             category_url = f"{base_url}-{category}"
             # category = category_url.split("/")[-1].split("-")[-1]
             segment = 40
             times = (page_count + segment - 1) // segment
             print(f"{times=}")
-            dresses_not = ["549_600", "825_900"]
             log.debug(f"分页{segment=}, {times=}")
             for j in range(0, times):
                 log.debug(f"开始第{j + 1}轮 处理, 共 {times} 轮")
@@ -375,11 +161,6 @@ async def run(playwright: Playwright) -> None:
 
                 page = await context.new_page()
                 async with page:
-                    # base_url: str = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-trousers"
-                    # base_url = "https://www.next.co.uk/shop/gender-women-productaffiliation-clothing/category-dresses"
-                    a = ["1-50", "50-100", "100-200", "200-326", "326-347", "347"]
-                    b = ["1-50", "51-100", "101-200", "200, .."]
-                    c = [""]
                     # category = base_url.split("/")[-1].split("-")[-1]
                     print(category)
                     # 拦截所有图片
@@ -389,11 +170,6 @@ async def run(playwright: Playwright) -> None:
                     )
                     log.debug(f"打开页面: {next_base_url}")
                     await page.goto(next_base_url)
-                    b = "/html/body/main/div/div/div[2]/div[4]/div/div[22]/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
-                    selector = "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[1]/div[1]/div/div/div[1]/a"
-                    li_selector = (
-                        "//main/div/div/div[2]/div[4]/div/div/div/div/section/div/div[2]/div[2]/div/div/div/ul/li/a"
-                    )
                     await page.wait_for_load_state(timeout=60000)
                     await page.wait_for_timeout(5000)
                     scroll_pause_time = random.randrange(1000, 1800, 200)
