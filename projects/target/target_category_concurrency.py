@@ -135,6 +135,7 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
         if isinstance(result, Exception):
             log.error(f"抓取商品失败: {result}")
             raise ValueError(f"抓取商品失败: {result}")
+    log.info(f"类别抓取状态:{main_category=}, {subcategory=}, 抓取完毕")
     await browser.close()
 
 
@@ -324,7 +325,7 @@ async def open_pdp_page(
                         nonlocal sku
                         product, sku = await parse_target_product(
                             json_dict,
-                            primary_category=primary_category,
+                            main_category=primary_category,
                             sub_category=sub_category,
                             source=source,
                             sku_id=sku_id,
@@ -734,7 +735,7 @@ async def parse_target_product(
         sku_id: str | None = None,
         product_id: str | None = None,
         source: str | None = "target",
-        primary_category: str | None = None,
+        main_category: str | None = None,
         sub_category: str | None = None,
         headers: dict | None = None,
         cookies: dict | None = None,
@@ -747,7 +748,7 @@ async def parse_target_product(
     product: dict | None = data.get("data").get("product") if data.get("data") else {}
     if not product:
         log.error(f"未从接口中获取到商品信息,{product_id=}, {sku_id=}, {task_type=} ")
-        raise ValueError(f"未从接口中获取到商品信息,{product_id=}, {sku_id=}, {task_type=} ")
+        # raise ValueError(f"未从接口中获取到商品信息,{product_id=}, {sku_id=}, {task_type=} ")
         return None, None
     product_id_from_api = product.get("tcin")
     if product_id_from_api != product_id:
@@ -805,7 +806,7 @@ async def parse_target_product(
                 semaphore = asyncio.Semaphore(10)  # 设置并发请求数限制为10
                 if task_type == "category":
                     sku_dir = settings.data_dir.joinpath(
-                        source, primary_category, sub_category, str(product_id), str(sku_id)
+                        source, main_category, sub_category, str(product_id), str(sku_id)
                     )
                 elif task_type == "brand":
                     sku_dir = settings.data_dir.joinpath(source + brand, brand, str(product_id), str(sku_id))
@@ -891,8 +892,9 @@ async def parse_target_product(
         attributes=attributes,  # 商品属性
         description=description,  # 描述信息
         review_count=review_count,  # 评论数
-        gender=primary_category,  # 大类别
-        main_category=primary_category,  # 大类别
+        gender=main_category if main_category not in (
+            'pets', 'furniture', 'household', 'outdoor-living-garden') else 'unknown',  # 大类别
+        main_category=main_category,  # 大类别
         inner_category=sub_category,  # 内部类别
         sub_category=sub_category,  # 子类别
     )
@@ -1078,7 +1080,7 @@ async def main():
     categories = [
         # ("women", "jeans"),  # mac finished 抓取完毕 0725 重新尝试
         # ("women", "shorts"),  # 102 finished 抓取完毕 0726
-        ("women", "dresses"),
+        # ("women", "dresses"),
         # ("pets", "dog-supplies"),  # mac finished 抓取完毕 0724
         # ("pets", "cat-supplies"),  # 188  finished 抓取完毕 0723
         # ("pets", "gifts-for-pets"),  # 188 finished 抓取完毕 0723
@@ -1114,18 +1116,34 @@ async def main():
         # ("girls", "bottoms"),  # 188 finished 抓取完成 0729
         # ("girls", "dresses-rompers"),  # 188 finished 抓取完毕 0729
         # ("girls", "pajamas-robes"),  # 188 processing
-        # ("girls", "swimsuits"),  # 188 processing
-        # ("girls", "coats-jackets"),  # 188 processing
+        # ("girls", "swimsuits"),  # 188 finished 抓取完毕 0730
+        # ("girls", "coats-jackets"),  # 188 finished 抓取完毕 0730
         # ("girls", "girls-accessories"),  # mac finished 抓取完毕 0729
         # ("girls", "socks-tights"),  # mac finished 抓取完毕 0729
         # ("girls", "underwear-bras"),  # mac finished 抓取完毕 0729
         # ("girls", "activewear"),  # mac finished 抓取完毕 0729
         # ("girls", "multipacks"),  # 135 finished 抓取完毕 0729
         # ("girls", "new-arrivals"),  # 135 finished 抓取完毕 0729
-        ("girls", "shoes"),  # 184 finished 抓取完毕 0730
+        # ("girls", "shoes"),  # 184 finished 抓取完毕 0730
         # ("girls", "adaptive-clothing"),  # 184 finished 抓取完毕 0729
-        # ("girls", "outfit-sets"),  # processing 135
-        # ("girls", "all-in-motion"),  # processing 135
+        # ("girls", "outfit-sets"),  # finished 135
+        # ("girls", "all-in-motion"),  # finished 135
+        # ("boys", "boys-uniforms"),  # 188 finished 抓取完毕 0731
+        # ("boys", "tween-boys"),  # 188 finished 抓取完毕 0731
+        # ("boys", "bottoms"),  # 188 finished 抓取完毕 0731
+        # ("boys", "dresswear"),  # 188 finished 抓取完毕 0731
+        # ("boys", "shorts-bottoms"),  # finished 抓取完毕 0731
+        # ("boys", "swimsuits"),  # finished 抓取完毕 0731
+        # ("boys", "coats-jackets"),  # 188 finished 抓取完毕 0731
+        ("boys", "pajamas-robes"),
+        ("boys", "boys-accessories"),
+        ("boys", "socks"),  # 135 processing
+        ("boys", "underwear"),
+        ("boys", "activewear"),
+        ("boys", "new-arrivals"),
+        ("boys", "shoes"),
+        ("boys", "adaptive-clothing"),
+        ("boys", "tops"),  # 184 processing
 
     ]
 
