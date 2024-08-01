@@ -302,8 +302,8 @@ async def analyze_review_by_metrics(
 
     # 将 ORM对象转换为字典
     review_dicts = [ProductReviewAnalysisValidator.model_validate(review).model_dump(exclude_unset=True) for review in
-                    reviews]
-    log.debug(review_dicts)
+                    reviews[:1000]]
+    # log.debug(review_dicts)
 
     if not reviews:
         return {"analyses": None, "statistics": None}
