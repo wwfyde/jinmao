@@ -190,7 +190,7 @@ async def analyze_reviews(reviews: list[dict], extra_metrics: list[str] | str | 
         tasks.append(task)
 
     # 使用 asyncio.gather 并行执行所有任务，等待所有任务完成
-    results: tuple[dict | None] = await asyncio.gather(*tasks)
+    results: tuple[dict | None] = await asyncio.gather(*tasks, return_exceptions=True)
 
     total_input_tokens = 0  # 输入标记的总数
     total_output_tokens = 0  # 输出标记的总数
@@ -201,6 +201,9 @@ async def analyze_reviews(reviews: list[dict], extra_metrics: list[str] | str | 
 
     # 统计总的评论分析耗时
     for res in results:
+        if isinstance(res, Exception):
+            log.error(f"Error occurred: {res}")
+            continue
         if res:
             # print(f"{res=}")
             total_input_tokens += int(res["input_tokens"])

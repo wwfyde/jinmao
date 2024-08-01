@@ -404,6 +404,7 @@ async def save_review_data_async(data: dict | list[dict]):
 
         for item in data:
             review_id = item.get("review_id")
+            product_id = item.get("product_id")
             source = item.get("source")
 
             if review_id is None:
@@ -411,7 +412,9 @@ async def save_review_data_async(data: dict | list[dict]):
                 continue
 
             result = await session.execute(
-                select(ProductReview).filter(ProductReview.review_id == review_id, ProductReview.source == source)
+                select(ProductReview).filter(ProductReview.review_id == review_id,
+                                             ProductReview.product_id == product_id,
+                                             ProductReview.source == source)
             )
             review = result.scalars().one_or_none()
 

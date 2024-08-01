@@ -130,8 +130,8 @@ class ProductReviewIn(BaseModel):
             "example": {
                 "product_id": "728681",
                 "source": "gap",
-                "date_start": "2024-07-09",
-                "date_end": "2024-07-10",
+                # "date_start": "2024-07-09",
+                # "date_end": "2024-07-10",
                 "lang": "en",
                 "from_api": False,
                 "llm": "ark",

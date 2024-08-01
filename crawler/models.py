@@ -334,8 +334,9 @@ class ProductSKUDetail(Base):
 class ProductReview(Base):
     __tablename__ = "product_review"
     __table_args__ = (
-        Index("ix_source_product_id", "source", "product_id", mysql_using="hash"),
-        UniqueConstraint("review_id", "source", name="uq_review_id_source"),
+        Index("ix_source_product_id", "source", "product_id"),
+        Index("ix_source_product_id", "source", "product_id", "review_id"),
+        UniqueConstraint("review_id", "product_id", "source", name="uq_review_id_product_id_source"),
         {"comment": "商品评论"},
     )
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
