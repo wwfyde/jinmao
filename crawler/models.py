@@ -15,6 +15,8 @@ class Product(Base):
     __table_args__ = (
         Index("ix_source_product_id", "source", "product_id"),
         # Index("ix_source_product_id_sku_id", "source", "product_id", "sku_id"),  # 组合索引
+        Index("ix_review_count", "review_count"),
+        Index("ix_product_id", "product_id"),
         UniqueConstraint("product_id", "source", name="uq_product_id_source"),
         {"comment": "商品"},
     )
@@ -209,6 +211,7 @@ class ProductSKU(Base):
     __table_args__ = (
         Index("ix_source_sku_id", "source", "sku_id", mysql_using="hash"),
         Index("ix_source_product_id", "source", "product_id", mysql_using="hash"),
+        Index("ix_product_id", "product_id"),
         UniqueConstraint("product_id", "sku_id", "source", name="uq_product_id_sku_id_source"),
         {"comment": "商品SKU"},
     )

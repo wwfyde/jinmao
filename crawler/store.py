@@ -534,14 +534,14 @@ async def save_sku_data_async(data: dict | list[dict]) -> list | None:
             sku = result.scalars().one_or_none()
             if sku:
                 log.debug(
-                    f"更新前的SKU数据: {sku.product_id=}, {sku.sku_id=}, {sku.source=}, {sku.color=}, {sku.product_url=}, {sku.outer_model_image_urls=}")
+                    f"更新前的SKU数据: {sku.product_id=}, {sku.sku_id=}, {sku.source=}, {sku.color=}, {sku.product_url=}, {sku.outer_model_image_urls=}, {sku.outer_image_url=}")
                 for key, value in item.items():
                     setattr(sku, key, value)
                 session.add(sku)
                 await session.commit()
                 await session.refresh(sku)
                 log.debug(
-                    f"更新后的SKU数据: {sku.product_id=}, {sku.sku_id=}, {sku.source=}, {sku.color=}, {sku.product_url=}, {sku.outer_model_image_urls=}")
+                    f"更新后的SKU数据: {sku.product_id=}, {sku.sku_id=}, {sku.source=}, {sku.color=}, {sku.product_url=}, {sku.outer_model_image_urls=}, {sku.outer_image_url=}")
                 log.debug(f"插入的product数据: {item}")
                 log.debug(
                     f"更新子款[SKU] 数据成功, id={sku.id}, sku_id={sku.sku_id}, product_id={sku.product_id}, source={sku.source}"
