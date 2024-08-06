@@ -314,7 +314,7 @@ async def open_pdp_page(
                 product.update(
                     dict(
                         model_image_urls=model_image_urls,
-                        outer_image_urls=model_image_urls,
+                        outer_model_image_urls=model_image_urls,
                         image_url=image_url,
                         outer_image_url=image_url,
                     )
