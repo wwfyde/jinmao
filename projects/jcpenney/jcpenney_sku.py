@@ -106,9 +106,17 @@ async def open_pdp_page(
         sub_category: str = None
 ):
     async with semaphore:
+        product_id = httpx.URL(url).path.split("/")[-1]  # 获取商品ID
+
+        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+        key = f"status:{source}:{product_id}"
+        async with r:
+            product_status = await r.get(key)
+            if product_status == "done":
+                log.info(f"已经抓取过产品 {product_id=}")
+                return product_id
         page = await context.new_page()
         page.set_default_timeout(PLAYWRIGHT_TIMEOUT)
-        product_id = httpx.URL(url).path.split("/")[-1]  # 获取商品ID
 
         # 临时储存商品信息目录
         product_folder = settings.data_dir.joinpath(source, "products")
@@ -118,15 +126,6 @@ async def open_pdp_page(
         reviews_folder = settings.data_dir.joinpath(source, "reviews")
         reviews_folder.mkdir(exist_ok=True, parents=True)
         reviews_file = reviews_folder.joinpath(f"reviews_{product_id}.json")
-
-        # TODO 优化去重跳过逻辑
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-        key = f"status:{source}:{product_id}"
-        async with r:
-            product_status = await r.get(key)
-            if product_status == "done":
-                log.info(f"已经抓取过产品 {product_id=}")
-                return product_id
 
         # need_crawl = True
         # if Path(product_file).exists():
@@ -419,7 +418,7 @@ async def main():
         # ("men", "default"),
         ("men", "shirts"),
     ]
-    categories = [
+    categories = {
         ('women', 'view-all-women',
          'https://www.jcpenney.com/g/women/view-all-women?new_arrivals=view+all+new&id=cat10011030002&boostIds=ppr5008270089-ppr5008270103-ppr5008270088-ppr5008270067-ppr5008270073-ppr5008270107-ppr5008270565-ppr5008270075&cm_re=ZA-_-DEPARTMENT-WOMEN-_-LF-_-NEW-ARRIVALS-_-VIEW-ALL-WOMENS-NEW-ARRIVALS_1'),
         ('women', 'womens-plus-size',
@@ -651,7 +650,7 @@ async def main():
 
         ("girls", "default", "https://www.jcpenney.com/g/baby-kids/all-girls-clothing?id=cat11100001191"),
         ("boys", "default", "https://www.jcpenney.com/g/baby-kids/all-boys-clothing?id=cat11100001196"),
-    ]
+    }
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
         tasks = [loop.run_in_executor(executor, async_runner, main_category, sub_category) for
                  main_category, sub_category, _ in categories]
