@@ -4,11 +4,15 @@
 
 import asyncio
 import json
+
+import httpx
 from playwright.async_api import (
     async_playwright,
 )
 
 from projects.jcpenney.common import cancel_requests
+
+main_category = "women"
 
 
 async def fetch_category_data():
@@ -19,8 +23,7 @@ async def fetch_category_data():
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
         await cancel_requests(page)
-
-        await page.goto("https://www.jcpenney.com/d/women")
+        await page.goto(f"https://www.jcpenney.com/d/{main_category}")
         await page.wait_for_load_state("domcontentloaded")
 
         await page.wait_for_timeout(10000)
@@ -32,7 +35,8 @@ async def fetch_category_data():
         urls = []
         for element in elements:
             url = await element.get_attribute("href")
-            urls.append("https://www.jcpenney.com" + url)
+            sub_category = httpx.URL(url).path.split("/")[-1]
+            urls.append((main_category, sub_category, "https://www.jcpenney.com" + url))
 
         await browser.close()
         print(urls)
@@ -44,7 +48,7 @@ async def main():
     result = list(set(result))
 
     # save to json
-    with open("projects/jcpenney/category.json", "w") as f:
+    with open(f"projects/jcpenney/category-{main_category}.json", "w") as f:
         json.dump(result, f, indent=4)
 
 

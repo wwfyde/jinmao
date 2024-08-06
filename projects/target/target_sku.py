@@ -4,7 +4,7 @@ from playwright.async_api import Playwright, async_playwright
 
 from crawler import log
 from crawler.config import settings
-from projects.target.target_category import open_pdp_page
+from projects.target.target_category_concurrency import open_pdp_page
 
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 PLAYWRIGHT_TIMEOUT = 1000 * 30
@@ -30,25 +30,15 @@ async def run(playwright: Playwright) -> None:
             # devtools=True,
         )
     else:
-        browser = await chromium.launch(
-            headless=False,
-            # devtools=True,
-        )
-        context = await browser.new_context()
-
-    # browser = await chromium.launch(headless=True)
-    # context = await browser.new_context()
-
-    # 设置全局超时
-    context.set_default_timeout(PLAYWRIGHT_TIMEOUT)
-    # 创建一个新的浏览器上下文，设置视口大小
-    # context = await browser.new_context(viewport={"width": 1920, "height": 1080})
-    # 在浏览器上下文中打开一个新页面
-    # 关闭浏览器context
-    semaphore = asyncio.Semaphore(1)
+        pass
+    browser = await chromium.launch(
+        headless=settings.playwright.headless,
+        # devtools=True,
+    )
+    semaphore = asyncio.Semaphore(5)
     # TODO  修改如下参数
-    primary_category = "women"
-    sub_category = "dresses"
+    main_category = "pets"
+    sub_category = "cat-treats"
     # base_url: str = "https://www.target.com/p/women-s-tie-waist-button-front-midi-skirt-universal-thread/-/A-89766757"
     #
     # base_url: str = "https://www.target.com/p/women-s-poplin-cross-back-dress-a-new-day/-/A-90587245"
@@ -59,18 +49,27 @@ async def run(playwright: Playwright) -> None:
     url = "https://www.target.com/p/allegra-k-women-s-glitter-sequin-spaghetti-strap-v-neck-party-cocktail-sparkly-mini-dress/-/A-87419082?preselect=89041542#lnk=sametab"
     url = "https://www.target.com/p/women-s-best-ever-maxi-a-line-dress-a-new-day/-/A-90368246?preselect=90379157#lnk=sametab"
     url = "https://www.target.com/p/women-s-flutter-cap-sleeve-maxi-a-line-dress-universal-thread/-/A-91637488?preselect=91485713#lnk=sametab"
-    await open_pdp_page(
-        context,
-        url=url,
-        semaphore=semaphore,
-        source="target",
-        primary_category=primary_category,
-        sub_category=sub_category,
-        color="red",
-        size="M",
-    )
+    url = "https://www.target.com/p/greenies-petite-original-chicken-adult-dental-dog-treats/-/A-54557364?preselect=75666634"
+    url = "https://www.target.com/p/hartz-delectables-sqeeze-up-chicken-38-tuna-cat-treats-variety-pack-5oz-10ct/-/A-80783370?preselect=80783370"
+    sku_tasks = [
+        ("pets", "cat-treats",
+         "https://www.target.com/p/hartz-delectables-sqeeze-up-chicken-38-tuna-cat-treats-variety-pack-5oz-10ct/-/A-80783370?preselect=80783370"),
+        ("pets", "dog-treats",
+         "https://www.target.com/p/greenies-petite-original-chicken-adult-dental-dog-treats/-/A-54557364?preselect=75666634"),
+        ("pets", "cat-treats",
+         "https://www.target.com/p/delectables-hartz-squeeze-up-chicken-flavored-cat-treat-2oz-4ct/-/A-76375257?preselect=76375257"),
+    ]
+    for (main_category, sub_category, url) in sku_tasks:
+        await open_pdp_page(
+            browser,
+            url=url,
+            semaphore=semaphore,
+            source="target",
+            main_category=main_category,
+            sub_category=sub_category,
+        )
     # TODO 暂不关闭浏览器
-    await context.close()
+    await browser.close()
 
 
 async def main():

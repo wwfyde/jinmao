@@ -26,8 +26,9 @@ __doc__ = """
 从商品索引中获取商品链接,并开始抓取
 """
 
-settings.playwright.concurrency = 5
+settings.playwright.concurrency = 6
 settings.playwright.headless = True
+should_skip_failed = False
 
 
 async def run(playwright: Playwright) -> None:
@@ -138,7 +139,8 @@ async def run(playwright: Playwright) -> None:
             # product_urls = ["https://www.next.co.uk/style/su272671/q64927#q64927"]
             tasks = [
                 open_pdp_page(
-                    context, semaphore, url, main_category=main_category, source=source, sub_category=sub_category
+                    context, semaphore, url, main_category=main_category, source=source, sub_category=sub_category,
+                    skip_failed=should_skip_failed
                 )
                 for url in product_urls
             ]
@@ -163,6 +165,7 @@ async def open_pdp_page(
         main_category: str,
         sub_category: str,
         source: str,
+        skip_failed: bool = True,
 ):
     """
     打开产品详情页PDP
@@ -178,7 +181,10 @@ async def open_pdp_page(
 
         async with r:
             status = await r.get(f"status:next:{product_id}:{sku_id}")
-            if status == "done" or status == "failed":
+            skipped_status = ["done"]
+            if skip_failed:
+                skipped_status = ["done", "failed"]
+            if status in skipped_status:
                 log.info(f"商品{product_id=}, {sku_id=}, {status=} 已经下载完成或失败, 跳过下载")
                 return product_id, sku_id
         log.info(f"正在抓取商品:{product_id=}, {sku_id=}, {url=}, ")

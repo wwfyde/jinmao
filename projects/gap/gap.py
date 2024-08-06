@@ -15,95 +15,97 @@ from crawler.config import settings
 from crawler.store import save_review_data_async, save_product_data_async, \
     save_sku_data_async, save_product_detail_data_async
 
-# urls = [
-#     {
-#         "women": [
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
-#             "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
-#         ]
-#     },  # 女装 2804
-#     {"men.all": "https://www.gap.com/browse/category.do?cid=1127944&department=75"},  # 男装 约1009
-# ]
+urls = []
 source = "gap"
 sub_category = "default"  # 商品子类别
-urls = [
+urls += [
     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=0"),
     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=1"),
     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=2"),
     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=3"),
     ("men", sub_category, "https://www.gap.com/browse/category.do?cid=1127944&department=75&pageId=4"),
 ]
+urls += [
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
+    ),
+    (
+        "women",
+        sub_category,
+        "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
+    ),
+]
+urls = [
+    ("boys", "default", "https://www.gap.com/browse/category.do?cid=1127945&department=16&pageId=0"),
+    ("boys", "default", "https://www.gap.com/browse/category.do?cid=1127945&department=16&pageId=1"),
+    ("boys", "default", "https://www.gap.com/browse/category.do?cid=1127945&department=16&pageId=2"),
+]
+urls += [
+    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=0"),
+    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=1"),
+    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=2"),
+    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=3"),
+    ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=4"),
+]
+urls = [
+    # ("baby_girls", "default", "https://www.gap.com/browse/category.do?cid=1127952&department=165&pageId=0"),
+    # ("baby_girls", "default", "https://www.gap.com/browse/category.do?cid=1127952&department=165&pageId=1"),
+    # ("baby_girls", "default", "https://www.gap.com/browse/category.do?cid=1127952&department=165&pageId=2"),
+    ("baby_girls", "default", "https://www.gap.com/browse/category.do?cid=1127947&department=165&pageId=0"),
+    ("baby_girls", "default", "https://www.gap.com/browse/category.do?cid=1127947&department=165&pageId=1"),
+
+]
 # urls = [
-#     # (
-#     #     "women",
-#     #     sub_category,
-#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=0",
-#     # ),
-#     # (
-#     #     "women",
-#     #     sub_category,
-#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=1",
-#     # ),
-#     # (
-#     #     "women",
-#     #     sub_category,
-#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=2",
-#     # ),
-#     # (
-#     #     "women",
-#     #     sub_category,
-#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=3",
-#     # ),
-#     # (
-#     #     "women",
-#     #     sub_category,
-#     #     "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=4",
-#     # ),
-#     (
-#         "women",
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=5",
-#     ),
-#     (
-#         "women",
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=6",
-#     ),
-#     (
-#         "women",
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=7",
-#     ),
-#     (
-#         "women",
-#         sub_category,
-#         "https://www.gap.com/browse/category.do?cid=1127938&department=136#department=136&pageId=8",
-#     ),
-# ]
-# primary_category = "boys"  # 商品主类别
-# sub_category = "default"  # 商品子类别
-# urls = [("boys", "default", "https://www.gap.com/browse/category.do?cid=6189&department=16")]
-# urls = [
-#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=0"),
-#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=1"),
-#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=2"),
-#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=3"),
-#     ("girls", "default", "https://www.gap.com/browse/category.do?cid=1127946&department=48&pageId=4"),
+#     ("baby_boys", "default", "https://www.gap.com/browse/category.do?cid=1127955&department=166&pageId=0"),
+#     ("baby_boys", "default", "https://www.gap.com/browse/category.do?cid=1127955&department=166&pageId=1"),
+#     ("baby_boys", "default", "https://www.gap.com/browse/category.do?cid=1127948&department=166&pageId=0"),
+#     ("baby_boys", "default", "https://www.gap.com/browse/category.do?cid=1127948&department=166&pageId=1"),
 # ]
 PLAYWRIGHT_TIMEOUT: int = settings.playwright.timeout or 1000 * 60
+PLAYWRIGHT_TIMEOUT: int = 1000 * 60 * 2
 print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 8
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-PLAYWRIGHT_HEADLESS: bool = False
-should_use_proxy = True
+# PLAYWRIGHT_HEADLESS: bool = False
+should_use_proxy = False
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
 """
@@ -261,7 +263,10 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
             # # log.info("从route获取到的数据: ", results)
 
             # 等待路由事件完成
-            await main_route_event.wait()
+            try:
+                await asyncio.wait_for(main_route_event.wait(), timeout=60 * 2)
+            except Exception as e:
+                log.warning(f"等待路由事件超时: {e}")
 
             # log.info(f"拦截路由更新: {products_list}")
             log.info(f"拦截路由更新: {product_count}")
@@ -552,7 +557,7 @@ async def open_pdp_page(
         async with r:
             log.info(f"商品{product_id=}, {sku_id=}抓取完毕, 标记redis状态")
             await r.set(f"status:{source}:{product_id}:{sku_id}", "done")
-        await sub_page.pause()
+        # await sub_page.pause()
         return sku_id
 
 
@@ -890,7 +895,7 @@ async def parse_category_from_api(
     # 保存商品数据
     await save_product_data_async(results)
     await save_product_detail_data_async(results)
-    await page.pause()
+    # await page.pause()
     return results, product_count, pagination, skus_index
     pass
 

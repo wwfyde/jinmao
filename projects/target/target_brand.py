@@ -8,7 +8,7 @@ from playwright.async_api import Playwright, async_playwright, Route
 
 from crawler.config import settings
 from projects.gap.gap import PLAYWRIGHT_HEADLESS
-from projects.target.target_category import open_pdp_page
+from projects.target.target_category_concurrency import open_pdp_page
 from projects.target import log
 
 # 增加按品牌搜索

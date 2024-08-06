@@ -124,7 +124,7 @@ async def run(playwright: Playwright, main_category: str, subcategory) -> None:
                 url=url,
                 semaphore=semaphore,
                 source=source,
-                primary_category=main_category,
+                main_category=main_category,
                 sub_category=subcategory,
             )
         )
@@ -146,7 +146,7 @@ async def open_pdp_page(
         url: str,
         semaphore: asyncio.Semaphore,
         source: str,
-        primary_category: str | None = None,
+        main_category: str | None = None,
         sub_category: str | None = None,
         color: str | None = None,
         size: str | None = None,
@@ -325,7 +325,7 @@ async def open_pdp_page(
                         nonlocal sku
                         product, sku = await parse_target_product(
                             json_dict,
-                            main_category=primary_category,
+                            main_category=main_category,
                             sub_category=sub_category,
                             source=source,
                             sku_id=sku_id,
@@ -1135,15 +1135,15 @@ async def main():
         # ("boys", "shorts-bottoms"),  # finished 抓取完毕 0731
         # ("boys", "swimsuits"),  # finished 抓取完毕 0731
         # ("boys", "coats-jackets"),  # 188 finished 抓取完毕 0731
-        ("boys", "pajamas-robes"),
-        ("boys", "boys-accessories"),
-        ("boys", "socks"),  # 135 processing
-        ("boys", "underwear"),
-        ("boys", "activewear"),
-        ("boys", "new-arrivals"),
-        ("boys", "shoes"),
-        ("boys", "adaptive-clothing"),
-        ("boys", "tops"),  # 184 processing
+        ("boys", "tops"),  # 184+ manc finished 抓取完毕 0802
+        # ("boys", "pajamas-robes"),  # finished 0731
+        # ("boys", "boys-accessories"),  # finished 0731
+        # ("boys", "socks"),  # 135 finished
+        # ("boys", "underwear"),  # 115 finished 0731
+        # ("boys", "activewear"),  # 115 finished 0731
+        # ("boys", "new-arrivals"),  # 115 finished 0731
+        # ("boys", "shoes"),  # 115 finished 0731
+        # ("boys", "adaptive-clothing"),  # 115 finished 0731
 
     ]
 

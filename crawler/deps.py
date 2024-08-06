@@ -52,7 +52,7 @@ def get_logger(name: str = __name__):
     handler.setLevel(logging.WARNING)  # 设置处理器的日志级别
     formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(message)s [in %(pathname)s:%(lineno)d]")
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    # logger.addHandler(handler)
     # 创建标准输出处理器
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)  # 设置处理器的日志级别
