@@ -183,7 +183,7 @@ async def run(main_category: str, sub_category: str, url: str):
                         inserted_count = await r.sadd(f"{source}:{main_category}:{sub_category}", *product_urls)
                         log.info(f"保存商品url到redis: {inserted_count=}")
                         # category_key = f"category_task_status:{source}:{main_category}:{sub_category}:{url}"
-                        await r.set(category_key)
+                        await r.set(category_key, "done")
                         log.info(f"设置任务状态: {category_key=} 商品索引建立完成")
 
                     else:
