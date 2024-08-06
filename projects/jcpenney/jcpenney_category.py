@@ -378,6 +378,7 @@ def clean():
 async def main():
     loop = asyncio.get_running_loop()
     num_processes = os.cpu_count() // 2
+    num_processes = 4
     log.info(f"CPU核心数: {os.cpu_count()}, 进程数: {num_processes}")
     categories = [
         ('women', 'view-all-women',
