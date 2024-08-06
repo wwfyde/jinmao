@@ -146,6 +146,10 @@ async def open_pdp_page(
 
         # 声明路由事件
         async with page:
+            await page.route(
+                "**/*",
+                lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
+            )
             route_event = asyncio.Event()
 
             async def handle_route(route: Route):
@@ -223,6 +227,7 @@ async def open_pdp_page(
             )
             if not preloaded_state:
                 log.error(f"获取产品{product_id=}详情失败")
+                return product_id
 
             sku_id = preloaded_state.get("queryParams", {}).get("selectedSKUId")
 

@@ -75,7 +75,7 @@ def parse_category_from_api(data: dict) -> tuple[list[dict], list[str], dict]:
         parsed_product = dict(
             product_id=product.get("ppId", None),
             source="jcpenney",
-            product_name=product.get("name", None),
+            product_name=product.get("name")[:128] if product.get("name", None) else None,
             brand=product.get("brand", None),
             price=product.get("currentMin", None),
             rating=product.get("averageRating", None),
