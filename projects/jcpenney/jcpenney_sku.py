@@ -17,6 +17,7 @@ from crawler.config import settings
 from crawler.deps import get_logger
 from crawler.store import save_product_detail_data_async, save_product_data_async, \
     save_review_data_async, save_sku_data_async
+from projects.jcpenney.common import cancel_requests
 
 PLAYWRIGHT_TIMEOUT = settings.playwright.timeout
 IMAGE_POSTFIX = "?hei=1500&wid=1500&op_usm=.4%2C.8%2C0%2C0&resmode=sharp2&op_sharpen=1"
@@ -47,8 +48,10 @@ async def run(
             proxy = None
         log.info(f"使用代理 {should_use_proxy=}")
         browser = await chromium.launch(
-            slow_mo=50, headless=PLAYWRIGHT_HEADLESS, args=["--single-process"], timeout=60000,
-            proxy=proxy,
+            # slow_mo=50, 
+            headless=PLAYWRIGHT_HEADLESS,
+            # args=["--single-process"], timeout=60000,
+            # proxy=proxy,
 
         )
         context = await browser.new_context()
@@ -146,6 +149,8 @@ async def open_pdp_page(
 
         # 声明路由事件
         async with page:
+            await cancel_requests(page)
+
             await page.route(
                 "**/*",
                 lambda route: route.abort() if route.request.resource_type == "image" else route.continue_(),
@@ -261,6 +266,8 @@ async def open_pdp_page(
 
             if product_details:
                 product_name = product_details.get("name")
+                if product_name:
+                    product_name = product_name[:128]
                 domain = "https://www.jcpenney.com"
                 brand = product_details.get("brand", {}).get("name")
 
