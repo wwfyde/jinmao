@@ -1,6 +1,12 @@
 # 新版本开发
 
-## 流程
+## 流程(新-20240819)
+
+1. `projects\jcpenney\category.py` 获取类别列表
+2. `projects\jcpenney\jcpenney_category.py` 将类别加入到商品索引 url
+3. `projects\jcpenney\jcpenney_sku.py` 获取商品详情
+
+## 流程(赵轩)
 
 1. `projects\jcpenney\category.py` 获取类别列表，其中内容会有重复
 2. `projects\jcpenney\item-list.py` 获取产品列表 url，会用重复产品

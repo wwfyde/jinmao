@@ -12,7 +12,7 @@ from playwright.async_api import (
 
 from projects.jcpenney.common import cancel_requests
 
-main_category = "women"
+main_category = "jewelry-and-watches"
 
 
 async def fetch_category_data():

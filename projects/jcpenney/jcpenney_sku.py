@@ -258,7 +258,8 @@ async def open_pdp_page(
                 primary_sku_id=sku_id,
                 source=source,
                 gender=main_category if main_category not in (
-                    'pets', 'furniture', 'household', 'outdoor-living-garden') else 'unknown',  # 大类别,
+                    'pets', 'furniture', 'household', 'outdoor-living-garden', 'jewelry-and-watches') else 'unknown',
+                # 大类别,
                 main_category=main_category,
                 sub_category=sub_category,
                 lot_id=lot_id,
