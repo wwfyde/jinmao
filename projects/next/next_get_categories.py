@@ -15,10 +15,14 @@ async def run(playwright):
         # men="https://www.next.co.uk/shop/gender-men-productaffiliation-clothing-0",
         # boys="https://www.next.co.uk/shop/gender-newbornboys-gender-newbornunisex-gender-olderboys-gender-youngerboys-productaffiliation-boysclothing-0",
         # boys="https://www.next.co.uk/shop/gender-newbornboys-gender-newbornunisex-gender-olderboys-gender-youngerboys-productaffiliation-boysclothing-0"
-        girls="https://www.next.co.uk/shop/gender-newborngirls-gender-newbornunisex-gender-oldergirls-gender-youngergirls-productaffiliation-girlsclothing-0",
+        # girls="https://www.next.co.uk/shop/gender-newborngirls-gender-newbornunisex-gender-oldergirls-gender-youngergirls-productaffiliation-girlsclothing-0",
         # pets="https://www.next.co.uk/shop/productaffiliation-gifts/category-pets",
         # bed="https://www.next.co.uk/shop/department-homeware-productaffiliation-bedding-0",
         # baby="https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing-0?p=1#417"
+
+    )
+    main_categories = dict(
+        women='https://www2.next.co.uk/shop/gender-women-productaffiliation-nightwear'
     )
     for key, url in main_categories.items():
 

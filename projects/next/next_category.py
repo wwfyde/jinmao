@@ -130,6 +130,25 @@ async def run(playwright: Playwright) -> None:
         baby="https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category",
         gifts="https://www.next.co.uk/shop/productaffiliation-gifts/category",
     )
+    # 追加
+    categories = dict(
+        # women=[('pyjamas', '725')],
+        # men=[('pyjamas', '160')],
+        # women=[('bras', '2439')],
+        women=[
+            # ('pyjamas', '737'), 
+            ('slippers', '470'), ('nighties', '159'), ('robes', '148'), ('slips', '72'),
+            ('camisets', '46'), ('thermals', '42'), ('blankethoodies', '21'), ('socks', '11'), ('hoodies', '10'),
+            ('joggers', '7'), ('sweattops', '4'), ('trousers', '4'), ('allinone', '3'), ('topshortsets', '2'),
+            ('tracksuits', '2'), ('tshirts', '2'), ('beautysleep', '1'), ('loungewearsets', '1'), ('shorts', '1')],
+
+    )
+    base_url_config = dict(
+        women="https://www.next.co.uk/shop/gender-women-productaffiliation-nightwear/category",
+        # men='https://www.next.co.uk/shop/gender-men-productaffiliation-nightwear/category-pyjamas'
+        # women='https://www.next.co.uk/shop/gender-women-productaffiliation-lingerie/category'
+    )
+
     # TODO 修复 base_url
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
@@ -186,7 +205,7 @@ async def run(playwright: Playwright) -> None:
                             url = await product_locators.nth(i).locator(
                                 "section > div > div:nth-child(2) > a").get_attribute(
                                 "href", timeout=10000)
-                            log.debug(f"抓取到商品数量{url}")
+                            log.debug(f"抓取到商品url: {url}")
                             product_urls.append(url)
                         # TODO 将 所有url 存入redis, 以持久化
                         except Exception as exc:

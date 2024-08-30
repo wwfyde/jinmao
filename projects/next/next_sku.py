@@ -26,7 +26,7 @@ __doc__ = """
 从商品索引中获取商品链接,并开始抓取
 """
 
-settings.playwright.concurrency = 6
+settings.playwright.concurrency = 5
 settings.playwright.headless = True
 should_skip_failed = False
 
@@ -82,7 +82,11 @@ async def run(playwright: Playwright) -> None:
                             'suittrousers', 'tankinis', 'suitjackets', 'croptops', 'ponchos', 'dungarees', 'boobtube',
                             'tracksuits', 'bodysuits', 'rashvests', 'allinone', 'loungewearsets', 'topshortsets',
                             'blazers', 'suitskirts', 'hoodiejoggerset', 'jacketshirttrouserset', 'jackettoptrouserset',
-                            'sweattopjoggersets'}
+                            'sweattopjoggersets', 'pyjamas', 'slippers', 'nighties', 'robes', 'slips', 'camisets',
+                            'thermals', 'blankethoodies', 'socks', 'hoodies', 'joggers', 'sweattops', 'trousers',
+                            'allinone', 'topshortsets', 'tracksuits', 'tshirts', 'beautysleep', 'loungewearsets',
+                            'shorts'}
+
     category_indexes.extend({('women', item) for item in sub_categories_women})
     sub_categories_men = {'tshirts', 'shirts', 'shorts', 'poloshirts', 'jackets', 'trousers', 'hoodies', 'sweattops',
                           'socks', 'joggers', 'jeans', 'jumpers', 'footballshirts', 'swimshorts', 'suittrousers',
@@ -123,6 +127,11 @@ async def run(playwright: Playwright) -> None:
                            'coverups', 'gilets', 'ponchos', 'snowsuits', 'dressset', 'shirttrouserset', 'bodies',
                            'topskirtset', 'jumperleggingsset', 'bodysuitleggingsset'}
     category_indexes.extend({("baby", item) for item in sub_categories_baby})
+
+    sub_categories_women = {'pyjamas', 'slippers', 'nighties', 'robes', 'slips', 'camisets', 'thermals',
+                            'blankethoodies', 'socks', 'hoodies', 'joggers', 'sweattops', 'trousers', 'allinone',
+                            'topshortsets', 'tracksuits', 'tshirts', 'beautysleep', 'loungewearsets', 'shorts'}
+    category_indexes = {("women", item) for item in sub_categories_women}
 
     for main_category, sub_category in category_indexes:
         # for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
@@ -181,6 +190,7 @@ async def open_pdp_page(
 
         async with r:
             status = await r.get(f"status:next:{product_id}:{sku_id}")
+            log.debug(f"获取商品{product_id=}, {sku_id=}的状态: {status}")
             skipped_status = ["done"]
             if skip_failed:
                 skipped_status = ["done", "failed"]
@@ -233,6 +243,7 @@ async def open_pdp_page(
 
                 sku_id_raw = product.get("sku_id_raw")
                 # product.update(dict(sub_category=sub_category, source=source, main_category=main_category))
+                log.info("开始保存数据到mysql")
                 await save_product_data_async(product)
                 await save_product_detail_data_async(product)
                 await save_sku_data_async(product)
@@ -254,6 +265,7 @@ async def open_pdp_page(
                 )
                 log.debug(f"商品SKU信息: {sku=}")
                 # 通过点击按钮加载更多评论
+                i = 0
                 while True:
                     try:
                         review_button = page.locator('//*[@id="LoadMoreBtn"]')
@@ -275,6 +287,10 @@ async def open_pdp_page(
                         await page.wait_for_timeout(2000)
                         await page.wait_for_load_state("domcontentloaded", timeout=3000)
                         log.debug("等待加载完成")
+                        i += 1
+                        # 无限循环
+                        if i >= 1000:
+                            break
                     except Exception as exc:
                         log.info(f"没有更多评论可加载: {exc}")
                         break
