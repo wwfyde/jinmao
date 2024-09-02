@@ -16,6 +16,25 @@ settings.save_login_state = False
 settings.playwright.headless = False
 
 
+def add_url_for_categories(base: dict[str, list[tuple[str, str]]], url_config: dict) -> dict[
+    str, list[tuple[str, str, str]]]:
+    new_categories = {}
+    for key, value in base.items():
+        new_categories[key] = [(item[0], item[1], f"{url_config[key]}-{item[0]}") for item in value]
+
+    return new_categories
+
+
+def merge_categories(base: dict[str, list[tuple[str, str, str]]], additional: dict[str, list[tuple[str, str, str]]]) -> \
+        dict[str, list[tuple[str, str, str]]]:
+    for key, value in additional.items():
+        if key in base:
+            base[key].extend(value)
+        else:
+            base[key] = value
+    return base
+
+
 async def run(playwright: Playwright) -> None:
     # 从playwright对象中获取chromium浏览器
     chromium = playwright.chromium
@@ -58,7 +77,7 @@ async def run(playwright: Playwright) -> None:
     # 打开新的页面
     # for base_url in urls:
 
-    categories = dict(
+    base_categories = dict(
         women=[
             ('dresses', '11286'),
             ('tshirts', '3497'), ('blouses', '3076'), ('trousers', '2783'),
@@ -130,34 +149,78 @@ async def run(playwright: Playwright) -> None:
         baby="https://www.next.co.uk/shop/gender-newbornboys-gender-newborngirls-gender-newbornunisex-gender-youngerboys-gender-youngergirls-productaffiliation-clothing/category",
         gifts="https://www.next.co.uk/shop/productaffiliation-gifts/category",
     )
+    categories = add_url_for_categories(base_categories, base_url_config)
     # 追加
-    categories = dict(
+    base_lingerie_categories = dict(
         # women=[('pyjamas', '725')],
         # men=[('pyjamas', '160')],
         # women=[('bras', '2439')],
-        # women=[
-        #     # ('pyjamas', '737'), 
-        #     ('slippers', '470'), ('nighties', '159'), ('robes', '148'), ('slips', '72'),
-        #     ('camisets', '46'), ('thermals', '42'), ('blankethoodies', '21'), ('socks', '11'), ('hoodies', '10'),
-        #     ('joggers', '7'), ('sweattops', '4'), ('trousers', '4'), ('allinone', '3'), ('topshortsets', '2'),
-        #     ('tracksuits', '2'), ('tshirts', '2'), ('beautysleep', '1'), ('loungewearsets', '1'), ('shorts', '1')],
+
         women=[('bras', '2493'), ('knickers', '1963'), ('shapewearsolutions', '314'), ('tights', '187'),
                ('slips', '68'), ('camisets', '47'), ('thermals', '41'), ('bodies', '36'), ('suspenders', '33'),
                ('babydollsbasques', '31'), ('braaccessories', '21'), ('braknickersets', '9')]
 
     )
-    base_url_config = dict(
+    base_lingerie_url_config = dict(
         # women="https://www.next.co.uk/shop/gender-women-productaffiliation-nightwear/category",
         women="https://www3.next.co.uk/shop/gender-women-productaffiliation-lingerie/category"
         # men='https://www.next.co.uk/shop/gender-men-productaffiliation-nightwear/category-pyjamas'
         # women='https://www.next.co.uk/shop/gender-women-productaffiliation-lingerie/category'
     )
+    base_nightwear_categories = dict(
+        women=[
+            ('pyjamas', '737'),
+            ('slippers', '470'), ('nighties', '159'), ('robes', '148'), ('slips', '72'),
+            ('camisets', '46'), ('thermals', '42'), ('blankethoodies', '21'), ('socks', '11'), ('hoodies', '10'),
+            ('joggers', '7'), ('sweattops', '4'), ('trousers', '4'), ('allinone', '3'), ('topshortsets', '2'),
+            ('tracksuits', '2'), ('tshirts', '2'), ('beautysleep', '1'), ('loungewearsets', '1'), ('shorts', '1')],
+
+    )
+    base_nightwear_url_config = dict(
+        women="https://www.next.co.uk/shop/gender-women-productaffiliation-nightwear/category",
+    )
+
+    # 追加lingerie类别
+    categories = merge_categories(categories,
+                                  add_url_for_categories(base_lingerie_categories, base_lingerie_url_config))
+
+    # 追加nightwear类别
+    categories = merge_categories(categories,
+                                  add_url_for_categories(base_nightwear_categories, base_nightwear_url_config))
+
+    base_men_nightwear_categories = dict(
+        men=[('slippers', '212'), ('pyjamas', '167'), ('robes', '59'), ('thermals', '33'), ('shorts', '30'),
+             ('vests', '24'), ('joggers', '17'), ('hoodies', '16'), ('sweattops', '8'), ('blankethoodies', '5'),
+             ('socks', '1')]
+    )
+    base_men_nightwear_url_config = dict(
+        men='https://www.next.co.uk/shop/gender-men-productaffiliation-nightwear/category'
+
+    )
+    categories = merge_categories(categories,
+                                  add_url_for_categories(base_men_nightwear_categories, base_men_nightwear_url_config))
+    # 如果只对单项进行追加
+    categories = add_url_for_categories(base_men_nightwear_categories, base_men_nightwear_url_config)
+    print(categories)
+    base_women_accessories_categories = dict(
+        women=[('bags', '3440'), ('earrings', '1547'), ('necklaces', '1079'), ('luggage', '656'), ('bracelets', '641'),
+               ('hats', '581'), ('sunglasses', '575'), ('purses', '443'), ('belts', '316'), ('scarves', '309'),
+               ('rings', '294'), ('hairaccessories', '212'), ('phonecases', '160'), ('watches', '157'),
+               ('gloves', '135'), ('jewellerysets', '83'), ('cosmeticbags', '37'), ('travelaccessories', '35'),
+               ('drinksbottles', '33'), ('umbrellas', '33'), ('brooches', '28'), ('keyrings', '22'),
+               ('headbands', '15'), ('washbags', '9'), ('hatglovesscarfsets', '7'), ('readingglasses', '6'),
+               ('lunchbags', '5'), ('earmuffs', '4'), ('skigoggles', '1')]
+    )
+    base_women_accessories_url_config = dict(
+        women='https://www3.next.co.uk/shop/gender-women-productaffiliation-accessories/category'
+    )
+    categories = add_url_for_categories(base_women_accessories_categories, base_women_accessories_url_config)
 
     # TODO 修复 base_url
     r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
 
-    for gender, subcategories in categories.items():
-        for category, count in subcategories:
+    for gender, subcategories, in categories.items():
+        for category, count, category_url in subcategories:
             async with r:
                 key = f"next_category_status:{gender}:{category}"
                 result = await r.get(key)
@@ -171,8 +234,6 @@ async def run(playwright: Playwright) -> None:
             page_size = 12
             page_count = (total + page_size - 1) // page_size
 
-            base_url = base_url_config.get(gender, "")
-            category_url = f"{base_url}-{category}"
             # category = category_url.split("/")[-1].split("-")[-1]
             segment = 40
             times = (page_count + segment - 1) // segment

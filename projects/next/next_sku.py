@@ -134,9 +134,14 @@ async def run(playwright: Playwright) -> None:
     sub_categories_women = {'bras', 'knickers', 'shapewearsolutions', 'tights', 'slips', 'camisets', 'thermals',
                             'bodies', 'suspenders', 'babydollsbasques', 'braaccessories', 'braknickersets'}
     category_indexes = {("women", item) for item in sub_categories_women}
-
-    for main_category, sub_category in category_indexes:
+    
+    # 采用遍历redis数据库键的方式
+    category_keys: list = await r.keys("next:*")
+    print(category_indexes)
+    for key in category_keys:
+        _, main_category, sub_category = key.split(":")
         # for main_category, sub_category in {("gifts", item) for item in sub_categories_gifts}:
+        print(main_category, sub_category)
         async with r:
             source = "next"
             log.info(f"开始抓取{main_category=}, {sub_category=}")
