@@ -22,7 +22,8 @@ async def run(playwright):
 
     )
     main_categories = dict(
-        women='https://www2.next.co.uk/shop/gender-women-productaffiliation-nightwear'
+        # women_nightwear='https://www2.next.co.uk/shop/gender-women-productaffiliation-nightwear',
+        women_lingerie='https://www3.next.co.uk/shop/gender-women-productaffiliation-lingerie',
     )
     for key, url in main_categories.items():
 

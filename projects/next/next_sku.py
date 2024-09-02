@@ -131,6 +131,8 @@ async def run(playwright: Playwright) -> None:
     sub_categories_women = {'pyjamas', 'slippers', 'nighties', 'robes', 'slips', 'camisets', 'thermals',
                             'blankethoodies', 'socks', 'hoodies', 'joggers', 'sweattops', 'trousers', 'allinone',
                             'topshortsets', 'tracksuits', 'tshirts', 'beautysleep', 'loungewearsets', 'shorts'}
+    sub_categories_women = {'bras', 'knickers', 'shapewearsolutions', 'tights', 'slips', 'camisets', 'thermals',
+                            'bodies', 'suspenders', 'babydollsbasques', 'braaccessories', 'braknickersets'}
     category_indexes = {("women", item) for item in sub_categories_women}
 
     for main_category, sub_category in category_indexes:

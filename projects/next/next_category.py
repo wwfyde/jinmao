@@ -135,16 +135,20 @@ async def run(playwright: Playwright) -> None:
         # women=[('pyjamas', '725')],
         # men=[('pyjamas', '160')],
         # women=[('bras', '2439')],
-        women=[
-            # ('pyjamas', '737'), 
-            ('slippers', '470'), ('nighties', '159'), ('robes', '148'), ('slips', '72'),
-            ('camisets', '46'), ('thermals', '42'), ('blankethoodies', '21'), ('socks', '11'), ('hoodies', '10'),
-            ('joggers', '7'), ('sweattops', '4'), ('trousers', '4'), ('allinone', '3'), ('topshortsets', '2'),
-            ('tracksuits', '2'), ('tshirts', '2'), ('beautysleep', '1'), ('loungewearsets', '1'), ('shorts', '1')],
+        # women=[
+        #     # ('pyjamas', '737'), 
+        #     ('slippers', '470'), ('nighties', '159'), ('robes', '148'), ('slips', '72'),
+        #     ('camisets', '46'), ('thermals', '42'), ('blankethoodies', '21'), ('socks', '11'), ('hoodies', '10'),
+        #     ('joggers', '7'), ('sweattops', '4'), ('trousers', '4'), ('allinone', '3'), ('topshortsets', '2'),
+        #     ('tracksuits', '2'), ('tshirts', '2'), ('beautysleep', '1'), ('loungewearsets', '1'), ('shorts', '1')],
+        women=[('bras', '2493'), ('knickers', '1963'), ('shapewearsolutions', '314'), ('tights', '187'),
+               ('slips', '68'), ('camisets', '47'), ('thermals', '41'), ('bodies', '36'), ('suspenders', '33'),
+               ('babydollsbasques', '31'), ('braaccessories', '21'), ('braknickersets', '9')]
 
     )
     base_url_config = dict(
-        women="https://www.next.co.uk/shop/gender-women-productaffiliation-nightwear/category",
+        # women="https://www.next.co.uk/shop/gender-women-productaffiliation-nightwear/category",
+        women="https://www3.next.co.uk/shop/gender-women-productaffiliation-lingerie/category"
         # men='https://www.next.co.uk/shop/gender-men-productaffiliation-nightwear/category-pyjamas'
         # women='https://www.next.co.uk/shop/gender-women-productaffiliation-lingerie/category'
     )
