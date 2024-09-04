@@ -46,3 +46,4 @@ async def cancel_requests(page):
     await page.route("*.bidswitch.net/*", cancel_request)
     await page.route("*.adform.net/*", cancel_request)
     await page.route("*.kampyle.com/*", cancel_request)
+    await page.route("*.truefitcorp.com/*", cancel_request)
