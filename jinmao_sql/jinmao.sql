@@ -79,7 +79,7 @@ select main_category, sub_category, product_sku.source, count(*) as count
 from product_sku
          LEFT JOIN
      product_detail on product_sku.product_id = product_detail.product_id and product_sku.source = product_detail.source
-where product_sku.source = 'jcpenney'
+where product_sku.source = 'next'
 group by main_category, sub_category, product_sku.source
 order by count desc;
 
@@ -88,7 +88,7 @@ select main_category, product_sku.source, count(*) as count
 from product_sku
          LEFT JOIN
      product_detail on product_sku.product_id = product_detail.product_id and product_sku.source = product_detail.source
-where product_sku.source = 'jcpenney'
+where product_sku.source = 'next'
 group by main_category, product_sku.source
 order by count desc;
 
@@ -317,7 +317,7 @@ where category = 'Pets'
 
 select *
 from product
-where product_id = 'su153034';
+where product_id = 'st130964';
 
 
 select *

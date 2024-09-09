@@ -14,6 +14,7 @@ from projects.jcpenney.common import cancel_requests
 
 main_category = "jewelry-and-watches"
 main_category = "home-store"
+main_category = "young-adult"
 
 
 async def fetch_category_data():
