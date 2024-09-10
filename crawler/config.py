@@ -114,23 +114,23 @@ class Settings(BaseSettings):
     @computed_field
     def mysql_dsn(self) -> MySQLDsn:
         ...
-        return f"mysql+pymysql://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
+        return f"mysql+pymysql://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}?charset=utf8mb4"
         # return f"mysql+mysqldb://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
 
     @computed_field
     def mysql_async_dsn(self) -> MySQLDsn:
         ...
-        return f"mysql+aiomysql://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}"
+        return f"mysql+aiomysql://{self.mysql.user}:{self.mysql.password}@{self.mysql.host}:{self.mysql.port}/{self.mysql.db}?charset=utf8mb4"
 
     @computed_field
     def mysql_test_async_dsn(self) -> MySQLDsn:
         ...
-        return f"mysql+aiomysql://{self.mysql_test.user}:{self.mysql_test.password}@{self.mysql_test.host}:{self.mysql_test.port}/{self.mysql_test.db}"
+        return f"mysql+aiomysql://{self.mysql_test.user}:{self.mysql_test.password}@{self.mysql_test.host}:{self.mysql_test.port}/{self.mysql_test.db}?charset=utf8mb4"
 
     @computed_field
     def mysql_test_dsn(self) -> MySQLDsn:
         ...
-        return f"mysql+pymysql://{self.mysql_test.user}:{self.mysql_test.password}@{self.mysql_test.host}:{self.mysql_test.port}/{self.mysql_test.db}"
+        return f"mysql+pymysql://{self.mysql_test.user}:{self.mysql_test.password}@{self.mysql_test.host}:{self.mysql_test.port}/{self.mysql_test.db}?charset=utf8mb4"
 
     @computed_field
     def redis_dsn(self) -> str:
@@ -138,11 +138,11 @@ class Settings(BaseSettings):
 
     @computed_field
     def molook_db2_dsn(self) -> MySQLDsn:
-        return f"mysql+pymysql://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db2}"
+        return f"mysql+pymysql://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db2}?charset=utf8mb4"
 
     @computed_field
     def molook_db_dsn(self) -> MySQLDsn:
-        return f"mysql+pymysql://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db}"
+        return f"mysql+pymysql://{self.molook_db.user}:{self.molook_db.password}@{self.molook_db.host}:{self.molook_db.port}/{self.molook_db.db}?charset=utf8mb4"
 
     model_config = SettingsConfigDict(
         yaml_file=[

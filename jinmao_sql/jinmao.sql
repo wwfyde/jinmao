@@ -88,7 +88,7 @@ select main_category, product_sku.source, count(*) as count
 from product_sku
          LEFT JOIN
      product_detail on product_sku.product_id = product_detail.product_id and product_sku.source = product_detail.source
-where product_sku.source = 'next'
+where product_sku.source = 'jcpenney'
 group by main_category, product_sku.source
 order by count desc;
 
