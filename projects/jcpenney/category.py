@@ -16,6 +16,7 @@ main_category = "jewelry-and-watches"
 main_category = "home-store"
 main_category = "young-adult"
 main_category = "baby-kids"
+main_category = "shoes"
 
 
 async def fetch_category_data():

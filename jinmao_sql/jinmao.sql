@@ -342,3 +342,20 @@ from product
 where created_at >= '2024-09-01'
   and source = 'next'
 order by created_at desc;
+
+
+SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
+FROM information_schema.SCHEMATA
+WHERE SCHEMA_NAME = 'crawler';
+
+select @@version;
+
+ALTER DATABASE crawler CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+# 查看最大连接数
+SHOW VARIABLES LIKE 'max_connections';
+
+SHOW TABLE STATUS WHERE Name = 'product_review';
+
+ALTER TABLE product_sku
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
