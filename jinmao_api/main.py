@@ -1,22 +1,25 @@
 import logging
+from datetime import datetime
+from enum import Enum
+from typing import Annotated, Literal
 
-from fastapi import FastAPI, Depends, APIRouter
-from sqlalchemy import select, update, and_, func, desc, text, asc, insert, delete
+from fastapi import APIRouter, Depends, FastAPI, Query
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from redis import Redis
+from sqlalchemy import and_, asc, delete, desc, distinct, func, insert, or_, select, text, tuple_, update
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from uvicorn import run
 
-from jinmao_api.doubao import analyze_reviews, summarize_reviews
-from jinmao_api.schemas import (
-    ProductReviewIn,
-    ProductReviewAnalysisValidator,
-    ProductReviewAnalysisByMetricsIn,
-    ReviewFilter,
-)
-from jinmao_api import log
 from crawler.db import get_db
-from crawler.models import ProductReview, Product, ProductReviewAnalysis, ReviewAnalysisExtraMetric
+from crawler.deps import get_redis_cache_sync
+from crawler.models import Product, ProductDetail, ProductReview, ProductReviewAnalysis, ProductSKU, \
+    ReviewAnalysisExtraMetric
+from jinmao_api import log
+from jinmao_api.doubao import analyze_reviews, summarize_reviews
+from jinmao_api.schemas import (ProductReviewAnalysisByMetricsIn, ProductReviewAnalysisValidator, ProductReviewIn,
+                                ReviewFilter)
 
 log.setLevel(logging.DEBUG)
 
@@ -568,6 +571,337 @@ async def review_metrics_filter(params: ReviewFilter, db: Session = Depends(get_
         raise ValueError(f"请传入正确的指标, {exc}")
 
     pass
+
+
+class PageSize(int, Enum):
+    small = 20
+    medium = 50
+    large = 100
+
+class Source(str, Enum):
+    next = "next"
+    gap = "gap"
+    target = "target"
+    jcpenney = "jcpenney"
+
+
+class Gender(str, Enum):
+    women = 'women'
+    men = 'men'
+    girls = 'girls'
+    boys = 'boys'
+    unisex = 'unisex'
+    unknown = 'unknown'
+
+
+class SearchProductParams(BaseModel):
+    keyword: str | None = Field(None, description="搜索关键词")
+    source: Source | None = Field(None, description="数据源")
+    brands: list[str] = Field(None, description="品牌列表")
+    categories: list[str] | None = Field(None, description="类别列表")
+    genders: list[str] | None = Field(None, description="性别列表", examples=["women", "men"])
+    tags: list[str] | None = Field(None, description="标签列表")
+    product_id: str | None = Field(None, description="商品ID或SKU ID", validation_alias=AliasChoices("product_id","productId"))
+    language_code: str | None = Field(default="en", description="语言代码", validation_alias=AliasChoices("language_code", "languageCode"))
+    use_index: bool = Field(False, description="是否使用索引", validation_alias=AliasChoices("use_index", "useIndex"))
+
+    product_name: str | None = Field(None, description="商品名称", validation_alias=AliasChoices("product_name", "productName"))
+    page_current: int = Field(1, ge=1, description="当前页", validation_alias=AliasChoices("page_current", "pageCurrent"))
+    page_size: PageSize = Field(20, ge=1, le=100, examples=[20, 50, 100], validation_alias=AliasChoices("page_size", "pageSize"))
+    # refresh: bool = False  # TODO 是否刷新 索引
+    # TODO 支持多排序
+    sort_by: Literal['review_count', 'gathered_at', 'id'] | None = Field('review_count', description="排序字段", validation_alias=AliasChoices("sort_by", "sortBy"))
+    sort_order: Literal["desc", "asc"] | None = Field("desc", description="排序方式", validation_alias=AliasChoices("sort_order", "sortOrder"))
+    released_at_start: str | None = Field(None, description="发布时间开始", validation_alias=AliasChoices("released_at_start", "releasedAtStart"))
+    released_at_end: str | None = Field(None, description="发布时间结束", validation_alias=AliasChoices("released_at_end", "releasedAtEnd"))
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "keyword": "pyjamas",
+                "page": 1,
+                "page_size": 20,
+                "refresh": False,
+            }
+        },
+        use_enum_values=True,
+    )
+
+
+class ProductOut(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        protected_namespaces=(), 
+    )
+    source: Source = Field(..., description="数据源", alias="source")
+    id: str | int = Field(..., description="商品ID", alias="id")
+    product_id: str = Field(..., description="商品ID", alias="productId", validation_alias=AliasChoices("product_id", "productId"))
+    primary_sku_id: str | None = Field(None, description="主SKU ID", alias="primarySkuId", validation_alias=AliasChoices("primary_sku_id", "primarySkuId"))
+    brand: str | None = Field(None, description="品牌", alias="brand")
+    product_url: str | None = Field(None, description="商品链接", alias="productUrl", validation_alias=AliasChoices("product_url", "productUrl"))
+    rating: float | None = Field(None, description="评分", alias="rating")
+    review_count: int | None = Field(None, description="评论数", alias="reviewCount", validation_alias=AliasChoices("review_count", "reviewCount"))
+    rating_count: int | None = Field(None, description="评分数", alias="ratingCount", validation_alias=AliasChoices("rating_count", "ratingCount"))
+
+    # attributes: dict | list | None = Field(None, description="属性", alias="attributes")
+    description: str | None = Field(None, description="描述", alias="description")
+    # attributes_raw: dict | list | None = Field(None, description="原始属性", alias="attributesRaw", validation_alias=AliasChoices("attributes_raw", "attributesRaw"))
+    category: str | None = Field(None, description="类别", alias="category")
+    gender: Gender | None = Field(None, description="性别", alias="gender")
+    released_at: str | datetime | None = Field(None, description="发布时间", alias="releasedAt", validation_alias=AliasChoices("released_at", "releasedAt"))
+    tags: list[str] | None = Field(None, description="标签", alias="tags")
+    is_review_analyzed: bool | None = Field(None, description="是否已分析评论", alias="isReviewAnalyzed", validation_alias=AliasChoices("is_review_analyzed", "isReviewAnalyzed"))
+    # review_analyses: list[dict] | None = Field(None, description="评论分析", alias="reviewAnalyses", validation_alias=AliasChoices("review_analyses", "reviewAnalyses"))
+    # extra_metrics: list[str] | None = Field(None, description="额外指标", alias="extraMetrics", validation_alias=AliasChoices("extra_metrics", "extraMetrics"))
+    # extra_review_analyses: list[dict] | None = Field(None, description="额外评论分析", alias="extraReviewAnalyses", validation_alias=AliasChoices("extra_review_analyses", "extraReviewAnalyses"))
+    # review_statistics: dict | None = Field(None, description="评论统计", alias="reviewStatistics", validation_alias=AliasChoices("review_statistics", "reviewStatistics"))
+    # extra_review_statistics: dict | None = Field(None, description="额外评论统计", alias="extraReviewStatistics", validation_alias=AliasChoices("extra_review_statistics", "extraReviewStatistics"))
+    # review_summary: dict | None = Field(None, description="评论总结", alias="reviewSummary", validation_alias=AliasChoices("review_summary", "reviewSummary"))
+    # remark: str | None = Field(None, description="备注", alias="remark")
+    category_id: str | None = Field(None, description="类别ID", alias="categoryId", validation_alias=AliasChoices("category_id", "categoryId"))
+    is_deleted: bool | None = Field(None, description="是否已删除", alias="isDeleted", validation_alias=AliasChoices("is_deleted", "isDeleted"))
+    gathered_at: str | datetime| None = Field(None, description="采集时间", alias="gatheredAt", validation_alias=AliasChoices("gathered_at", "gatheredAt"))
+    last_gathered_at: str | datetime| None = Field(None, description="最后采集时间", alias="lastGatheredAt", validation_alias=AliasChoices("last_gathered_at", "lastGatheredAt"))
+    created_at: str | datetime | None = Field(None, description="创建时间", alias="createdAt", validation_alias=AliasChoices("created_at", "createdAt"))
+    updated_at: str | datetime | None = Field(None, description="更新时间", alias="updatedAt", validation_alias=AliasChoices("updated_at", "updatedAt"))
+    current_version: str | None = Field(None, description="当前版本", alias="currentVersion", validation_alias=AliasChoices("current_version", "currentVersion"))
+    image: str | None = Field(None, description="图片", alias="image")
+
+    #sku_id:从ProductSKU中获取
+    sku_id: str | None = Field(None, description="SKU ID", alias="skuId", validation_alias=AliasChoices("sku_id", "skuId"))
+    model_image_urls: list[str] | None = Field(None, description="模型图片链接", alias="modelImageUrls", validation_alias=AliasChoices("model_image_urls", "modelImageUrls"))
+    outer_model_image_urls: list[str] | None = Field(None, description="外部模型图片链接", alias="outerModelImageUrls", validation_alias=AliasChoices("outer_model_image_urls", "outerModelImageUrls"))
+    image_url: str | None = Field(None, description="图片链接", alias="imageUrl", validation_alias=AliasChoices("image_url", "imageUrl"))
+    outer_image_url: str | None = Field(None, description="外部图片链接", alias="outerImageUrl", validation_alias=AliasChoices("outer_image_url", "outerImageUrl"))
+    color: str | None = Field(None, description="颜色", alias="color")
+    size: str | None = Field(None, description="尺寸", alias="size")
+    material: str | None = Field(None, description="材质", alias="material")
+    sku_name: str | None = Field(None, description="SKU名称", alias="skuName", validation_alias=AliasChoices("sku_name", "skuName"))
+
+    main_category: str | None = Field(None, description="主类别", alias="mainCategory")
+    sub_category: str | None = Field(None, description="子类别", alias="subCategory")
+
+
+@router.post("/product/search", summary="商品搜索")
+async def search_product(
+        params: Annotated[SearchProductParams, Query(description="搜索参数")],
+        db: Session = Depends(get_db),
+        cache: Redis = Depends(get_redis_cache_sync)
+):
+    """
+    相关度排序搜索
+    """
+    print(params)
+
+    # #使用联表查询
+    # p = aliased(Product)
+    # sku = aliased(ProductSKU)
+    stmt = select(Product, ProductSKU, ProductDetail).join(ProductSKU, and_(Product.product_id == ProductSKU.product_id, Product.source == ProductSKU.source)).join(ProductDetail, and_(ProductSKU.product_id == ProductDetail.product_id, ProductSKU.source == ProductDetail.source))
+
+    # 不使用联表查询
+    # stmt = select(Product).where(Product.is_deleted == False)
+
+            # .join(ProductDetail, and_(ProductSKU.product_id==ProductDetail.product_id, ProductSKU.source==ProductDetail.source)))
+    if params.use_index and params.source == "next":
+        # 从Redis中获取商品ID
+        product_ids = cache.lrange(f"jinmao:{params.source}:{params.keyword}", 0, -1)
+    if params.source:
+        stmt = stmt.where(Product.source == params.source)
+    # if any(params.keyword in keyword for keyword in {'pyjamas', 'pajamas'}):
+    if params.tags:
+        tag_conditions = [
+            func.json_contains(Product.tags, func.json_quote(tag)) == 1
+            for tag in params.tags
+        ]
+        stmt = stmt.where(or_(*tag_conditions))
+    if params.brands:
+        stmt = stmt.where(Product.brand.in_(params.brands))
+    if params.categories:
+        stmt = stmt.where(Product.category.in_(params.categories))
+    if params.keyword and params.source == "next":
+        if 'pyjamas' in params.keyword.lower() or 'pajamas' in params.keyword.lower() or '睡衣' in params.keyword:
+            keyword = "pyjamas"
+            stmt = stmt.where(or_(Product.category.ilike("%pyjamas%"), Product.category.ilike("%pajamas%"), Product.product_name.ilike("%pyjamas%"), Product.product_name.ilike("%pajamas%")))
+            start = params.page_size * (params.page_current - 1)
+            end = start + params.page_size
+
+            products = cache.lrange(f"jinmao:{params.source}:{params.keyword}:indb", start, end)
+            formatted_products = []
+            for product in products:
+                product_id, sku_id = product.split(", ")
+                formatted_products.append((product_id, sku_id))
+            print(formatted_products)
+            stmt = stmt.where(
+                    tuple_(Product.product_id, ProductSKU.sku_id).in_(formatted_products)
+                )
+            results = db.execute(stmt)
+            total = cache.llen(f"jinmao:{params.source}:{keyword}:indb")
+            sku_total = total
+            serial_results = []
+            for result in results:
+                product: Product = result.Product
+                product_sku: ProductSKU = result.ProductSKU
+                product_detail: ProductDetail = result.ProductDetail
+                product_dict = ProductOut.model_validate(product)
+                product_dict.sku_id = product_sku.sku_id
+                product_dict.model_image_urls = product_sku.model_image_urls or product_sku.outer_model_image_urls
+                product_dict.outer_model_image_urls = product_sku.outer_model_image_urls
+                product_dict.image_url = product_sku.image_url or product_sku.outer_image_url
+                product_dict.outer_image_url = product_sku.outer_image_url
+                product_dict.image = product_sku.image_url or product_sku.outer_image_url
+                product_dict.main_category = product_detail.main_category
+                product_dict.sub_category = product_detail.sub_category
+                serial_results.append(product_dict)
+
+            # log.warning(f"{total=}, {sku_total=}, {len(serial_results)=}, {serial_results=}")
+            return {
+                "code": "00000",
+                "data": {
+                    "total": total,
+                    "SKUTotal": sku_total,
+                    "pageCurrent": params.page_current,
+                    "pageSize": params.page_size,
+                    "data": serial_results
+                },
+                "msg": "一切ok"
+            }
+
+            return {
+
+            }
+    if params.genders:
+        stmt = stmt.where(Product.gender.in_(params.genders))
+
+        ...
+    if params.product_id:
+        stmt = stmt.where(
+            or_(
+                Product.product_id.ilike(f"%{params.product_id.strip()}%"),
+                ProductSKU.sku_id.ilike(f"%{params.product_id.strip()}%")
+            )
+        )
+    if params.product_name:
+        stmt = stmt.where(Product.product_name.ilike(f"%{params.product_name.strip()}%"))
+    if params.released_at_start:
+        stmt = stmt.where(Product.released_at >= params.released_at_start)
+    if params.released_at_end:
+        stmt = stmt.where(Product.released_at <= params.released_at_end)
+    if params.sort_by:
+        log.debug(f"{params.sort_by}, {params.sort_order}")
+        order = desc(params.sort_by) if params.sort_order == "desc" else asc(params.sort_by)
+        stmt = stmt.order_by(order)
+    stmt = stmt.limit(params.page_size).offset((params.page_current - 1) * params.page_size)
+    log.debug(stmt.compile())
+    log.debug(stmt)
+    results = db.execute(stmt)
+    if stmt.whereclause is not None:
+        print(stmt.whereclause)
+        sku_total = db.execute(select(func.count("*")).select_from(Product).join(ProductSKU, and_(Product.product_id == ProductSKU.product_id, Product.source == ProductSKU.source)).where(stmt.whereclause)).scalar()
+        total = db.execute(select(func.count(distinct(Product.product_id))).select_from(Product).join(ProductSKU, and_(Product.product_id == ProductSKU.product_id, Product.source == ProductSKU.source)).where(stmt.whereclause)).scalar()
+    else:
+        sku_total = db.execute(select(func.count("*")).select_from(Product).join(ProductSKU, and_(Product.product_id == ProductSKU.product_id, Product.source == ProductSKU.source))).scalar()
+        total = db.execute(select(func.count("*")).select_from(Product)).scalar()
+
+    total_pages = (total + params.page_size - 1) // params.page_size
+
+    # for result in results:
+    #     product_sku: ProductSKU = result.ProductSKU
+    #     product: Product = result.Product
+    #     result = ProductOut.model_validate(product)
+    #     result.sku_id = product_sku.sku_id
+    #     result.model_image_urls = product_sku.model_image_urls
+    #
+    #     # serial_results.append(result)
+    #     serial_results.append(product.id)
+    # for result in results:
+    #     serial_results.append((result.id, result.gathered_at, result.review_count))
+    # return serial_results
+    serial_results = []
+    for result in results:
+        product: Product = result.Product
+        product_sku: ProductSKU = result.ProductSKU
+        product_detail: ProductDetail = result.ProductDetail
+        product_dict = ProductOut.model_validate(product)
+        product_dict.sku_id = product_sku.sku_id
+        product_dict.model_image_urls = product_sku.model_image_urls or product_sku.outer_model_image_urls
+        product_dict.outer_model_image_urls = product_sku.outer_model_image_urls
+        product_dict.image_url = product_sku.image_url or product_sku.outer_image_url
+        product_dict.outer_image_url = product_sku.outer_image_url
+        product_dict.image = product_sku.image_url or product_sku.outer_image_url
+        product_dict.main_category = product_detail.main_category
+        product_dict.sub_category = product_detail.sub_category
+        serial_results.append(product_dict)
+
+    # log.warning(f"{total=}, {sku_total=}, {len(serial_results)=}, {serial_results=}")
+    return {
+        "code": "00000",
+        "data": {
+            "total": total,
+            "SKUTotal": sku_total,
+            "pageCurrent": params.page_current,
+            "pageSize": params.page_size,
+
+            "data": serial_results
+        },
+        "msg": "一切ok"
+    }
+    if params.refresh:
+        if any(keyword in params.keyword for keyword in {'pyjamas', 'pajamas'}):
+            # stmt = select(Product).where(
+            #     Product.name.ilike("%pyjamas%")
+            # )
+            # db.execute(stmt)
+            keyword = "pyjamas"
+            source = "next"
+            all_products_sorted = cache.lrange(f"jinmao:{source}:{keyword}", 0, -1)
+            for product in all_products_sorted:
+                print(f"{product}, {type(product)=}")
+                product_id, sku_id = product.decode().split(", ")
+                stmt = select(ProductSKU).where(
+                    ProductSKU.product_id == product_id,
+                    ProductSKU.sku_id == sku_id,
+                    source == "next"
+                )
+                product_sku = db.execute(stmt).scalars().one_or_none()
+                if product_sku:
+                    r = cache.lpush(f"jinmao:{source}:{keyword}:indb", product)
+
+            indb_products = cache.lrange(f"jinmao:{source}:{keyword}:indb", 0, -1)
+            return {
+                "redis_result": all_products_sorted,
+                "indb_result": indb_products,
+                "indb_count": len(indb_products),
+                "all_count": len(all_products_sorted)
+            }
+
+            return {
+                "redis_result": all_products_sorted
+            }
+            ...
+    else:
+        if any(keyword in params.keyword for keyword in {'pyjamas', 'pajamas'}):
+            keyword = "pyjamas"
+            source = "next"
+            start = (params.page - 1) * params.page_size
+            end = start + params.page_size - 1
+            products: list[bytes] = cache.lrange(f"jinmao:{source}:{keyword}:indb", start, end)
+            product_index = [tuple(product.decode().split(', ')) for product in products]
+            stmt = select(ProductSKU).where(
+                tuple_(ProductSKU.product_id, ProductSKU.sku_id).in_(product_index),
+                ProductSKU.source == source
+            )
+            sku_list = db.execute(stmt).scalars().all()
+            return {
+                "total": cache.llen(f"jinmao:{source}:{keyword}:indb"),
+                "redis_result": product_index,
+                "sku_list": sku_list
+            }
+
+
+        return False
+        ...
+
+    
 
 
 app.include_router(router, prefix="/api")

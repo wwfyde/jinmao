@@ -134,7 +134,7 @@ class Settings(BaseSettings):
 
     @computed_field
     def redis_dsn(self) -> str:
-        return f"redis://:{self.redis.password}@{self.redis.host}:{self.redis.port}/{self.redis.db}"
+        return f"redis://:{self.redis.password}@{self.redis.host}:{self.redis.port}/{self.redis.db}?decode_responses=True"
 
     @computed_field
     def molook_db2_dsn(self) -> MySQLDsn:

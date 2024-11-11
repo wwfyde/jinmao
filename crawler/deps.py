@@ -1,8 +1,9 @@
 import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Generator
 
+import redis as redis_sync
 import redis.asyncio as redis
 
 from crawler.config import settings
@@ -22,8 +23,8 @@ async def create_pool() -> redis.ConnectionPool:
 
 
 async def get_redis_cache() -> AsyncGenerator[redis.Redis, None]:
-    pool = redis.ConnectionPool.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
-    r = redis.Redis(connection_pool=pool, decode_responses=True, protocol=3)
+    pool = redis.ConnectionPool.from_url(settings.redis_dsn, decode_responses=True)
+    r = redis.Redis(connection_pool=pool)
     async with r:
         print(await r.get("a"))
         yield r
@@ -61,16 +62,24 @@ def get_logger(name: str = __name__):
     return logger
 
 
+def get_redis_cache_sync() -> Generator[redis_sync.Redis, None, None]:
+    pool = redis_sync.ConnectionPool.from_url(settings.redis_dsn, decode_responses=True)
+    with redis_sync.Redis(connection_pool=pool) as r:
+        yield r
+
 async def main():
     # await redis_client.set("foo", "bar")
     # redis_client = await RedisClient.get_client()
     # print(await redis_client.get("a"))
-    r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+    r = redis.from_url(settings.redis_dsn, decode_responses=True)
     async with r:
+        print(await r.set("a", "你好"))
         print(await r.get("a"))
+    # await r.wait_closed()
     # return
-    async with await get_redis_cache().__anext__() as r:
-        print(await r.get("a"))
+    # async with await get_redis_cache().__anext__() as r:
+    #     print(await r.get("a"))
+
 
     # r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
     # async with r:

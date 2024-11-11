@@ -4,10 +4,11 @@ from enum import Enum
 import httpx
 from playwright.async_api import async_playwright, Playwright, Page
 
-from crawler import log
 from crawler.config import settings
+from crawler.deps import get_logger
 from projects.gap.gap import open_pdp_page
 
+log = get_logger(name='gap')
 # urls = [
 #     {
 #         "women": [
@@ -88,7 +89,7 @@ print(PLAYWRIGHT_TIMEOUT)
 PLAYWRIGHT_CONCURRENCY: int = settings.playwright.concurrency or 10
 PLAYWRIGHT_CONCURRENCY: int = 1
 PLAYWRIGHT_HEADLESS: bool = settings.playwright.headless
-# PLAYWRIGHT_HEADLESS: bool = True
+PLAYWRIGHT_HEADLESS: bool = False
 should_use_proxy = False
 __doc__ = """
     金茂爬虫, 主要通过按类别爬取和按搜索爬取两种方式
@@ -939,11 +940,14 @@ async def run(playwright: Playwright, urls: list[tuple]) -> None:
     ]
     sku_index = zip(products, sku_ids)
 
-    sku_index = [("879147", "879147002")]
-    sku_index = [('874579', '874579022')]
-    main_category = "men"
-    sub_category = "default"
-    for product_id, sku_id in sku_index:
+    # sku_index = [("879147", "879147002")]
+    sku_index = [
+        # ('737296', '737296842', 'men', 'default'),
+        # ('488948', '488948212', 'boys', 'default'),
+        # ('688194', '688194322', 'girls', 'default'),
+        ('669948', '669948462', 'boys', 'default'),
+    ]
+    for product_id, sku_id, main_category, sub_category in sku_index:
         tasks.append(
             open_pdp_page(
                 context,

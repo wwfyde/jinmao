@@ -1,4 +1,3 @@
-import asyncio
 import json
 import time
 from typing import Literal
@@ -343,6 +342,7 @@ if __name__ == '__main__':
     # asyncio.set_event_loop(loop)
     # loop.run_until_complete(main())
     # loop.close()
-    asyncio.run(product_run_sync())
+    # asyncio.run(product_run_sync())
     # asyncio.run(review_run_sync())
     # asyncio.run(review_run())
+    ...

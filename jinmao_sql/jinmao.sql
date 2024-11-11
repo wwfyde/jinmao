@@ -346,7 +346,7 @@ order by created_at desc;
 
 SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
 FROM information_schema.SCHEMATA
-WHERE SCHEMA_NAME = 'crawler';
+WHERE SCHEMA_NAME = 'comfy';
 
 select @@version;
 
@@ -359,3 +359,34 @@ SHOW TABLE STATUS WHERE Name = 'product_review';
 
 ALTER TABLE product_sku
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+select *
+from product
+where product_id = 'ppr5008338564';
+
+select distinct product.gender
+from product
+where product.source = 'gap';
+
+
+update product
+set gender = 'girls'
+where gender = 'baby_girls'
+  and source = 'gap';
+
+select sku_id, product_id, image_url, outer_image_url
+from product_sku
+where product_id = '496157';
+
+select count(*)
+from product_sku
+         join crawler.product p on p.product_id = product_sku.product_id
+where (product_name like '%pajama%' or product_name like '%pyjama%' or category like '%pajama%' or
+       category like '%pyjama%');
+
+select count(*)
+from product
+where source = 'next'
+  and (product_name like '%pajama%' or product_name like '%pyjama%' or category like '%pajama%' or
+       category like '%pyjama%');

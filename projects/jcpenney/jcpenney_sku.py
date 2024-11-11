@@ -72,9 +72,17 @@ async def run(
 
         tasks = []
         log.info(f"开始抓取 {main_categories=} {sub_categories=}")
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
+        pool = redis.ConnectionPool.from_url(settings.redis_dsn, decode_responses=True, protocol=3,
+                                             max_connections=1000)
+        r = redis.Redis(connection_pool=pool, decode_responses=True, protocol=3)
         key = f"{source}:{main_categories}:{sub_categories}"
+        # 判断类别是否抓取完毕
+
         async with r:
+            status = await r.get(f"category_task_status:{source}:{main_categories}:{sub_categories}")
+            if status == "done":
+                log.info(f"类别{main_categories}-{sub_categories}已经抓取过")
+                return
             product_urls = await r.smembers(key)
             log.info(f"类别: {main_categories}-{sub_categories}, 共获取到 {len(product_urls)} 个商品链接")
 
@@ -88,6 +96,7 @@ async def run(
                     url=url,
                     main_category=main_categories,
                     sub_category=sub_categories,
+                    r=r
                 )
             )
 
@@ -95,6 +104,10 @@ async def run(
         for result in task_results:
             if isinstance(result, Exception):
                 log.error(f"{result}")
+        log.info(f"抓取完成 {main_categories=} {sub_categories=}")
+        # 使用redis标记类别抓取状态, 避免再次扫描
+        async with r:
+            await r.set(f"category_task_status:{source}:{main_categories}:{sub_categories}", "done")
         await context.close()
 
 
@@ -105,12 +118,12 @@ async def open_pdp_page(
         *,
         source: str = "jcpenney",
         main_category: str = None,
-        sub_category: str = None
+        sub_category: str = None,
+        r: redis.Redis = None,
 ):
     async with semaphore:
         product_id = httpx.URL(url).path.split("/")[-1]  # 获取商品ID
 
-        r = redis.from_url(settings.redis_dsn, decode_responses=True, protocol=3)
         key = f"status:{source}:{product_id}"
         async with r:
             product_status = await r.get(key)
